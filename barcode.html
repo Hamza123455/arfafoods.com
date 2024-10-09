@@ -1152,9 +1152,9 @@
                     <h2>${item.urduName}</h2>
                     <div class="dates">
                         <span>MFG:</span>
-                        <input type="text" value="${formatDate(new Date(mfgDate))}" readonly />
+                        <input type="text" value="${formatDate(new Date(mfgDate))}" />
                         <span>EXP:</span>
-                        <input type="text" value="${formatDate(new Date(expDate))}" readonly />
+                        <input type="text" value="${formatDate(new Date(expDate))}" />
                     </div>
                     <img class="barcode-img" src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${item.code.trim()}&scale=3" alt="Barcode">
                     <div class="barcode-number">${item.code.trim()}</div>
