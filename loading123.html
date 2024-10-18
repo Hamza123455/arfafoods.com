@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
-    <meta http-equiv="refresh" content="3;url=https://example.com">
     <style>
         body {
             display: flex;
@@ -35,16 +34,14 @@
             height: 100%;
             width: 0;
             background-color: blue;
-            animation: loading 3s linear forwards;
+            display: none; /* Hide initially */
         }
         @keyframes loading {
             0% {
                 width: 0;
-                transform: translateX(0);
             }
             100% {
                 width: 100%;
-                transform: translateX(0);
             }
         }
         .spinner {
@@ -53,8 +50,12 @@
             border-radius: 50%;
             width: 40px;
             height: 40px;
-            animation: spin 1s linear infinite;
             margin-top: 20px; /* Space between loading text and spinner */
+            display: none; /* Hide initially */
+        }
+        .spinner.active {
+            animation: spin 1s linear infinite; /* Activate spinning */
+            display: block; /* Show the spinner */
         }
         @keyframes spin {
             0% {
@@ -64,18 +65,49 @@
                 transform: rotate(360deg);
             }
         }
+        .play-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
-    <script>
-        setTimeout(function() {
-            window.location.href = "adminpannel.html"; // Replace with your desired URL
-        }, 3000);
-    </script>
 </head>
 <body>
-    <div class="loading">Loading, please wait...</div>
+    <div class="loading">Click Start To Continue...</div>
     <div class="loading-bar">
-        <div class="bar"></div>
+        <div class="bar" id="loading-bar"></div>
     </div>
-    <div class="spinner"></div>
+    <div class="spinner" id="spinner"></div>
+    <audio id="loading-audio">
+        <source src="starting.mp3" type="audio/mpeg"> <!-- Replace with your music file -->
+        Your browser does not support the audio tag.
+    </audio>
+    <button class="play-button" onclick="startLoading()">Start</button> <!-- Button to play audio -->
+    <script>
+        function startLoading() {
+            const audio = document.getElementById("loading-audio");
+            const loadingBar = document.getElementById("loading-bar");
+            const spinner = document.getElementById("spinner");
+
+            // Show loading elements
+            loadingBar.style.display = 'block'; // Show the loading bar
+            spinner.classList.add('active'); // Start the spinner animation
+            audio.volume = 1.0; // Set volume to full
+            audio.play().catch(error => {
+                console.log("Audio playback failed:", error); // Log any errors
+            });
+
+            // Start loading animation
+            loadingBar.style.display = 'block';
+            loadingBar.classList.add('bar');
+            loadingBar.style.animation = 'loading 20s linear forwards'; // Set animation for loading bar
+
+            // Redirect after 20 seconds
+            setTimeout(() => {
+                window.location.href = 'adminpannel.html'; // Redirect to the desired URL
+            }, 20000); // 20 seconds
+        }
+    </script>
 </body>
 </html>
