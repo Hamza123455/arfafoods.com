@@ -3,111 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
+    <title>Loading-Page</title>
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient background */
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            text-align: center;
         }
-        .loading {
-            font-size: 24px;
-            color: #333;
-            z-index: 1;
-        }
-        .loading-bar {
-            position: absolute;
-            height: 4px;
-            width: 100%;
-            background-color: #e0e0e0;
-            bottom: 60px;
-            overflow: hidden;
-        }
-        .bar {
-            height: 100%;
-            width: 0;
-            background-color: blue;
-            display: none; /* Hide initially */
-        }
-        @keyframes loading {
-            0% {
-                width: 0;
-            }
-            100% {
-                width: 100%;
-            }
-        }
-        .spinner {
-            border: 8px solid #e0e0e0; /* Light gray */
-            border-top: 8px solid blue; /* Blue */
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 10px solid rgba(255, 255, 255, 0.2); /* Light border */
+            border-top: 10px solid #fff; /* White top */
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            margin-top: 20px; /* Space between loading text and spinner */
-            display: none; /* Hide initially */
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
-        .spinner.active {
-            animation: spin 1s linear infinite; /* Activate spinning */
-            display: block; /* Show the spinner */
-        }
+
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .play-button {
+
+        .loading-text {
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0.8;
+            animation: fadeIn 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="loading">Click Start To Continue...</div>
-    <div class="loading-bar">
-        <div class="bar" id="loading-bar"></div>
-    </div>
-    <div class="spinner" id="spinner"></div>
-    <audio id="loading-audio">
-        <source src="starting.mp3" type="audio/mpeg"> <!-- Replace with your music file -->
-        Your browser does not support the audio tag.
-    </audio>
-    <button class="play-button" onclick="startLoading()">Start</button> <!-- Button to play audio -->
+    <div class="loader"></div>
+    <div class="loading-text">Loading...</div>
+
     <script>
-        function startLoading() {
-            const audio = document.getElementById("loading-audio");
-            const loadingBar = document.getElementById("loading-bar");
-            const spinner = document.getElementById("spinner");
-
-            // Show loading elements
-            loadingBar.style.display = 'block'; // Show the loading bar
-            spinner.classList.add('active'); // Start the spinner animation
-            audio.volume = 1.0; // Set volume to full
-            audio.play().catch(error => {
-                console.log("Audio playback failed:", error); // Log any errors
-            });
-
-            // Start loading animation
-            loadingBar.style.display = 'block';
-            loadingBar.classList.add('bar');
-            loadingBar.style.animation = 'loading 20s linear forwards'; // Set animation for loading bar
-
-            // Redirect after 20 seconds
-            setTimeout(() => {
-                window.location.href = 'adminpannel.html'; // Redirect to the desired URL
-            }, 20000); // 20 seconds
-        }
+        setTimeout(() => {
+            window.location.href = "adminpannel.html"; // Change to your main content page
+        }, 5000); // 5000 milliseconds = 5 seconds
     </script>
 </body>
 </html>
