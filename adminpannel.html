@@ -67,6 +67,18 @@
             background-color: #f2f2f2;
             text-align: left;
         }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -75,7 +87,7 @@
             <h2>Admin Panel</h2>
             <a href="leaveform.HTML">Leaveform</a>
             <a href="barcode.html">Barcode File</a>
-            <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRj1WwucrI3OegJqcOXf47IA7Uj_-dAGBIA8VZY940RlKm2V8xjLTBctPY0uPLsq6SEtBB5BtxIVm3k/pubhtml?gid=1004172570&single=true">Sheet(updating...)</a>
+            <a href="#" id="google-sheet-link">Sheet 1.1</a>
             <a href="#reports">[] [] []</a>
             <a href="#settings">[] [] []</a>
         </aside>
@@ -97,5 +109,19 @@
             </div>
         </main>
     </div>
+    <div class="popup" id="popup-message">NOTE: THIS SHEET </div>
+
+    <script>
+        document.getElementById('google-sheet-link').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent the default link behavior
+            const popup = document.getElementById('popup-message');
+            popup.style.display = 'block'; // Show the popup
+            
+            setTimeout(function() {
+                popup.style.display = 'none'; // Hide the popup after 3 seconds
+                window.open('https://docs.google.com/spreadsheets/d/e/2PACX-1vRj1WwucrI3OegJqcOXf47IA7Uj_-dAGBIA8VZY940RlKm2V8xjLTBctPY0uPLsq6SEtBB5BtxIVm3k/pubhtml?gid=1004172570&single=true', '_blank'); // Open the Google Sheet
+            }, 3000);
+        });
+    </script>
 </body>
 </html>
