@@ -122,7 +122,10 @@
         </main>
     </div>
     
-    <div class="popup" id="popup-message">NOTE: THIS SHEET WILL UPDATE FROM TIME TO TIME</div>
+    <div class="popup" id="popup-message">
+        NOTE: THIS SHEET WILL UPDATE FROM TIME TO TIME<br>
+        TO VIEW SPECIFIC ITEM IN LIST, PLEASE SEARCH FROM BROWSER SETTING.
+    </div>
 
     <script>
         document.getElementById('google-sheet-link').addEventListener('click', function(event) {
@@ -133,7 +136,7 @@
             setTimeout(function() {
                 popup.style.display = 'none'; // Hide the popup after 3 seconds
                 window.open('https://docs.google.com/spreadsheets/d/e/2PACX-1vRj1WwucrI3OegJqcOXf47IA7Uj_-dAGBIA8VZY940RlKm2V8xjLTBctPY0uPLsq6SEtBB5BtxIVm3k/pubhtml?gid=234044044&single=true'); // Open the Google Sheet
-            }, 3000);
+            }, 6000);
         });
 
          // Event listener for dropdown menu to navigate to the selected page
