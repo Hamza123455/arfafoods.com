@@ -142,8 +142,10 @@
          // Event listener for dropdown menu to navigate to the selected page
          document.getElementById('dropdown-menu').addEventListener('change', function(event) {
             var selectedValue = event.target.value;
-            if (selectedValue) {
-                window.location.href = selectedValue; // Navigate to the selected URL
+             
+           // Only redirect if the value is not the placeholder
+            if (selectedValue !== "#") {
+                window.location.href = selectedValue; // Redirect to the selected page
             }
         });
     </script>
