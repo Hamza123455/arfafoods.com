@@ -132,10 +132,11 @@
             const popup = document.getElementById('popup-message');
             popup.style.display = 'block'; // Show the popup
             
-            setTimeout(function() {
+           setTimeout(function() {
                 popup.style.display = 'none'; // Hide the popup after 3 seconds
-                window.open('https://docs.google.com/spreadsheets/d/e/2PACX-1vRj1WwucrI3OegJqcOXf47IA7Uj_-dAGBIA8VZY940RlKm2V8xjLTBctPY0uPLsq6SEtBB5BtxIVm3k/pubhtml?gid=234044044&single=true'); // Open the Google Sheet
-            }, 6000);
+                // Use window.location.href to navigate to the Google Sheet in the same tab
+                window.location.href = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRj1WwucrI3OegJqcOXf47IA7Uj_-dAGBIA8VZY940RlKm2V8xjLTBctPY0uPLsq6SEtBB5BtxIVm3k/pubhtml?gid=234044044&single=true'; 
+            }, 6000); // After 6 seconds, navigate to the Google Sheet
         });
 
          // Event listener for dropdown menu to navigate to the selected page
