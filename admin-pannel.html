@@ -86,6 +86,50 @@
             border-radius: 4px;
             border: 1px solid #ccc;
         }
+        /* Media Queries for mobile responsiveness */
+        @media (max-width: 768px) {
+            /* Sidebar styles for smaller screens */
+            .sidebar {
+                width: 100%;
+                height: auto;
+                box-shadow: none;
+                padding: 10px;
+            }
+
+            /* Adjust main content */
+            .main-content {
+                width: 100%;
+                padding: 10px;
+            }
+
+            /* Ensure cards fit on small screens */
+            .card {
+                margin: 10px 0;
+                padding: 15px;
+            }
+
+            /* Adjust table for smaller screens */
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Further adjustments for very small screens (phones) */
+            .card-header {
+                font-size: 1.2em;
+            }
+
+            /* Adjust popup font size */
+            .popup {
+                width: 80%;
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
