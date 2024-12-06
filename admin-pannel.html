@@ -7,37 +7,50 @@
     <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
     <style>
-        /* Basic styling for layout */
+     /* Basic styling for layout */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
         }
+
+        /* Flexbox layout for main container */
         .container {
             display: flex;
+            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
         }
+
+        /* Sidebar styles */
         .sidebar {
             width: 250px;
-            background-color: #1d86af;
-            color: #7021b1;
+            background-color: #333;
+            color: #fff;
             height: 100vh;
             padding: 20px;
-            box-shadow: 2px 0 5px rgb(4, 111, 153);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
+
         .sidebar a {
             color: #fff;
             text-decoration: none;
             display: block;
             padding: 10px 0;
         }
+
         .sidebar a:hover {
-            background-color: #1883c0;
+            background-color: #575757;
         }
+
+        /* Main content styles */
         .main-content {
             flex: 1;
             padding: 20px;
+            box-sizing: border-box; /* Ensure padding doesn't affect width */
+            width: 100%;
         }
+
+        /* Card styles */
         .card {
             background: #fff;
             border-radius: 8px;
@@ -45,27 +58,29 @@
             padding: 20px;
             margin-bottom: 20px;
         }
+
         .card-header {
             font-size: 1.5em;
             margin-bottom: 10px;
         }
-        .chart-container {
-            width: 100%;
-            height: 400px;
-            margin-bottom: 20px;
-        }
+
+        /* Table styles */
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
         }
+
         th {
             background-color: #f2f2f2;
             text-align: left;
         }
+
+        /* Popup styles */
         .popup {
             display: none;
             position: fixed;
@@ -78,14 +93,7 @@
             border-radius: 8px;
             z-index: 1000;
         }
-        select {
-            padding: 8px;
-            font-size: 1em;
-            width: 100%;
-            margin: 10px 0;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+
         /* Media Queries for mobile responsiveness */
         @media (max-width: 768px) {
             /* Sidebar styles for smaller screens */
