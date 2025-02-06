@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,37 +20,78 @@
         .login-container {
             text-align: center;
             background-color: rgb(82, 18, 102);
-            padding: 40px; /* Increased padding for larger box */
+            padding: 40px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            width: 300px; /* Fixed width for consistency */
+            width: 50%;
+	    height: 300px;
+            background-image: url('logo 1.0.01.jpg');
+            background-size: cover;
+            background-position: center;
+            transition: all 0.5s ease;
         }
 
         h1 {
-            margin-bottom: 30px; /* Adjusted margin for more space */
+            margin-bottom: 30px;
+            color: #fff;
         }
 
         .signin-button {
-            padding: 15px 30px; /* Increased button size */
-            font-size: 18px; /* Larger font size */
+            padding: 15px 30px;
+            font-size: 18px;
             color: rgb(154, 38, 184);
             background-color: #2434c2;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s, box-shadow 0.3s; /* Added transition for box-shadow */
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .signin-button:hover {
             background-color: #0056b3;
-            box-shadow: 0 0 20px rgba(0, 123, 255, 0.8); /* Glowing effect */
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+        }
+
+        /* Animation for clockwise rotation */
+        @keyframes rotateClockwise {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Add the animation to the container */
+        .rotate-animation {
+            animation: rotateClockwise 0.5s ease forwards; /* Clockwise rotation animation */
+            width: 150px;
+            height: 150px;
+            padding: 20px;
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Welcome</h1>
-        <button onclick="window.location.href='loading123.html';">Sign In</button>
+    <div class="login-container" id="loginContainer">
+        
+      
     </div>
+    <div class="login-buttoncontainer" id=loginButton">
+	    
+            <button class="signin-button" onclick="animateLogo()">Sign In</button>
+    </div>
+
+    <script>
+        function animateLogo() {
+            var container = document.getElementById('loginContainer');
+            // Add the rotation animation class when the user clicks the Sign In button
+            container.classList.add('rotate-animation');
+            // Redirect after animation
+            setTimeout(function() {
+                window.location.href = 'loading123.html';
+            }, 500); // Match the duration of the animation
+        }
+    </script>
 </body>
 </html>
