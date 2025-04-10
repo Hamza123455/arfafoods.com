@@ -25,36 +25,13 @@
     <button type="button" onclick="addEmployee()">Add New Employee</button>
   </form>
 
+  <!-- Button to manually trigger GitHub Action -->
+  <button onclick="triggerWorkflow()">Run Workflow</button>
+
   <script>
     let employees = [];
 
-    const githubToken = 'YOUR_GITHUB_TOKEN_HERE'; // Replace with your GitHub token
-    const owner = 'Hamza123455';  // Your GitHub username
-    const repo = 'masterfile'; // Your GitHub repository name
-    const filePath = 'employees.json'; // Path to the file in your repo (ensure it exists or can be created)
-
-    // Fetch existing employee data when the page loads
-    async function loadEmployees() {
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-
-      if (response.status === 200) {
-        const data = await response.json();
-        const fileContent = atob(data.content); // Decode base64 content
-        employees = JSON.parse(fileContent).employees || []; // Parse JSON and get employee list
-      } else {
-        console.error('Error fetching file from GitHub:', response.status);
-        alert('No employee data found or error fetching file from GitHub.');
-      }
-    }
-
-    // Add a new employee
+    // Function to add a new employee and trigger the GitHub Action
     async function addEmployee() {
       // Get form values
       const name = document.getElementById('name').value;
@@ -77,66 +54,36 @@
       // Clear the form
       document.getElementById('employeeForm').reset();
 
-      // Update the file on GitHub
-      await updateGitHubFile();
+      // Trigger the GitHub Action to update the file
+      await triggerWorkflow();
     }
 
-    // Update GitHub file with the new employee list
-    async function updateGitHubFile() {
+    // Function to trigger the GitHub Action workflow (via GitHub API)
+    async function triggerWorkflow() {
       try {
-        // Get the current content of the file (to get its SHA for update)
-        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
-        const response = await fetch(url, {
-          method: 'GET',
+        const response = await fetch('https://api.github.com/repos/your_username/your_repo/actions/workflows/update-employee-data.yml/dispatches', {
+          method: 'POST',
           headers: {
-            'Authorization': `token ${githubToken}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-
-        let sha;
-        if (response.status === 200) {
-          const data = await response.json();
-          sha = data.sha;  // Get the SHA if the file exists
-        } else if (response.status === 404) {
-          sha = null; // File doesn't exist, no SHA needed for the first push
-        } else {
-          console.error('Error fetching file from GitHub:', response.status);
-          alert('Error fetching file from GitHub.');
-          return;
-        }
-
-        // Prepare the content for the file (base64 encoded)
-        const content = btoa(JSON.stringify({ employees }, null, 2)); // btoa to encode as base64
-
-        // Push the updated content to GitHub
-        const updateResponse = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Accept': 'application/vnd.github.v3+json'
+            'Authorization': `token YOUR_GITHUB_TOKEN`, // Replace with your GitHub token or use a GitHub Action secret
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message: 'Add new employee',
-            content: content,
-            sha: sha,  // Include SHA if updating an existing file
-          })
+            ref: 'main', // Reference to the branch (usually main)
+          }),
         });
 
-        if (updateResponse.ok) {
-          alert('Employee data updated successfully on GitHub!');
+        if (response.ok) {
+          alert('Employee added and GitHub Action triggered successfully!');
         } else {
-          console.error('Error updating file on GitHub:', await updateResponse.text());
-          alert('Failed to update employee data on GitHub.');
+          console.error('Error triggering workflow:', await response.text());
+          alert('Error triggering workflow.');
         }
       } catch (error) {
-        console.error('Error updating GitHub file:', error);
-        alert('There was an error updating the file on GitHub.');
+        console.error('Error triggering workflow:', error);
+        alert('Error triggering workflow.');
       }
     }
-
-    // Load the employees when the page is ready
-    loadEmployees();
   </script>
 </body>
 </html>
