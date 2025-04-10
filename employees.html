@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee JSON Creator</title>
+</head>
+<body>
+  <h1>Create Employee JSON</h1>
+
+  <!-- Employee Input Form -->
+  <form id="employeeForm">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="role">Role:</label><br>
+    <input type="text" id="role" name="role" required><br><br>
+
+    <label for="department">Department:</label><br>
+    <input type="text" id="department" name="department" required><br><br>
+
+    <button type="button" onclick="addEmployee()">Add New Employee</button>
+  </form>
+
+  <script>
+    let employees = [];
+
+    const githubToken = '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'; // Replace with your GitHub token
+    const owner = 'Hamza123455';  // Your GitHub username
+    const repo = 'arfafoods.com'; // Your GitHub repository name
+    const filePath = 'employees.json'; // Path to the file in your repo (ensure it exists or can be created)
+
+    // Fetch existing employee data when the page loads
+    async function loadEmployees() {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        const fileContent = atob(data.content); // Decode base64 content
+        employees = JSON.parse(fileContent).employees || []; // Parse JSON and get employee list
+      } else {
+        console.error('Error fetching file from GitHub:', response.status);
+        alert('No employee data found or error fetching file from GitHub.');
+      }
+    }
+
+    // Add a new employee
+    async function addEmployee() {
+      // Get form values
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const role = document.getElementById('role').value;
+      const department = document.getElementById('department').value;
+
+      // Check if form values are valid
+      if (!name || !email || !role || !department) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      // Create new employee object
+      const employee = { name, email, role, department };
+
+      // Add the employee to the array
+      employees.push(employee);
+
+      // Clear the form
+      document.getElementById('employeeForm').reset();
+
+      // Update the file on GitHub
+      await updateGitHubFile();
+    }
+
+    // Update GitHub file with the new employee list
+    async function updateGitHubFile() {
+      try {
+        // Get the current content of the file (to get its SHA for update)
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+
+        let sha;
+        if (response.status === 200) {
+          const data = await response.json();
+          sha = data.sha;  // Get the SHA if the file exists
+        } else if (response.status === 404) {
+          sha = null; // File doesn't exist, no SHA needed for the first push
+        } else {
+          console.error('Error fetching file from GitHub:', response.status);
+          alert('Error fetching file from GitHub.');
+          return;
+        }
+
+        // Prepare the content for the file (base64 encoded)
+        const content = btoa(JSON.stringify({ employees }, null, 2)); // btoa to encode as base64
+
+        // Push the updated content to GitHub
+        const updateResponse = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify({
+            message: 'Add new employee',
+            content: content,
+            sha: sha,  // Include SHA if updating an existing file
+          })
+        });
+
+        if (updateResponse.ok) {
+          alert('Employee data updated successfully on GitHub!');
+        } else {
+          console.error('Error updating file on GitHub:', await updateResponse.text());
+          alert('Failed to update employee data on GitHub.');
+        }
+      } catch (error) {
+        console.error('Error updating GitHub file:', error);
+        alert('There was an error updating the file on GitHub.');
+      }
+    }
+
+    // Load the employees when the page is ready
+    loadEmployees();
+  </script>
+</body>
+</html>
