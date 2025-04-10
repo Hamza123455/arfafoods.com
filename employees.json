@@ -5,6 +5,12 @@
       "email": "gill@gmail.com",
       "role": "abc",
       "department": "cba"
+    },
+    {
+      "name": "shan ali",
+      "email": "mh98h@gmail.com",
+      "role": "asdf",
+      "department": "sfasd"
     }
   ]
 }
