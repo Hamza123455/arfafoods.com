@@ -1,0 +1,22 @@
+name: Update Employee Data
+
+on:
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Update Employees Data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub secret for authentication
+        run: |
+          echo "Updating employee data..."
+          # Example: You can use curl or a script to update the file in your repository.
+          curl -X PUT -H "Authorization: token $GITHUB_TOKEN" \
+               -d '{"message": "Update employee data", "content": "NEW_BASE64_ENCODED_CONTENT"}' \
+               https://api.github.com/repos/your_username/your_repo/contents/employees.json
