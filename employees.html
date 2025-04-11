@@ -48,7 +48,7 @@
       // Create new employee object
       const employee = { name, email, role, department };
 
-      // Add the employee to the array
+      // Add the employee to the array (for display or later use)
       employees.push(employee);
 
       // Clear the form
@@ -60,15 +60,15 @@
 
     // Function to trigger the GitHub Action workflow (via GitHub API)
     async function triggerWorkflow(name, email, role, department) {
-      const response = await fetch("https://api.github.com/repos/hamza123455/arfafoods.com/actions/workflows/update.json.yml/dispatches", {
+      const response = await fetch("https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/actions/workflows/update.json.yml/dispatches", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer YOUR_TOKEN", // ⚠️ Use GitHub Secret in backend or test locally
+          "Authorization": `Bearer ${await getGitHubToken()}`, // Securely use the token from the backend or GitHub secret
           "Accept": "application/vnd.github+json",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          ref: "main",
+          ref: "main", // The branch you're working on (usually 'main')
           inputs: { name, email, role, department }
         })
       });
@@ -80,6 +80,14 @@
         console.error("Error triggering workflow:", errorText);
         alert("Error triggering workflow.");
       }
+    }
+
+    // Function to securely fetch GitHub token (use backend or GitHub secret for real use)
+    async function getGitHubToken() {
+      // In production, you should securely get the token from your backend server or GitHub Secrets
+      // For example, a backend endpoint could return the token securely.
+      // Below is a placeholder for local testing purposes:
+      return "YOUR_TOKEN";  // Replace with your GitHub token or method to get it from a backend
     }
   </script>
 </body>
