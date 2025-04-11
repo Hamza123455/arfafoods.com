@@ -59,31 +59,28 @@
     }
 
     // Function to trigger the GitHub Action workflow (via GitHub API)
-    async function triggerWorkflow() {
-      try {
-        const response = await fetch('https://api.github.com/repos/your_username/your_repo/actions/workflows/update-employee-data.yml/dispatches', {
-          method: 'POST',
-          headers: {
-            'Authorization': `token YOUR_GITHUB_TOKEN`, // Replace with your GitHub token or use a GitHub Action secret
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ref: 'main', // Reference to the branch (usually main)
-          }),
-        });
+async function triggerWorkflow(name, email, role, department) {
+  const response = await fetch("https://api.github.com/repos/hamza123455/masterfile/actions/workflows/update.json.yml/dispatches", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer YOUR_TOKEN", // ⚠️ Use GitHub Secret in backend or test locally
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      ref: "main",
+      inputs: { name, email, role, department }
+    })
+  });
 
-        if (response.ok) {
-          alert('Employee added and GitHub Action triggered successfully!');
-        } else {
-          console.error('Error triggering workflow:', await response.text());
-          alert('Error triggering workflow.');
-        }
-      } catch (error) {
-        console.error('Error triggering workflow:', error);
-        alert('Error triggering workflow.');
-      }
-    }
+  if (response.ok) {
+    alert("GitHub Action triggered successfully!");
+  } else {
+    const errorText = await response.text();
+    console.error("Error triggering workflow:", errorText);
+    alert("Error triggering workflow.");
+  }
+}
   </script>
 </body>
 </html>
