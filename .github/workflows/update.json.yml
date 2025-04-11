@@ -1,0 +1,38 @@
+name: Update Employee JSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Employee name'
+        required: true
+      email:
+        description: 'Employee email'
+        required: true
+      role:
+        description: 'Employee role'
+        required: true
+      department:
+        description: 'Employee department'
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Update employees.json
+        run: |
+          jq --arg name "${{ github.event.inputs.name }}" \
+             --arg email "${{ github.event.inputs.email }}" \
+             --arg role "${{ github.event.inputs.role }}" \
+             --arg dept "${{ github.event.inputs.department }}" \
+             '.employees += [{"name": $name, "email": $email, "role": $role, "department": $dept}]' employees.json > temp.json
+          mv temp.json employees.json
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Added new employee from form"
