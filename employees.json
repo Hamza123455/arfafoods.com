@@ -17,6 +17,12 @@
       "email": "mh6537132@gmail.com",
       "role": "ABC",
       "department": "CBA"
+    },
+    {
+      "name": "john",
+      "email": "doe@gmai.com",
+      "role": "abc",
+      "department": "sdlkf"
     }
   ]
 }
