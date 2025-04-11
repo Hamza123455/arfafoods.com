@@ -4,35 +4,34 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: 'Employee name'
+        description: 'Employee Name'
         required: true
       email:
-        description: 'Employee email'
+        description: 'Employee Email'
         required: true
       role:
-        description: 'Employee role'
+        description: 'Employee Role'
         required: true
       department:
-        description: 'Employee department'
+        description: 'Employee Department'
         required: true
 
 jobs:
-  update:
+  update_json:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Update employees.json
+      - name: Update Employee JSON
         run: |
-          jq --arg name "${{ github.event.inputs.name }}" \
-             --arg email "${{ github.event.inputs.email }}" \
-             --arg role "${{ github.event.inputs.role }}" \
-             --arg dept "${{ github.event.inputs.department }}" \
-             '.employees += [{"name": $name, "email": $email, "role": $role, "department": $dept}]' employees.json > temp.json
-          mv temp.json employees.json
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Added new employee from form"
+          EMPLOYEE_FILE="employees.json"
+          if [ -f $EMPLOYEE_FILE ]; then
+            cat $EMPLOYEE_FILE | jq ".employees += [{\"name\":\"${{ github.event.inputs.name }}\", \"email\":\"${{ github.event.inputs.email }}\", \"role\":\"${{ github.event.inputs.role }}\", \"department\":\"${{ github.event.inputs.department }}\"}]" > temp.json && mv temp.json $EMPLOYEE_FILE
+          else
+            echo "{\"employees\": [{\"name\":\"${{ github.event.inputs.name }}\", \"email\":\"${{ github.event.inputs.email }}\", \"role\":\"${{ github.event.inputs.role }}\", \"department\":\"${{ github.event.inputs.department }}\"}]}" > $EMPLOYEE_FILE
+          fi
+          git config --global user.email "your-email@example.com"
+          git config --global user.name "Your Name"
+          git commit -am "Add new employee"
+          git push
