@@ -288,6 +288,8 @@ table {
         return;
       }
 
+      employees = employees.sort((a, b) => parseInt(a.srno) - parseInt(b.srno));
+
       const table = document.createElement('table');
       table.id = 'employeeTable';
 
