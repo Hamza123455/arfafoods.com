@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>employeesmasterdata</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+  
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background-color: #f4f6f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+  
+    h1, h2, h3 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+  
+    #employeeFormContainer {
+      background-color: #fff;
+      padding: 30px 25px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+    }
+  
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+      text-align: left;
+    }
+  
+    input:focus, textarea:focus, select:focus {
+      border-color: #007BFF;
+      outline: none;
+    }
+  
+    input[type="file"] {
+      padding: 5px;
+    }
+  
+    button, .btn {
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      font-size: 14px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px 3px 0 0;
+      transition: background-color 0.2s ease;
+    }
+  
+    .btn:hover, button:hover {
+      background-color: #0056b3;
+    }
+  
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+  
+    .table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 25px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+table {
+      width: 205%;
+      border-collapse: collapse;
+      margin-top: 5px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+      -ms-text-size-adjust: 1px;
+    }
+
+    th {
+      background-color: #a53838;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .btn {
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 5px;
+    }
+  </style>
+  
+</head>
+<body>
+
+  <h1>Employee Master Data</h1>
+
+  <!-- Add Button -->
+  <button id="showFormBtn" class="btn" onclick="showEmployeeForm()">Add New Employee</button>
+
+  <!-- Form Panel (Hidden by default) -->
+  <div id="employeeFormContainer" class="hidden">
+    <form id="employeeForm">
+      <input type="number" id="srno" placeholder="Sr No" required>
+      <input type="number" id="empid" placeholder="Emp ID" required>
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="fathername" placeholder="Father Name" required>
+      <input type="text" id="education" placeholder="Education" required>
+      <input type="text" id="department" placeholder="Department" required>
+      <input type="text" id="dateofbirth" placeholder="Date of Birth" required>
+      <input type="text" id="cnic" maxlength="15" placeholder="CNIC (12345-1234567-1)" required>
+      <input type="text" id="fathercnic" maxlength="15" placeholder="Father CNIC (12345-1234567-1)" required>
+      <input type="text" id="empcurrentaddress" placeholder="Current Address" required>
+      <input type="text" id="empparmaddress" placeholder="Permanent Address" required>
+      <input type="number" id="empcontactno" placeholder="Contact No" required>
+      <input type="number" id="empfatherno" placeholder="Parent Contact No" required>
+      <input type="text" id="maritialstatus" placeholder="Marital Status" required>
+      <input type="number" id="familycount" placeholder="Family Count" required>
+      <input type="text" id="fatherjob" placeholder="Father's Occupation" required>
+      <input type="text" id="emppreviousjob" placeholder="Previous Job" required>
+      <input type="text" id="referenceby" placeholder="Reference" required>
+      <input type="number" id="refcontact" placeholder="Reference Contact" required>
+      <input type="text" id="refadd" placeholder="Reference Address" required>
+      <input type="text" id="dateofjoining" placeholder="Date of Joining" required>
+      <input type="number" id="salary" placeholder="Salary" required>
+      <div class="form-actions">
+      <button type="button" class="btn" onclick="addEmployee()">Add Employee</button>
+      <button type="button" class="btn" onclick="hideEmployeeForm()" style="background-color:#dc3545;">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Excel Upload -->
+  <h3>Import from Excel File</h3>
+  <input type="file" id="excelFile" accept=".xlsx" />
+  <button class="btn" onclick="importFromExcel()">Import Excel File</button><br>
+  <button class="btn" onclick="toggleTable()">Show/Hide Employee Table</button>
+  <button onclick="exportToExcel()">Export to Excel</button>
+
+  <!-- Admin Tools -->
+  <h3>Admin Actions</h3>
+  <input type="password" id="deletePassword" placeholder="Enter password to delete all" />
+  <button class="btn" style="background-color:#dc3545;" onclick="deleteAllEmployees()">Delete Record</button>
+
+  <div id="employeeTableContainer" class="hidden">
+    <h2>Employee Records</h2>
+    <div id="employeeList"></div>
+    <br>
+    <button class="btn" onclick="exportToExcel()">Export Table to Excel</button>  
+  </div>
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const githubToken = 'TOKEN WILL HERE'; // Replace in production
+    const owner = 'Hamza123455';
+    const repo = 'masterfile';
+    const filePath = 'employees.json';
+    let employees = [];
+    let editingIndex = -1;
+    let employeePassword = '';
+
+    ['cnic', 'fathercnic'].forEach(id => {
+      document.getElementById(id).addEventListener('input', function () {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
+        if (v.length > 13) v = v.slice(0, 13) + '-' + v.slice(13, 14);
+        this.value = v.slice(0, 15);
+      });
+    });
+
+    function showEmployeeForm() {
+      document.getElementById('employeeFormContainer').classList.remove('hidden');
+      document.getElementById('employeeForm').reset();
+      document.getElementById('showFormBtn').style.display = 'none';
+    }
+
+    function hideEmployeeForm() {
+      document.getElementById('employeeFormContainer').classList.add('hidden');
+      document.getElementById('showFormBtn').style.display = 'inline-block';
+    }
+
+    async function loadEmployees() {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `token ${githubToken}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const jsonData = JSON.parse(atob(data.content));
+        employees = jsonData.employees || [];
+        employeePassword = jsonData.password || "";
+        renderEmployeeList();
+      }
+    }
+
+    async function updateGitHubFile() {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+      const getRes = await fetch(url, {
+        headers: { 'Authorization': `token ${githubToken}` }
+      });
+      const sha = (await getRes.json()).sha;
+      const body = {
+        message: "Update employee list",
+        content: btoa(JSON.stringify({ password: employeePassword, employees }, null, 2)),
+        sha
+      };
+      await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify(body)
+      });
+    }
+
+    function addEmployee() {
+  const fields = ['srno', 'empid', 'name', 'fathername', 'education', 'department', 'dateofbirth', 'cnic', 'fathercnic', 'empcurrentaddress', 'empparmaddress', 'empcontactno', 'empfatherno', 'maritialstatus', 'familycount', 'fatherjob', 'emppreviousjob', 'referenceby', 'refcontact', 'refadd', 'dateofjoining', 'salary'];
+  const emp = {};
+  for (let f of fields) {
+    const val = document.getElementById(f).value.trim();
+    if (!val) return alert("Please fill all fields");
+    emp[f] = val;
+  }
+
+  if (editingIndex >= 0) {
+    employees[editingIndex] = emp; // Update existing
+    editingIndex = -1; // Reset after edit
+  } else {
+    employees.push(emp); // Add new
+  }
+
+  document.getElementById('employeeForm').reset();
+  hideEmployeeForm();
+  updateGitHubFile();
+  renderEmployeeList();
+}
+
+
+    function renderEmployeeList() {
+      const container = document.getElementById('employeeList');
+      container.innerHTML = '';
+
+      if (employees.length === 0) {
+        container.innerHTML = '<p>No employee added yet.</p>';
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.id = 'employeeTable';
+
+      const header = table.insertRow();
+      const keys = Object.keys(employees[0]);
+      keys.forEach(key => {
+        const th = document.createElement('th');
+        th.textContent = key;
+        header.appendChild(th);
+      });
+      const thActions = document.createElement('th');
+      thActions.textContent = 'Actions';
+      header.appendChild(thActions);
+
+      const filterRow = table.insertRow();
+      keys.forEach((key, i) => {
+        const td = document.createElement('td');
+        td.innerHTML = `<input type="text" data-index="${i}" placeholder="Search ${key}" oninput="filterByColumn(this)">`;
+        filterRow.appendChild(td);
+      });
+      filterRow.appendChild(document.createElement('td'));
+
+      employees.forEach((emp, idx) => {
+        const row = table.insertRow();
+        keys.forEach(key => {
+          const td = row.insertCell();
+          td.textContent = emp[key];
+        });
+        const actionCell = row.insertCell();
+        actionCell.innerHTML = `
+          <button class="btn" onclick="editEmployee(${idx})">Edit</button>
+          <button class="btn" style="background-color:#dc3545;" onclick="deleteEmployee(${idx})">Delete</button>
+        `;
+      });
+
+      container.appendChild(table);
+    }
+
+    function editEmployee(index) {
+     const emp = employees[index];
+  editingIndex = index; // Set the index we're editing
+  showEmployeeForm();   // Show the form first
+  for (const key in emp) {
+    const input = document.getElementById(key);
+    if (input) input.value = emp[key];
+  }
+}
+
+
+    async function deleteEmployee(index) {
+      if (confirm("Delete this employee?")) {
+        employees.splice(index, 1);
+        await updateGitHubFile();
+        renderEmployeeList();
+      }
+    }
+
+    function toggleTable() {
+      const table = document.getElementById('employeeTableContainer');
+      table.classList.toggle('hidden');
+      if (!table.classList.contains('hidden')) {
+        renderEmployeeList();
+      }
+    }
+
+    function pasteFromExcel() {
+      const raw = document.getElementById('excelPasteArea').value.trim();
+      if (!raw) return alert('Please paste some data');
+      const lines = raw.split('\n');
+      const fieldMap = ['srno', 'empid', 'name', 'fathername', 'education', 'department', 'dateofbirth', 'cnic', 'fathercnic', 'empcurrentaddress', 'empparmaddress', 'empcontactno', 'empfatherno', 'maritialstatus', 'familycount', 'fatherjob', 'emppreviousjob', 'referenceby', 'refcontact', 'refadd', 'dateofjoining', 'salary'];
+      for (let line of lines) {
+        const cols = line.split('\t');
+        if (cols.length < fieldMap.length) continue;
+        const emp = {};
+        for (let i = 0; i < fieldMap.length; i++) {
+          emp[fieldMap[i]] = cols[i].trim();
+        }
+        employees.push(emp);
+      }
+      document.getElementById('excelPasteArea').value = '';
+      updateGitHubFile();
+      renderEmployeeList();
+    }
+
+    function importFromExcel() {
+      const input = document.getElementById('excelFile');
+      if (!input.files.length) return alert('Select an Excel file');
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        const requiredHeaders = ["srno", "empid", "name", "fathername", "education", "department", "dateofbirth", "cnic", "fathercnic","empcurrentaddress", "empparmaddress", "empcontactno", "empfatherno", "maritialstatus", "familycount", "fatherjob", "emppreviousjob", "referenceby", "refcontact", "refadd", "dateofjoining", "salary"];
+        for (const row of jsonData) {
+          const emp = {};
+          for (const key of requiredHeaders) {
+            if (!(key in row)) return alert(`Missing column: ${key}`);
+            emp[key] = row[key];
+          }
+          employees.push(emp);
+        }
+        updateGitHubFile();
+        renderEmployeeList();
+      };
+      reader.readAsArrayBuffer(input.files[0]);
+    }
+
+    async function deleteAllEmployees() {
+      const inputPassword = document.getElementById('deletePassword').value.trim();
+      if (!inputPassword) return alert("Please enter a password");
+      if (inputPassword !== employeePassword) return alert("Incorrect password");
+      if (!confirm("Are you sure you want to delete ALL employee records?")) return;
+
+      employees = [];
+      await updateGitHubFile();
+      renderEmployeeList();
+      alert("All employee records deleted.");
+    }
+
+    function filterByColumn(input) {
+      const index = input.getAttribute('data-index');
+      const value = input.value.toLowerCase();
+      const table = document.getElementById('employeeTable');
+      if (!table) return;
+      const rows = table.querySelectorAll('tr');
+      for (let i = 2; i < rows.length; i++) {
+        const cell = rows[i].cells[index];
+        if (cell && !cell.textContent.toLowerCase().includes(value)) {
+          rows[i].style.display = 'none';
+        } else {
+          rows[i].style.display = '';
+        }
+      }
+    }
+    function exportToExcel() {
+      if (employees.length === 0) return alert("No employee data to export.");
+
+      const worksheet = XLSX.utils.json_to_sheet(employees);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Employees");
+      XLSX.writeFile(workbook, "EmployeeData.xlsx");
+    }
+
+    loadEmployees();
+
+    function autoResizeInput(input) {
+      const tempSpan = document.createElement("span");
+      tempSpan.style.visibility = "hidden";
+      tempSpan.style.whiteSpace = "pre";
+      tempSpan.style.position = "absolute";
+      tempSpan.style.font = window.getComputedStyle(input).font;
+      tempSpan.textContent = input.value || input.placeholder || "";
+      document.body.appendChild(tempSpan);
+      input.style.width = (tempSpan.offsetWidth + 20) + "px";
+      document.body.removeChild(tempSpan);
+    }
+  </script>
+</body>
+</html>
