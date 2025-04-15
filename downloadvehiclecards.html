@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Arfa Foods - Download PDFs</title>
+    <link rel="icon" href="logo1.0.00.jpg" type="image/jpg" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .file-card {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-title {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 600px) {
+            .file-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .download-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📄 Arfa Foods PDFs</h1>
+    <p>Tap a file below to download it instantly</p>
+
+    <div class="container">
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('AHM 828.pdf')">AHM 828 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('AYQ 082.pdf')">AYQ 082 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('CAQ 127.pdf')">AQ 127 </button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('RIS 3496.pdf')">RIS 3496 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('RIS 871.pdf')">RIS 871 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('STS 8.pdf')">STS 8 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TAB 863.pdf')">TAB 863 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TAB 904.pdf')">TAB 904 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TAE 833.pdf')">TAE 833 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TAE 834.pdf')">TAE 834 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TB 404.pdf')">TB 404 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TB 737.pdf')">TB 737 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TC 222.pdf')">TC 222 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TZ 403.pdf')">TZ 403 File</button>
+        </div>
+        <div class="file-card">
+            <button class="download-btn" onclick="downloadPDF('TZ 736.pdf')">TZ 736 File</button>
+        </div>
+        <!-- Add more file cards below if needed -->
+    </div>
+
+    <script>
+        function downloadPDF(fileName) {
+            const baseURL = 'https://raw.githubusercontent.com/Hamza123455/masterfile/main/';
+            const fullURL = baseURL + fileName;
+
+            const a = document.createElement('a');
+            a.href = fullURL;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+
+</body>
+</html>
