@@ -22,6 +22,25 @@
             font-size: 11pt;
             font-family: "Calibri", sans-serif;
         }
+        .suggestions {
+            border: 1px solid #ccc;
+             max-height: 120px;
+             overflow-y: auto;
+             position: absolute;
+             background: white;
+             width: 300px;
+             z-index: 1000;
+        }
+
+        .suggestions div {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .suggestions div:hover {
+             background-color: #eee;
+        }
+
         p.MsoListParagraphCxSpFirst, p.MsoListParagraphCxSpLast {
             margin-top: 0;
             margin-right: 0;
@@ -57,7 +76,7 @@
     <span style="font-size: 12pt; line-height: 107%; font-family: 'Times New Roman', serif">
          &nbsp;
          Date 
-        <input type="date" id="date" name="date" value="0-0-0">
+        <input type="date" id="date" name="date" value="00-00-00">
     </span>
 </p>
 
@@ -71,236 +90,18 @@
 
 <p class="MsoNormal" style="line-height: 300%">
     <span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
-        &nbsp;
-        Name: 
-    </span>
-    <input list="employee-names" id="employee-name" name="employee-name" size="36">
-    <datalist id="employee-names">
+        <div class="form-container">
+            <div class="field-group">
+              <label for="employee-name">Name:</label>
+              <input type="text" id="employee-name" autocomplete="off" />
+              <div id="suggestions" class="suggestions"></div>
+            </div><br><br>
+        <div class="field-group">
+            <label for="contactNumber">Contact Number:</label>
+                <input type="text" id="contactNumber" placeholder="03012345678" />
+              </div>
+            </div><br><br>   
 
-<option value=" 	ABBAS HUSSAIN	"></option>
-<option value=" 	Abdul Ghafoor Khan	"></option>
-<option value=" 	Abdul Lateef	"></option>
-<option value=" 	Abdul Malik	"></option>
-<option value=" 	Abdul Manan	"></option>
-<option value=" 	Abdul Rauf	"></option>
-<option value=" 	Abdul Razaq	"></option>
-<option value=" 	ABDUL REHMAN MITHU	"></option>
-<option value=" 	Abdul Rizwan	"></option>
-<option value=" 	ABDUL SHAKOOR	"></option>
-<option value=" 	Abdullah Basharat	"></option>
-<option value=" 	ABDULLAH JAMEEL	"></option>
-<option value=" 	Afzal Ali (Afzal Bhayo)	"></option>
-<option value=" 	AHMAD YAR	"></option>
-<option value=" 	Ahmed Raheem	"></option>
-<option value=" 	Ahtasahm Mushtaq	"></option>
-<option value=" 	Ajmal Saeed	"></option>
-<option value=" 	Akhtar Hussain	"></option>
-<option value=" 	Akhtar Zaib	"></option>
-<option value=" 	Ali Akbar	"></option>
-<option value=" 	Ali Asghar	"></option>
-<option value=" 	ALI HAIDER	"></option>
-<option value=" 	Ali Hamza	"></option>
-<option value=" 	Ali Hamza Anwar	"></option>
-<option value=" 	Ali Hussain	"></option>
-<option value=" 	Ali Raza	"></option>
-<option value=" 	Ali Raza Supply	"></option>
-<option value=" 	Altaf Hussain	"></option>
-<option value=" 	Aman Shareef	"></option>
-<option value=" 	Ameer Hamza Cook	"></option>
-<option value=" 	Amin Khan	"></option>
-<option value=" 	AMIN SAYED	"></option>
-<option value=" 	Amir Ali	"></option>
-<option value=" 	Amir Khan	"></option>
-<option value=" 	Amir Zaman	"></option>
-<option value=" 	AMJAD HUSSAIN	"></option>
-<option value=" 	ANWAR SAEED	"></option>
-<option value=" 	Arham Nawaz	"></option>
-<option value=" 	Asad Rafique	"></option>
-<option value=" 	Asmat Ullah	"></option>
-<option value=" 	Ayyaz Khan	"></option>
-<option value=" 	Bakhsal Khan	"></option>
-<option value=" 	BAKHSHAD ALI KHAN	"></option>
-<option value=" 	Bakhshad Wakeel	"></option>
-<option value=" 	Bakht Ali	"></option>
-<option value=" 	Bashir Ahmed	"></option>
-<option value=" 	Basit Ali	"></option>
-<option value=" 	Bilawal Hussain	"></option>
-<option value=" 	Danish Ashraf	"></option>
-<option value=" 	Danish Wali	"></option>
-<option value=" 	Fahad Zafar	"></option>
-<option value=" 	Faisal Noman	"></option>
-<option value=" 	Faiz Subhani	"></option>
-<option value=" 	Farhan Ali	"></option>
-<option value=" 	FARHAN ULLAH	"></option>
-<option value=" 	Farhat Abbas	"></option>
-<option value=" 	FARYAD	"></option>
-<option value=" 	Fazeel Amir	"></option>
-<option value=" 	Fazeel Naseer	"></option>
-<option value=" 	Firdos Khan	"></option>
-<option value=" 	Ghaus Ali	"></option>
-<option value=" 	Ghaznfar Ali	"></option>
-<option value=" 	GHULAM RABANI	"></option>
-<option value=" 	GUL FARAZ KHAN	"></option>
-<option value=" 	Habbib Ullah	"></option>
-<option value=" 	HAIDER ALI	"></option>
-<option value=" 	Hammad Sadique	"></option>
-<option value=" 	Haseeb Akhtar	"></option>
-<option value=" 	Haseeb Zahid	"></option>
-<option value=" 	Hassan Bilal	"></option>
-<option value=" 	Husnain Abbasi	"></option>
-<option value=" 	HUZAIMA ABID	"></option>
-<option value=" 	IDREES AHMED	"></option>
-<option value=" 	Ijaz Ahmed	"></option>
-<option value=" 	Iqbal Hussain	"></option>
-<option value=" 	ISRAR AHMAD	"></option>
-<option value=" 	JAFAR ISHTIAQ	"></option>
-<option value=" 	Jahanzeb [driver]	"></option>
-<option value=" 	Jameel Khan	"></option>
-<option value=" 	Javed	"></option>
-<option value=" 	Jawad Ali	"></option>
-<option value=" 	Junaid Khan	"></option>
-<option value=" 	KALEEM FIAZ	"></option>
-<option value=" 	KALEEM UR REHMAN	"></option>
-<option value=" 	Kamaal Syed	"></option>
-<option value=" 	KAMRAN RASHEED	"></option>
-<option value=" 	Khizar Hayat	"></option>
-<option value=" 	Luqman Syed	"></option>
-<option value=" 	M Abdullah Ejaz	"></option>
-<option value=" 	M Bilal Muneer	"></option>
-<option value=" 	M Numan	"></option>
-<option value=" 	M Safeer Ahmad	"></option>
-<option value=" 	M Shoaib Asif	"></option>
-<option value=" 	M UMER	"></option>
-<option value=" 	M.Saleem	"></option>
-<option value=" 	M.Sameer	"></option>
-<option value=" 	Mahsood	"></option>
-<option value=" 	Majid Ali	"></option>
-<option value=" 	Mamnoon Abbas	"></option>
-<option value=" 	MAMNOON NASIR	"></option>
-<option value=" 	Mamoon Risham	"></option>
-<option value=" 	MATEEN IBRAHIM	"></option>
-<option value=" 	Mazhar Ullah	"></option>
-<option value=" 	Messam Tammar	"></option>
-<option value=" 	Mir Ali	"></option>
-<option value=" 	Mohsin Faheem	"></option>
-<option value=" 	Mohsin Jamal	"></option>
-<option value=" 	Mohsin Raza Nawazish	"></option>
-<option value=" 	MOIN QADIR	"></option>
-<option value=" 	Moin Syed	"></option>
-<option value=" 	MOMIN KHAN	"></option>
-<option value=" 	MOOR KHAN	"></option>
-<option value=" 	Mubashir Ali	"></option>
-<option value=" 	MUDASSAR HUSSAIN	"></option>
-<option value=" 	MUDASSIR ALI	"></option>
-<option value=" 	Mudsar Ali	"></option>
-<option value=" 	Muhammad Adil	"></option>
-<option value=" 	MUHAMMAD AHMAD SHABIR	"></option>
-<option value=" 	MUHAMMAD AHMED	"></option>
-<option value=" 	MUHAMMAD AMIR	"></option>
-<option value=" 	MUHAMMAD AQIB	"></option>
-<option value=" 	Muhammad Arslan	"></option>
-<option value=" 	Muhammad Ehtisham Rafique	"></option>
-<option value=" 	MUHAMMAD FAHAD	"></option>
-<option value=" 	Muhammad Farhad Ghous	"></option>
-<option value=" 	Muhammad Farhan Arshad	"></option>
-<option value=" 	MUHAMMAD FAROOQ	"></option>
-<option value=" 	Muhammad Hamza Ghafoor	"></option>
-<option value=" 	Muhammad Imran	"></option>
-<option value=" 	Muhammad Imran Bahadur	"></option>
-<option value=" 	Muhammad Maaz Abbasi	"></option>
-<option value=" 	MUHAMMAD MUBASHIR	"></option>
-<option value=" 	Muhammad Nadeem	"></option>
-<option value=" 	Muhammad Qasim	"></option>
-<option value=" 	Muhammad Riaz	"></option>
-<option value=" 	Muhammad Saad Shabeer	"></option>
-<option value=" 	Muhammad Sami	"></option>
-<option value=" 	MUHAMMAD SARWAR IMRAN	"></option>
-<option value=" 	Muhammad Shahzad	"></option>
-<option value=" 	Muhammad Shakoor	"></option>
-<option value=" 	Muhammad Tufail	"></option>
-<option value=" 	Muhammad Usman	"></option>
-<option value=" 	Muhammad Yaseen	"></option>
-<option value=" 	Muhammad Zahid	"></option>
-<option value=" 	Muhammad Zubair	"></option>
-<option value=" 	Mukhtar Syed	"></option>
-<option value=" 	MUMTAZ KHAN	"></option>
-<option value=" 	Muneeb Gulzar	"></option>
-<option value=" 	Murad Ali	"></option>
-<option value=" 	Muzahir Shah	"></option>
-<option value=" 	Naeem Ahmad	"></option>
-<option value=" 	name	"></option>
-<option value=" 	Naseeb Syed	"></option>
-<option value=" 	Nasir Mehmood	"></option>
-<option value=" 	Naveed Khaliq	"></option>
-<option value=" 	Nawaz Ali	"></option>
-<option value=" 	Nisaar Khan	"></option>
-<option value=" 	NOOR ZAMIN	"></option>
-<option value=" 	Noor Zamin Syed	"></option>
-<option value=" 	Obaid Ur Rehman	"></option>
-<option value=" 	Qaiser Ali	"></option>
-<option value=" 	Qurban Ghafoor	"></option>
-<option value=" 	Raheem Safdar	"></option>
-<option value=" 	Raheem Ullah	"></option>
-<option value=" 	Raja Khizar Hayyat	"></option>
-<option value=" 	RAJA ZAFAR IQBAL	"></option>
-<option value=" 	Raza Khan	"></option>
-<option value=" 	Rehan Ali	"></option>
-<option value=" 	Rehan Waheed	"></option>
-<option value=" 	Rehman Javed	"></option>
-<option value=" 	Rizwan Haider	"></option>
-<option value=" 	Sadaqat Shabeer	"></option>
-<option value=" 	SAEED AHMED	"></option>
-<option value=" 	Sagheer Ahmad	"></option>
-<option value=" 	Sajid Ali Khan	"></option>
-<option value=" 	Sajid Khan	"></option>
-<option value=" 	SAJID ULLAH	"></option>
-<option value=" 	Sanaullah Sb	"></option>
-<option value=" 	Sanwal Shahzad	"></option>
-<option value=" 	SHAHERYAR AHMAD	"></option>
-<option value=" 	SHAHZAD NIAZI	"></option>
-<option value=" 	Shahzad Waris	"></option>
-<option value=" 	Shahzaib Riaz	"></option>
-<option value=" 	Shahzaib Safeer	"></option>
-<option value=" 	Shahzaib Tarseem	"></option>
-<option value=" 	SHAN ALI	"></option>
-<option value=" 	Shareef Ullah Khan	"></option>
-<option value=" 	Shawaiz Arif	"></option>
-<option value=" 	SHER ALI	"></option>
-<option value=" 	Shoaib Ashraf	"></option>
-<option value=" 	Siddiq	"></option>
-<option value=" 	Siraj Haider	"></option>
-<option value=" 	Sohrab Jahangir	"></option>
-<option value=" 	Sufiyan Anwar	"></option>
-<option value=" 	SUFYAN AFZAL	"></option>
-<option value=" 	SULTAN MEHMOOD	"></option>
-<option value=" 	Syed Haider Ali Shah	"></option>
-<option value=" 	SYED QASIM RAZA	"></option>
-<option value=" 	Tahir Mehmood (cook)	"></option>
-<option value=" 	Taimoor Ahmad	"></option>
-<option value=" 	Talha Yaqoob	"></option>
-<option value=" 	Tanveer Ahmad	"></option>
-<option value=" 	TANVEER HUSSAIN	"></option>
-<option value=" 	Tayyab Ali	"></option>
-<option value=" 	Tora Baz	"></option>
-<option value=" 	Umair Khurshed	"></option>
-<option value=" 	Umais Ashrif	"></option>
-<option value=" 	Usama Mushtaq	"></option>
-<option value=" 	Usman Ali	"></option>
-<option value=" 	Waheed Sultan	"></option>
-<option value=" 	Wahid Ullah	"></option>
-<option value=" 	Waseem Abbas	"></option>
-<option value=" 	WASEEM HAIDER	"></option>
-<option value=" 	Zahid Hussain	"></option>
-<option value=" 	ZUBAIR USMAN	"></option>
-
-        <div class="input-container">
-            <label for="contactNumber">&nbsp; Contact Number:</label>
-            <input type="text" id="contactNumber" class="input-field" placeholder="0301_2345678">
-        	<p>&nbsp;</div>
-    
-<p class="MsoNormal" style="line-height: 300%">
-    <span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
-        &nbsp;
         Department: 
     </span>
     <input list="department-names" id="department-name" name="department-name">
@@ -354,7 +155,7 @@
     <span style="font-size: 12pt; line-height: 150%; font-family: Symbol">·</span>
     <b>
         <span style="font-size: 12pt; line-height: 150%; font-family: 'Times New Roman', serif">
-            Employee can leave the warehouse after the Lunch break before the day of leave allocated and return before Lunch time after the leave finishes. Otherwise absent will be marked.
+            Employee can leave the warehouse after the Lunch break before the day of leave allocated and return at Lunch time after the leave finishes. Otherwise absent will be marked.
         </span>
     </b>
 </p>
@@ -375,7 +176,7 @@
     <span style="font-size: 12pt; line-height: 150%; font-family: Symbol">·</span>
     <b>
         <span style="font-size: 12pt; line-height: 150%; font-family: 'Times New Roman', serif">
-            ملازم رخصت والے دن سے ایک دن پہلے دوپہر کے کھانے کے وقفے کے بعد گودام چھوڑ سکتا ہے اور حاضری والے دن دوپہر کے کھانے سے پہلے واپس آنا ضروری ہے۔  بصورت دیگر غیر حاضری شمار کی جائے گی۔
+            ملازم رخصت والے دن سے ایک دن پہلے دوپہر کے کھانے کے وقفے کے بعد گودام چھوڑ سکتا ہے اور حاضری والے دن دوپہر کے کھانے کے وقت واپس آنا ضروری ہے۔ بصورت دیگر غیر حاضری شمار کی جائے گی۔
         </span>
     </b>
 </p>
@@ -386,7 +187,7 @@
 </p>
 
 <p class="MsoNormal" style="line-height: 300%">
-    <span style="font size: 12px; font-family: 'Times New Roman', serif">&nbsp;
+    <span style= "fontsize: 12px; font-family: 'Times New Roman', serif">&nbsp;
 	</span>
 	<span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
             <u>Supervisor Approval: </u> 
@@ -411,19 +212,49 @@
 <div class="print-date-time"></div>
 
 <script>
-   document.getElementById('contactNumber').addEventListener('input', function() {
-        var input = this.value;
-        var formattedInput = input.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-        if (formattedInput.length > 4) {
-            formattedInput = formattedInput.slice(0, 4) + '_' + formattedInput.slice(4);
-        }
-        if (formattedInput.length > 11) {
-            formattedInput = formattedInput.slice(0, 12);
-        }
-        this.value = formattedInput;
-        validateInput();
+        const employeeInput = document.getElementById('employee-name');
+  const contactInput = document.getElementById('contactNumber');
+  const suggestionBox = document.getElementById('suggestions');
+
+  let employees = [];
+
+  // ✅ Replace with your actual raw GitHub URL:
+  const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json';
+
+  // Fetch employee data
+  fetch(GITHUB_JSON_URL)
+    .then(response => response.json())
+    .then(data => {
+      employees = data.employees; // ✅ Access inside "employees"
     });
 
+  // Live suggestions
+  employeeInput.addEventListener('input', function () {
+    const value = this.value.trim().toLowerCase();
+    suggestionBox.innerHTML = '';
+
+    if (!value) return;
+
+    const matches = employees.filter(emp => emp.name.toLowerCase().includes(value));
+
+    matches.forEach(match => {
+      const div = document.createElement('div');
+      div.textContent = match.name;
+      div.addEventListener('click', () => {
+        employeeInput.value = match.name;
+        contactInput.value = match.empcontactno || '';
+        suggestionBox.innerHTML = '';
+      });
+      suggestionBox.appendChild(div);
+    });
+  });
+
+  // Hide suggestions if clicked outside
+  document.addEventListener('click', function (e) {
+    if (!suggestionBox.contains(e.target) && e.target !== employeeInput) {
+      suggestionBox.innerHTML = '';
+    }
+  });
     function validateInput() {
         var input = document.getElementById('contactNumber').value;
         var errorMessage = document.getElementById('error-message');
