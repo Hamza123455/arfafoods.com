@@ -3,29 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <title>FFmpeg WASM Test</title>
-  <!-- ✅ Load FFmpeg before using it -->
   <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.4/dist/ffmpeg.min.js"></script>
 </head>
 <body>
-  <h1>FFmpeg Test</h1>
-  <button id="run">Run FFmpeg</button>
-  <p id="status">Waiting...</p>
+  <h2>Test FFmpeg.wasm</h2>
+  <button id="start">Start FFmpeg</button>
+  <p id="output">Status: Idle</p>
 
   <script>
-    // ✅ Wait until FFmpeg is loaded from CDN
-    const { createFFmpeg, fetchFile } = FFmpeg;
-    const ffmpeg = createFFmpeg({ log: true });
+    // ✅ Define only after script is loaded
+    let ffmpeg;
 
-    document.getElementById('run').addEventListener('click', async () => {
-      const status = document.getElementById('status');
-      status.textContent = 'Loading FFmpeg...';
-      await ffmpeg.load(); // ✅ load must happen before using it
+    document.getElementById('start').addEventListener('click', async () => {
+      const output = document.getElementById('output');
+      output.textContent = 'Initializing FFmpeg...';
 
-      status.textContent = 'Running FFmpeg...';
-      // Sample dummy task: create silent mp3
-      ffmpeg.FS('writeFile', 'input.wav', new Uint8Array([])); // empty input
+      // ✅ Only now create ffmpeg instance
+      const { createFFmpeg, fetchFile } = FFmpeg;
+      ffmpeg = createFFmpeg({ log: true });
 
-      status.textContent = 'FFmpeg loaded. Ready to process!';
+      try {
+        await ffmpeg.load();
+        output.textContent = 'FFmpeg loaded successfully!';
+      } catch (err) {
+        output.textContent = 'Failed to load FFmpeg: ' + err.message;
+      }
     });
   </script>
 </body>
