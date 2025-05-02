@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arfa Foods</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      width: 5in;
+      overflow: hidden;
+      background-color: #f0f8ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #searchInput {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 2px solid #007bff;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    #itemList {
+      width: 50%;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ec6060;
+      border-radius: 5px;
+      background-color: white;
+      position: absolute;
+      z-index: 10;
+      display: none;
+      left: 28%;
+      transform: translateX(-50%);
+      margin-top: 0.45in;
+    }
+    .item-option {
+      padding: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      width: 100%;
+    }
+    .item-option:hover {
+      background-color: #e9ecef;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px 0;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #results {
+      margin: 20px 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .item {
+      margin-bottom: 10px;
+      padding: 10px;
+      width: 90%;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .barcode-img {
+      height: 1in;
+      width: 100%;
+    }
+    .info {
+      text-align: center;
+      margin-bottom: 0px;
+    }
+    .barcode-number {
+      font-size: 10px;
+      margin-top: 5px;
+    }
+    .dates {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin: 0px 0px;
+    }
+  </style>
+</head>
+<body>
+
+<input type="text" id="searchInput" placeholder="Type item name..." autocomplete="on">
+<div id="itemList"></div>
+<button id="printButton" style="display: none;">Print</button>
+<div id="results"></div>
+
+<script>
+  let items = [];
+
+  // ✅ Replace this with your actual GitHub raw JSON URL
+  fetch('https://raw.githubusercontent.com/Hamza123455/masterfile/main/items.json')
+    .then(response => response.json())
+    .then(data => {
+      items = data;
+      console.log("Items loaded from GitHub JSON:", items);
+    })
+    .catch(error => {
+      console.error("Error fetching items.json:", error);
+    });
+
+  const searchInput = document.getElementById('searchInput');
+  const itemList = document.getElementById('itemList');
+  const resultsDiv = document.getElementById('results');
+  const printButton = document.getElementById('printButton');
+  let highlightedIndex = -1;
+
+  searchInput.addEventListener('input', function() {
+    const query = searchInput.value.toLowerCase();
+    itemList.innerHTML = '';
+    highlightedIndex = -1;
+    if (query) {
+      const filteredItems = items.filter(item =>
+        item.ItemName.toLowerCase().includes(query)
+      );
+      if (filteredItems.length > 0) {
+        itemList.style.display = 'block';
+        filteredItems.forEach(item => {
+          const option = document.createElement('div');
+          option.className = 'item-option';
+          option.innerHTML = `${item.ItemCode} - ${item.ItemName} - ${item.UrduName}`;
+          option.dataset.code = item.ItemCode;
+          option.onclick = () => selectItem(item.ItemCode.toString());
+          itemList.appendChild(option);
+        });
+      } else {
+        itemList.style.display = 'none';
+      }
+    } else {
+      itemList.style.display = 'none';
+    }
+  });
+
+  searchInput.addEventListener('keydown', function(event) {
+    const options = itemList.querySelectorAll('.item-option');
+    if (event.key === 'ArrowDown') {
+      highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
+      updateHighlightedOption(options);
+      event.preventDefault();
+    } else if (event.key === 'ArrowUp') {
+      highlightedIndex = Math.max(highlightedIndex - 1, 0);
+      updateHighlightedOption(options);
+      event.preventDefault();
+    } else if (event.key === 'Enter' && highlightedIndex >= 0) {
+      selectItem(options[highlightedIndex].dataset.code);
+      event.preventDefault();
+    }
+  });
+
+  function updateHighlightedOption(options) {
+    options.forEach((option, index) => {
+      option.style.backgroundColor = (index === highlightedIndex) ? '#e9ecef' : 'white';
+    });
+  }
+
+  function selectItem(code) {
+    searchInput.value = '';
+    itemList.style.display = 'none';
+    addItemToResults(code);
+  }
+
+  function addItemToResults(code) {
+    const foundItem = items.find(item => item.ItemCode.toString() === code);
+    resultsDiv.innerHTML = '';
+    printButton.style.display = 'none';
+    const currentDate = new Date();
+    const mfgDate = currentDate.toISOString().split('T')[0];
+    const expDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 1)).toISOString().split('T')[0];
+    if (foundItem) {
+      const itemDiv = document.createElement('div');
+      itemDiv.classList.add('item');
+      itemDiv.innerHTML = `
+        <h2>${foundItem.UrduName}</h2>
+        <div class="dates">
+          <span>MFG:</span>
+          <input type="text" value="${formatDate(new Date(mfgDate))}" />
+          <span>EXP:</span>
+          <input type="text" value="${formatDate(new Date(expDate))}" />
+        </div>
+        <img class="barcode-img" src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${foundItem.ItemCode}&scale=3" alt="Barcode">
+        <div class="barcode-number">${foundItem.ItemCode}</div>
+        <div class="info">
+          <input type="number" min="1" placeholder="Quantity" id="quantity-${foundItem.ItemCode}" />
+        </div>
+      `;
+      resultsDiv.appendChild(itemDiv);
+      printButton.style.display = 'inline';
+    } else {
+      resultsDiv.innerHTML = 'No items found.';
+    }
+  }
+
+  document.getElementById('printButton').addEventListener('click', function() {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <link href="https://fonts.googleapis.com/css2?family=Gulzar&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Gulzar', sans-serif; width: 4in; margin: 0; padding: 0; font-weight: bold; }
+            .container { display: flex; flex-wrap: wrap; justify-content: space-between; }
+            .item { width: 48%; margin-bottom: 0px; display: flex; flex-direction: column; align-items: center; }
+            .barcode-img { height: 0.6in; width: 68%; }
+            .barcode-number { font-size: 10px; margin-top: -0.5px; font-weight: bold; }
+            .dates { margin-bottom: 1.5px; font-size: 9px; font-weight: bold; }
+            h2 { font-size: 12px; margin-top:10px; margin-bottom: -0.5px; }
+          </style>
+        </head>
+        <body>
+    `);
+    const itemsToPrint = resultsDiv.querySelectorAll('.item');
+    let barcodes = [];
+    itemsToPrint.forEach(itemDiv => {
+      const name = itemDiv.querySelector('h2').textContent;
+      const mfgDate = itemDiv.querySelector('input[type="text"]:nth-of-type(1)').value;
+      const expDate = itemDiv.querySelector('input[type="text"]:nth-of-type(2)').value;
+      const barcode = itemDiv.querySelector('.barcode-number').textContent;
+      const quantityInput = itemDiv.querySelector('input[type="number"]');
+      const quantity = parseInt(quantityInput.value) || 1;
+      for (let i = 0; i < quantity; i++) {
+        barcodes.push({ name, mfgDate, expDate, barcode });
+      }
+    });
+    for (let i = 0; i < barcodes.length; i += 2) {
+      printWindow.document.write('<div class="container">');
+      for (let j = 0; j < 2; j++) {
+        if (i + j < barcodes.length) {
+          const item = barcodes[i + j];
+          printWindow.document.write(`
+            <div class="item">
+              <h2>${item.name}</h2>
+              <div class="dates">
+                <span>MFG: ${item.mfgDate}</span>
+                <span>EXP: ${item.expDate}</span>
+              </div>
+              <img class="barcode-img" src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${item.barcode}&scale=3" alt="Barcode">
+              <div class="barcode-number">${item.barcode}</div>
+            </div>
+          `);
+        }
+      }
+      printWindow.document.write('</div>');
+    }
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+  });
+
+  function formatDate(date) {
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    return date.toLocaleDateString('en-GB', options).replace(/(\d{2})\s(\w{3})\s(\d{4})/, '$1-$2-$3');
+  }
+</script>
+
+</body>
+</html>
