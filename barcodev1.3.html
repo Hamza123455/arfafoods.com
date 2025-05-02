@@ -220,15 +220,55 @@
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
           <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Gulzar&family=Noto+Nastaliq+Urdu:wght@700&family=Oswald:wght@700&family=PT+Serif:ital,wght@0,400;1,700&family=Sigmar&display=swap" rel="stylesheet">
-          <style>
-            body { font-family: 'Gulzar', sans-serif; width: 5in; margin: 0; padding: 13px 0 0 0; font-weight: 700; }
-            .container { display: flex; flex-wrap: wrap; justify-content: space-between; }
-            .item { width: 48%; margin-bottom: 0px; display: flex; flex-direction: column; align-items: center; line-height: 1; }
-            .barcode-img { height: 0.7in; width: 55%; margin: 0; display: block; }
-            .barcode-number { font-size: 15px; margin: 0; font-weight: bold; line-height: 1.4; }
-            .dates { margin: 0; font-size: 9px; font-weight: bold; line-height: 1; }
-            h2 { font-size: 12px; margin: 0; line-height: 1.7; }
-          </style>
+        <style>
+          body {
+                   font-family: 'Gulzar', sans-serif;
+                   width: 5in;
+                   margin: 0;
+                   padding: 5px 0 0 0;
+                   font-weight: 700;
+                }
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 2px; /* very tight space between rows */
+  }
+  .item {
+    width: 44%; /* very tight fit */
+    margin-right: 5%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+  }
+  .barcode-img {
+    height: 0.65in;
+    width: 75%;
+    display: block;
+    margin-right: 1;
+  }
+  .barcode-number {
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: bold;
+  }
+  .dates {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1;
+    font-weoght: bold;
+  }
+  h2 {
+    font-size: 12px;
+    margin: 0;
+    line-height: 2.9;
+    font-weight: 700;
+  }
+</style>
+
         </head>
         <body>
 `);
