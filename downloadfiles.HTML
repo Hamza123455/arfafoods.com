@@ -32,18 +32,18 @@
     <h1></h1>
     <p></p>
 
-    <button onclick="downloadExcel()">Click To Download Item Sheet / Spices</button> </br> </br>
-    <button onclick="downloadExcel()">Click To Download Item Sheet / Pulses</button>
+    <button onclick="downloadSpices()">Click To Download Item Sheet / Spices</button> </br> </br>
+    <button onclick="downloadPulses()">Click To Download Item Sheet / Pulses</button>
 
     <script>
-        function downloadExcel() {
+        function downloadSpices() {
             // Updated file name: ITEMSHEETSPICES.xlsx
             var link = 'https://raw.githubusercontent.com/Hamza123455/arfafoods.com/main/ITEMSHEETSPICES.xlsx';
             
             // Redirect to the raw file URL to trigger the download
             window.location.href = link;
         }
-        function downloadExcel() {
+        function downloadPulses() {
             // Updated file name: ITEMSHEETPULSES.xlsx
             var link = 'https://raw.githubusercontent.com/Hamza123455/arfafoods.com/main/ITEMSHEETPULSES.xlsx';
             
