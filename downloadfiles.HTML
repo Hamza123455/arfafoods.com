@@ -33,7 +33,8 @@
 <p></p>
 
 <button onclick="downloadSpices()">Click To Download Item Sheet / Spices</button> </br> </br>
-<button onclick="downloadPulses()">Click To Download Item Sheet / Pulses</button>
+<button onclick="downloadPulses()">Click To Download Item Sheet / Pulses</button> </br> </br>
+<button onclick="downloadRice()">Click To Download Rice Invoice Calculation Sheet</button> </br> </br>
 
 <script>
     function downloadFile(url, filename) {
@@ -54,6 +55,11 @@
     function downloadPulses() {
         const url = 'https://raw.githubusercontent.com/Hamza123455/arfafoods.com/main/ITEMSHEETPULSES.xlsx';
         const filename = 'ITEMSHEETPULSES.xlsx';
+        downloadFile(url, filename);
+    }
+    function downloadRice() {
+        const url = 'https://raw.githubusercontent.com/Hamza123455/arfafoods.com/main/RICE CAL.xlsx';
+        const filename = 'RICE CAL.xlsx';
         downloadFile(url, filename);
     }
 </script>
