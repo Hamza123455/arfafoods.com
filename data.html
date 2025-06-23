@@ -79,7 +79,7 @@
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // ← Replace with your Apps Script URL
+    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // ← Replace with your deployed Apps Script URL
 
     let rawData = [];
     let headers = [];
@@ -95,11 +95,9 @@
       headers.forEach((header, index) => {
         const th = document.createElement("th");
 
-        // For Item Name search (already above), leave empty filter
-        if (index === 1) {
-          th.innerHTML = '&nbsp;';
+        if (header.toLowerCase().includes("item name")) {
+          th.innerHTML = '&nbsp;'; // Skip filter for item name (search handled above)
         } else if (isNumericColumn(header)) {
-          // Numeric filters
           const select = document.createElement("select");
           select.innerHTML = `
             <option value="">All</option>
@@ -130,7 +128,6 @@
           th.appendChild(input1);
           th.appendChild(input2);
         } else {
-          // Categorical filter
           const select = document.createElement("select");
           select.innerHTML = `<option value="">All</option>`;
           const uniqueVals = [...new Set(rawData.map(row => row[header]).filter(val => val !== ""))];
@@ -163,15 +160,16 @@
         headers.forEach((header, i) => {
           const cell = filterCells[i];
 
-          // Text search on Item Name
-          if (i === 1) {
-            const itemName = row[header] ? row[header].toString().toLowerCase() : "";
-            if (!itemName.includes(searchText)) show = false;
+          // ✅ Search by Item Name
+          if (header.toLowerCase().includes("item name")) {
+            const value = (row[header] || "").toString().toLowerCase();
+            if (!value.includes(searchText)) show = false;
             return;
           }
 
+          // ✅ Numeric filters
           if (isNumericColumn(header)) {
-            const op = cell.querySelector("select").value;
+            const op = cell.querySelector("select")?.value;
             const val1 = parseFloat(cell.querySelectorAll("input")[0]?.value || "");
             const val2 = parseFloat(cell.querySelectorAll("input")[1]?.value || "");
             const actual = parseFloat(row[header]);
@@ -181,6 +179,7 @@
             if (op === "<" && actual >= val1) show = false;
             if (op === "between" && (actual < val1 || actual > val2)) show = false;
           } else {
+            // ✅ Dropdown match
             const selVal = cell.querySelector("select")?.value;
             if (selVal && row[header] !== selVal) show = false;
           }
@@ -188,10 +187,10 @@
 
         if (show) {
           const tr = document.createElement("tr");
-          headers.forEach((header, i) => {
+          headers.forEach((header) => {
             const td = document.createElement("td");
             td.textContent = row[header];
-            if (i === 1) td.classList.add("left-align"); // Item Name
+            if (header.toLowerCase().includes("item name")) td.classList.add("left-align");
             tr.appendChild(td);
           });
           tbody.appendChild(tr);
@@ -207,7 +206,7 @@
           const keys = Object.keys(row);
           const newRow = {};
           keys.forEach((key, i) => {
-            if (i !== 0) newRow[key] = row[key]; // skip index 0 (Item Code)
+            if (i !== 0) newRow[key] = row[key]; // skip first column
           });
           return newRow;
         });
