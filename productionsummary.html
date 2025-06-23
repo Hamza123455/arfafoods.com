@@ -62,15 +62,42 @@
     h2 {
       text-align: center;
     }
+
+    /* Print styles for PDF */
+    @media print {
+      body {
+        background: white;
+      }
+
+      button, #itemSearch {
+        display: none !important;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      thead tr:nth-child(2) {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
 
   <h2>Production Summary (June - July 2025)</h2>
 
-  <!-- Search box for Item Name -->
+  <!-- Search box and PDF button -->
   <label for="itemSearch"><strong>Search Item Name:</strong></label>
   <input type="text" id="itemSearch" placeholder="Type item name...">
+  
+  <button onclick="exportToPDF()" style="margin: 10px 0; padding: 8px 16px; font-size: 16px;">
+    Export Table as PDF
+  </button>
 
   <div class="table-wrapper">
     <table id="sheet-table">
@@ -80,7 +107,7 @@
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // ← Replace with your deployed Apps Script URL
+    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // Replace with your real URL
 
     let rawData = [];
     let headers = [];
@@ -93,11 +120,11 @@
       const thead = document.querySelector("#sheet-table thead");
       const filterRow = document.createElement("tr");
 
-      headers.forEach((header, index) => {
+      headers.forEach((header) => {
         const th = document.createElement("th");
 
         if (header.toLowerCase().includes("item name")) {
-          th.innerHTML = '&nbsp;'; // Skip filter for item name (search handled above)
+          th.innerHTML = '&nbsp;';
         } else if (isNumericColumn(header)) {
           const select = document.createElement("select");
           select.innerHTML = `
@@ -161,14 +188,12 @@
         headers.forEach((header, i) => {
           const cell = filterCells[i];
 
-          // ✅ Search by Item Name
           if (header.toLowerCase().includes("item name")) {
             const value = (row[header] || "").toString().toLowerCase();
             if (!value.includes(searchText)) show = false;
             return;
           }
 
-          // ✅ Numeric filters
           if (isNumericColumn(header)) {
             const op = cell.querySelector("select")?.value;
             const val1 = parseFloat(cell.querySelectorAll("input")[0]?.value || "");
@@ -180,7 +205,6 @@
             if (op === "<" && actual >= val1) show = false;
             if (op === "between" && (actual < val1 || actual > val2)) show = false;
           } else {
-            // ✅ Dropdown match
             const selVal = cell.querySelector("select")?.value;
             if (selVal && row[header] !== selVal) show = false;
           }
@@ -202,12 +226,11 @@
     fetch(apiUrl)
       .then(res => res.json())
       .then(data => {
-        // Keep all except the first column (Item Code)
         rawData = data.map(row => {
           const keys = Object.keys(row);
           const newRow = {};
           keys.forEach((key, i) => {
-            if (i !== 0) newRow[key] = row[key]; // skip first column
+            if (i !== 0) newRow[key] = row[key]; // remove first column (item code)
           });
           return newRow;
         });
@@ -233,6 +256,21 @@
       });
 
     document.getElementById("itemSearch").addEventListener("input", filterTable);
+
+    function exportToPDF() {
+      const originalTitle = document.title;
+      document.title = "Production Summary";
+
+      const filterRow = document.querySelector("#sheet-table thead tr:nth-child(2)");
+      if (filterRow) filterRow.style.display = "none";
+
+      window.print();
+
+      document.title = originalTitle;
+      setTimeout(() => {
+        if (filterRow) filterRow.style.display = "";
+      }, 1000);
+    }
   </script>
 
 </body>
