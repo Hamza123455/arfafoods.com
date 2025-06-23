@@ -233,17 +233,6 @@
                 window.location.href = selectedValue; // Redirect to the selected page
             }
         });
-    document.getElementById('mcs').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent default link behavior
-        const popup = document.getElementById('popup-message');
-        popup.style.display = 'block'; // Show the popup
-        
-        setTimeout(function() {
-            popup.style.display = 'none'; // Hide the popup after 3 seconds
-            // Navigate to the second Google Sheet
-            window.location.href = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRC4FoxxQt5IxVvYiJibSbLgsjwTWzZxsg1It99G4YD7MPytmGRY-6W8luYf9gIDKKV5Bqj32EhD_Wd/pubhtml?gid=492082597&single=true';
-        }, 1000); // After 6 seconds, navigate to the Google Sheet
-    });
     </script>
 </body>
 </html>
