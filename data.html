@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Production Planning</title>
+  <title>Sheet Data Viewer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
       padding: 20px;
+      background: #f9f9f9;
     }
 
     .table-wrapper {
@@ -16,27 +16,42 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       padding: 20px;
-      max-width: 100%;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1200px;
+      min-width: 900px;
     }
 
     th, td {
       padding: 10px;
       border: 1px solid #ccc;
       text-align: center;
-      vertical-align: middle;
-      white-space: pre-line; /* Allows line breaks in headers */
+      white-space: pre-line;
     }
 
     th {
-      background: #007BFF;
+      background-color: #007BFF;
       color: white;
-      font-weight: bold;
+    }
+
+    td.left-align {
+      text-align: left;
     }
 
     tr:nth-child(even) {
@@ -45,13 +60,17 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Production Requirement Summary</h2>
+  <h2>Production Summary (June - July 2025)</h2>
+
+  <!-- Search box for Item Name -->
+  <label for="itemSearch"><strong>Search Item Name:</strong></label>
+  <input type="text" id="itemSearch" placeholder="Type item name...">
+
   <div class="table-wrapper">
     <table id="sheet-table">
       <thead></thead>
@@ -60,41 +79,115 @@
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // Replace this with your actual web app URL
+    const apiUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"; // Replace this with your actual URL
+
+    let tableData = [];
+    let headers = [];
+
+    // Populate dropdown filters
+    function createDropdownFilters() {
+      const thead = document.querySelector("#sheet-table thead");
+      const filterRow = document.createElement("tr");
+
+      headers.forEach((header, colIndex) => {
+        const th = document.createElement("th");
+
+        if (colIndex === 0) {
+          th.innerHTML = '&nbsp;'; // No filter on Item Name
+        } else {
+          const select = document.createElement("select");
+          select.innerHTML = `<option value="">All</option>`;
+          const values = [...new Set(tableData.map(row => row[headers[colIndex]]).filter(val => val !== ""))];
+
+          values.sort().forEach(val => {
+            const option = document.createElement("option");
+            option.value = val;
+            option.textContent = val;
+            select.appendChild(option);
+          });
+
+          select.addEventListener("change", filterTable);
+          th.appendChild(select);
+        }
+
+        filterRow.appendChild(th);
+      });
+
+      thead.appendChild(filterRow);
+    }
+
+    // Apply filters and search
+    function filterTable() {
+      const searchText = document.getElementById("itemSearch").value.toLowerCase();
+      const tableBody = document.querySelector("#sheet-table tbody");
+      tableBody.innerHTML = "";
+
+      const selects = document.querySelectorAll("thead select");
+
+      tableData.forEach(row => {
+        let show = true;
+
+        // Filter by dropdowns
+        selects.forEach((select, i) => {
+          const filterVal = select.value;
+          if (filterVal && row[headers[i + 1]] !== filterVal) {
+            show = false;
+          }
+        });
+
+        // Filter by item name
+        if (show && searchText && !row[headers[0]].toLowerCase().includes(searchText)) {
+          show = false;
+        }
+
+        if (show) {
+          const tr = document.createElement("tr");
+          headers.forEach((header, i) => {
+            if (i === 0) return; // Skip first column (Item Code)
+            const td = document.createElement("td");
+            td.textContent = row[header];
+            if (i === 1) td.classList.add("left-align"); // Align Item Name left
+            tr.appendChild(td);
+          });
+          tableBody.appendChild(tr);
+        }
+      });
+    }
 
     fetch(apiUrl)
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
-        const tableHead = document.querySelector("#sheet-table thead");
-        const tableBody = document.querySelector("#sheet-table tbody");
+        // Remove first column (assumed to be Item Code)
+        headers = Object.keys(data[0]).slice(1);
+        tableData = data.map(row => {
+          const newRow = {};
+          headers.forEach(h => newRow[h] = row[h]);
+          return newRow;
+        });
 
-        if (data.length > 0) {
-          const headers = Object.keys(data[0]);
-          const headerRow = document.createElement("tr");
+        // Render headers
+        const thead = document.querySelector("#sheet-table thead");
+        const headerRow = document.createElement("tr");
+        headers.forEach(h => {
+          const th = document.createElement("th");
+          th.innerHTML = h.replaceAll("\n", "<br>");
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
 
-          headers.forEach(h => {
-            const th = document.createElement("th");
-            th.innerHTML = h.replaceAll("\n", "<br>"); // Converts Google Sheets line breaks to HTML
-            headerRow.appendChild(th);
-          });
+        // Create dropdown filters
+        createDropdownFilters();
 
-          tableHead.appendChild(headerRow);
-
-          data.forEach(row => {
-            const tr = document.createElement("tr");
-            headers.forEach(key => {
-              const td = document.createElement("td");
-              td.textContent = row[key];
-              tr.appendChild(td);
-            });
-            tableBody.appendChild(tr);
-          });
-        }
+        // Initially render all rows
+        filterTable();
       })
-      .catch(err => {
-        console.error("Error loading sheet:", err);
-        document.querySelector("#sheet-table").innerHTML = "<tr><td colspan='100%'>Failed to load data.</td></tr>";
+      .catch(error => {
+        console.error("Error loading data:", error);
+        document.querySelector(".table-wrapper").innerHTML = "<p style='color:red;'>Failed to load data.</p>";
       });
+
+    // Hook search input
+    document.getElementById("itemSearch").addEventListener("input", filterTable);
   </script>
 
 </body>
