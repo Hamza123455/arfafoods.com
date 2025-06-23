@@ -18,12 +18,12 @@
       padding: 20px;
     }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    input[type="text"], input[type="number"] {
+      padding: 6px;
+      margin-top: 4px;
+      width: 90%;
+      box-sizing: border-box;
+      margin-bottom: 6px;
     }
 
     select {
@@ -35,7 +35,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
+      min-width: 1000px;
     }
 
     th, td {
@@ -79,33 +79,67 @@
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // Replace this with your actual URL
+    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/execc"; // ← Replace with your Apps Script URL
 
-    let tableData = [];
+    let rawData = [];
     let headers = [];
 
-    // Populate dropdown filters
-    function createDropdownFilters() {
+    function isNumericColumn(column) {
+      return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
+    }
+
+    function createAdvancedFilters() {
       const thead = document.querySelector("#sheet-table thead");
       const filterRow = document.createElement("tr");
 
-      headers.forEach((header, colIndex) => {
+      headers.forEach((header, index) => {
         const th = document.createElement("th");
 
-        if (colIndex === 0) {
-          th.innerHTML = '&nbsp;'; // No filter on Item Name
-        } else {
+        // For Item Name search (already above), leave empty filter
+        if (index === 1) {
+          th.innerHTML = '&nbsp;';
+        } else if (isNumericColumn(header)) {
+          // Numeric filters
           const select = document.createElement("select");
-          select.innerHTML = `<option value="">All</option>`;
-          const values = [...new Set(tableData.map(row => row[headers[colIndex]]).filter(val => val !== ""))];
+          select.innerHTML = `
+            <option value="">All</option>
+            <option value="=">=</option>
+            <option value="<"><</option>
+            <option value=">">></option>
+            <option value="between">Between</option>
+          `;
 
-          values.sort().forEach(val => {
-            const option = document.createElement("option");
-            option.value = val;
-            option.textContent = val;
-            select.appendChild(option);
+          const input1 = document.createElement("input");
+          input1.type = "number";
+          input1.placeholder = "Value";
+
+          const input2 = document.createElement("input");
+          input2.type = "number";
+          input2.placeholder = "and";
+          input2.style.display = "none";
+
+          select.addEventListener("change", () => {
+            input2.style.display = (select.value === "between") ? "inline-block" : "none";
+            filterTable();
           });
 
+          input1.addEventListener("input", filterTable);
+          input2.addEventListener("input", filterTable);
+
+          th.appendChild(select);
+          th.appendChild(input1);
+          th.appendChild(input2);
+        } else {
+          // Categorical filter
+          const select = document.createElement("select");
+          select.innerHTML = `<option value="">All</option>`;
+          const uniqueVals = [...new Set(rawData.map(row => row[header]).filter(val => val !== ""))];
+          uniqueVals.sort().forEach(val => {
+            const opt = document.createElement("option");
+            opt.value = val;
+            opt.textContent = val;
+            select.appendChild(opt);
+          });
           select.addEventListener("change", filterTable);
           th.appendChild(select);
         }
@@ -116,77 +150,88 @@
       thead.appendChild(filterRow);
     }
 
-    // Apply filters and search
     function filterTable() {
+      const tbody = document.querySelector("#sheet-table tbody");
       const searchText = document.getElementById("itemSearch").value.toLowerCase();
-      const tableBody = document.querySelector("#sheet-table tbody");
-      tableBody.innerHTML = "";
+      tbody.innerHTML = "";
 
-      const selects = document.querySelectorAll("thead select");
+      const filterCells = document.querySelectorAll("#sheet-table thead tr:nth-child(2) th");
 
-      tableData.forEach(row => {
+      rawData.forEach(row => {
         let show = true;
 
-        // Filter by dropdowns
-        selects.forEach((select, i) => {
-          const filterVal = select.value;
-          if (filterVal && row[headers[i + 1]] !== filterVal) {
-            show = false;
+        headers.forEach((header, i) => {
+          const cell = filterCells[i];
+
+          // Text search on Item Name
+          if (i === 1) {
+            const itemName = row[header] ? row[header].toString().toLowerCase() : "";
+            if (!itemName.includes(searchText)) show = false;
+            return;
+          }
+
+          if (isNumericColumn(header)) {
+            const op = cell.querySelector("select").value;
+            const val1 = parseFloat(cell.querySelectorAll("input")[0]?.value || "");
+            const val2 = parseFloat(cell.querySelectorAll("input")[1]?.value || "");
+            const actual = parseFloat(row[header]);
+
+            if (op === "=" && actual !== val1) show = false;
+            if (op === ">" && actual <= val1) show = false;
+            if (op === "<" && actual >= val1) show = false;
+            if (op === "between" && (actual < val1 || actual > val2)) show = false;
+          } else {
+            const selVal = cell.querySelector("select")?.value;
+            if (selVal && row[header] !== selVal) show = false;
           }
         });
-
-        // Filter by item name
-        if (show && searchText && !row[headers[0]].toLowerCase().includes(searchText)) {
-          show = false;
-        }
 
         if (show) {
           const tr = document.createElement("tr");
           headers.forEach((header, i) => {
-            if (i === 0) return; // Skip first column (Item Code)
             const td = document.createElement("td");
             td.textContent = row[header];
-            if (i === 1) td.classList.add("left-align"); // Align Item Name left
+            if (i === 1) td.classList.add("left-align"); // Item Name
             tr.appendChild(td);
           });
-          tableBody.appendChild(tr);
+          tbody.appendChild(tr);
         }
       });
     }
 
     fetch(apiUrl)
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
-        // Remove first column (assumed to be Item Code)
-        headers = Object.keys(data[0]).slice(1);
-        tableData = data.map(row => {
+        // Keep all except the first column (Item Code)
+        rawData = data.map(row => {
+          const keys = Object.keys(row);
           const newRow = {};
-          headers.forEach(h => newRow[h] = row[h]);
+          keys.forEach((key, i) => {
+            if (i !== 0) newRow[key] = row[key]; // skip index 0 (Item Code)
+          });
           return newRow;
         });
 
-        // Render headers
+        headers = Object.keys(rawData[0]);
+
         const thead = document.querySelector("#sheet-table thead");
         const headerRow = document.createElement("tr");
+
         headers.forEach(h => {
           const th = document.createElement("th");
           th.innerHTML = h.replaceAll("\n", "<br>");
           headerRow.appendChild(th);
         });
+
         thead.appendChild(headerRow);
-
-        // Create dropdown filters
-        createDropdownFilters();
-
-        // Initially render all rows
+        createAdvancedFilters();
         filterTable();
       })
-      .catch(error => {
-        console.error("Error loading data:", error);
+      .catch(err => {
+        console.error("Error:", err);
         document.querySelector(".table-wrapper").innerHTML = "<p style='color:red;'>Failed to load data.</p>";
       });
 
-    // Hook search input
     document.getElementById("itemSearch").addEventListener("input", filterTable);
   </script>
 
