@@ -1,98 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Styled Google Sheet Table</title>
+  <title>Google Sheet Data</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f9f9f9;
-    }
-
-    .sheet-container {
-      max-width: 1000px;
-      margin: auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      background: white;
-      overflow-x: auto;
-      padding: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    h2 {
-      text-align: center;
-    }
+    body { font-family: Arial; padding: 20px; background: #f9f9f9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    th, td { padding: 12px; border: 1px solid #ccc; }
+    th { background-color: #4CAF50; color: white; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
   </style>
 </head>
 <body>
 
-  <div class="sheet-container">
-    <h2>Live Data from Google Sheet</h2>
-    <table id="sheet-table">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<h2>Live Sheet Data</h2>
+<table id="sheet-data">
+  <thead></thead>
+  <tbody></tbody>
+</table>
 
-  <script>
-    const apiUrl = "https://sheetsu.com/apis/v1.0su/6iem3u2ugow6e"; // Replace this with your actual Sheetsu URL
+<script>
+  const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // Replace with your Apps Script web app link
 
-    fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        const tableHead = document.querySelector("#sheet-table thead");
-        const tableBody = document.querySelector("#sheet-table tbody");
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const tableHead = document.querySelector("#sheet-data thead");
+      const tableBody = document.querySelector("#sheet-data tbody");
 
-        if (data.length > 0) {
-          // Create header
-          const headers = Object.keys(data[0]);
-          const headerRow = document.createElement("tr");
+      if (data.length > 0) {
+        const headers = Object.keys(data[0]);
+        const headRow = document.createElement("tr");
+        headers.forEach(header => {
+          const th = document.createElement("th");
+          th.textContent = header;
+          headRow.appendChild(th);
+        });
+        tableHead.appendChild(headRow);
+
+        data.forEach(row => {
+          const tr = document.createElement("tr");
           headers.forEach(key => {
-            const th = document.createElement("th");
-            th.textContent = key;
-            headerRow.appendChild(th);
+            const td = document.createElement("td");
+            td.textContent = row[key];
+            tr.appendChild(td);
           });
-          tableHead.appendChild(headerRow);
-
-          // Create rows
-          data.forEach(row => {
-            const tr = document.createElement("tr");
-            headers.forEach(key => {
-              const td = document.createElement("td");
-              td.textContent = row[key];
-              tr.appendChild(td);
-            });
-            tableBody.appendChild(tr);
-          });
-        }
-      })
-      .catch(error => {
-        console.error("Error loading data:", error);
-        document.querySelector(".sheet-container").innerHTML = "<p style='color:red;'>Failed to load data.</p>";
-      });
-  </script>
+          tableBody.appendChild(tr);
+        });
+      }
+    })
+    .catch(err => console.error("Error loading data:", err));
+</script>
 
 </body>
 </html>
