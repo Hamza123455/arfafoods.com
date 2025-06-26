@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arfa Foods</title>
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
+  <style>
+    body {
+      margin: 0;
+      background: #f4f4f4;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loader {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      transform: rotate(45deg);
+    }
+
+    .loader div {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #0772B3;
+      border-radius: 50%;
+    }
+
+    .dot-a { top: -25px; left: -25px; animation: a 0.5s ease-in-out infinite; }
+    .dot-b { top: -25px; left: 0;     animation: b 0.5s ease-in-out infinite; }
+    .dot-c { top: -25px; left: 25px;  animation: c 0.5s ease-in-out infinite; }
+    .dot-d { top: 0;     left: -25px; animation: d 0.5s ease-in-out infinite; }
+    .dot-e { top: 0;     left: 0;     animation: e 0.5s ease-in-out infinite; }
+    .dot-f { top: 0;     left: 25px;  animation: f 0.5s ease-in-out infinite; }
+    .dot-g { top: 25px;  left: -25px; animation: g 0.5s ease-in-out infinite; }
+    .dot-h { top: 25px;  left: 0;     animation: h 0.5s ease-in-out infinite; }
+    .dot-i { top: 25px;  left: 25px;  animation: i 0.5s ease-in-out infinite; }
+
+    @keyframes a { 50% { top: 0; left: -25px; } 100% { top: 0; left: -25px; } }
+    @keyframes b { 50% { top: -25px; left: -25px; } 100% { top: -25px; left: -25px; } }
+    @keyframes c { 50% { top: -25px; left: 0; } 100% { top: -25px; left: 0; } }
+    @keyframes d { 50% { top: 25px; left: -25px; } 100% { top: 25px; left: -25px; } }
+    @keyframes e { 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    @keyframes f { 50% { top: -25px; left: 25px; } 100% { top: -25px; left: 25px; } }
+    @keyframes g { 50% { top: 25px; left: 0; } 100% { top: 25px; left: 0; } }
+    @keyframes h { 50% { top: 25px; left: 25px; } 100% { top: 25px; left: 25px; } }
+    @keyframes i { 50% { top: 0; left: 25px; } 100% { top: 0; left: 25px; } }
+  </style>
+  <script>
+    // Redirect after 3 seconds
+    setTimeout(() => {
+      window.location.href = "admin-pannel"; // Change to your target URL
+    }, 3000);
+  </script>
+</head>
+<body>
+  <div class="loader">
+    <div class="dot-a"></div>
+    <div class="dot-b"></div>
+    <div class="dot-c"></div>
+    <div class="dot-d"></div>
+    <div class="dot-e"></div>
+    <div class="dot-f"></div>
+    <div class="dot-g"></div>
+    <div class="dot-h"></div>
+    <div class="dot-i"></div>
+  </div>
+</body>
+</html>
