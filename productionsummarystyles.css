@@ -1,0 +1,82 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f9f9f9;
+  margin: 0;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+input[type="text"], input[type="number"], select {
+  padding: 6px;
+  margin-top: 4px;
+  width: 90%;
+  box-sizing: border-box;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+  white-space: pre-line;
+}
+
+th {
+  background-color: #051ab8;
+  color: white;
+}
+
+td.left-align {
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+h2 {
+  text-align: center;
+  color: #510b9c;
+  font-weight: bolder;
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+#itemChart {
+  max-width: 100%;
+  height: 400px;
+  display: none;
+  margin: 40px auto 0;
+}
+
+@media print {
+  button, #itemSearch, canvas {
+    display: none !important;
+  }
+  thead tr:nth-child(2) {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  input[type="text"] {
+    width: 100%;
+  }
+
+  .table-wrapper {
+    padding: 10px;
+  }
+}
