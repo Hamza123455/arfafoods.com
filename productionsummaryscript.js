@@ -228,27 +228,4 @@ function exportToPDF() {
   setTimeout(() => {
     if (filterRow) filterRow.style.display = "";
   }, 1000);
-  function checkForSheetUpdates() {
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(newData => {
-      const oldHash = localStorage.getItem("sheetHash");
-      const newHash = JSON.stringify(newData);
-
-      if (oldHash && oldHash !== newHash) {
-        document.getElementById("updateNotification").style.display = "block";
-      }
-
-      localStorage.setItem("sheetHash", newHash);
-    })
-    .catch(err => {
-      console.warn("Update check failed:", err);
-    });
-}
-
-// 🔁 Check every 1 minute
-setInterval(checkForSheetUpdates, 30000);
-
-// ✅ First check when page loads
-checkForSheetUpdates();
 }
