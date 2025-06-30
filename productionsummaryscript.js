@@ -247,7 +247,7 @@ function exportToPDF() {
 }
 
 // 🔁 Check every 1 minute
-setInterval(checkForSheetUpdates, 60000);
+setInterval(checkForSheetUpdates, 10000);
 
 // ✅ First check when page loads
 checkForSheetUpdates();
