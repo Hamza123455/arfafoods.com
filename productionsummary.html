@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>Arfa Foods</title>
-  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       background: #f9f9f9;
+      margin: 0;
     }
 
     .table-wrapper {
@@ -19,17 +22,12 @@
       padding: 20px;
     }
 
-    input[type="text"], input[type="number"] {
+    input[type="text"], input[type="number"], select {
       padding: 6px;
       margin-top: 4px;
       width: 90%;
       box-sizing: border-box;
       margin-bottom: 6px;
-    }
-
-    select {
-      width: 100%;
-      padding: 6px;
       font-size: 14px;
     }
 
@@ -66,26 +64,29 @@
       font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
     }
 
-    /* Print styles for PDF */
-    @media print {
-      body {
-        background: white;
-      }
+    #itemChart {
+      max-width: 100%;
+      height: 400px;
+      display: none;
+      margin: 40px auto 0;
+    }
 
-      button, #itemSearch {
+    @media print {
+      button, #itemSearch, canvas {
         display: none !important;
       }
-
-      table {
-        font-size: 12px;
-      }
-
-      h2 {
-        font-size: 18px;
-      }
-
       thead tr:nth-child(2) {
         display: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      input[type="text"] {
+        width: 100%;
+      }
+
+      .table-wrapper {
+        padding: 10px;
       }
     }
   </style>
@@ -94,7 +95,6 @@
 
   <h2>Production Summary (June - July 2025)</h2>
 
-  <!-- Search box and PDF button -->
   <label for="itemSearch"><strong>Search Item Name:</strong></label>
   <input type="text" id="itemSearch" placeholder="Type item name...">
   
@@ -109,11 +109,17 @@
     </table>
   </div>
 
+  <!-- Chart Canvas -->
+  <div>
+    <canvas id="itemChart"></canvas>
+  </div>
+
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec"; // Replace with your real URL
+    const apiUrl = "https://script.google.com/macros/s/AKfycbzKh8UTPQmAmwyhlGk7o2YN157lJI1hBnbU8_kr9LOATAK3uZmUVWxZFV4mqEoehq_5/exec";
 
     let rawData = [];
     let headers = [];
+    let chartInstance = null;
 
     function isNumericColumn(column) {
       return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
@@ -181,9 +187,10 @@
     function filterTable() {
       const tbody = document.querySelector("#sheet-table tbody");
       const searchText = document.getElementById("itemSearch").value.toLowerCase();
-      tbody.innerHTML = "";
-
       const filterCells = document.querySelectorAll("#sheet-table thead tr:nth-child(2) th");
+
+      tbody.innerHTML = "";
+      let visibleRows = [];
 
       rawData.forEach(row => {
         let show = true;
@@ -214,6 +221,7 @@
         });
 
         if (show) {
+          visibleRows.push(row);
           const tr = document.createElement("tr");
           headers.forEach((header) => {
             const td = document.createElement("td");
@@ -224,6 +232,70 @@
           tbody.appendChild(tr);
         }
       });
+
+      renderChartIfOneMatch(visibleRows);
+    }
+
+    function renderChartIfOneMatch(rows) {
+      const canvas = document.getElementById("itemChart");
+
+      if (rows.length === 1) {
+        const item = rows[0];
+
+        const planned = parseFloat(item["Planned"]) || 0;
+        const requirement = parseFloat(item["Total-Req"]) || 0;
+        const produced = parseFloat(item["Produced"]) || 0;
+        const furtherRequired = parseFloat(item["Further Required"]) || 0; // 👈 Direct from sheet
+
+        const max = Math.max(planned, requirement, produced, furtherRequired);
+
+        const data = {
+          labels: ["Planned", "Total Required", "Produced", "Further Required"],
+          datasets: [{
+            label: item["Item Name"] || "Item",
+            data: [planned, requirement, produced, furtherRequired],
+            backgroundColor: ["#36a2eb", "#3e95cd", "#8e5ea2", "#c45850"]
+          }]
+        };
+
+        const config = {
+          type: 'bar',
+          data: data,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              title: {
+                display: true,
+                text: `Production Summary for "${item["Item Name"]}"`
+              },
+              datalabels: {
+                anchor: 'end',
+                align: 'top',
+                formatter: (val) => {
+                  return max > 0 ? `${Math.round((val / max) * 100)}%` : '';
+                },
+                color: '#333',
+                font: { weight: 'bold' }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: 'Quantity' }
+              }
+            }
+          },
+          plugins: [ChartDataLabels]
+        };
+
+        canvas.style.display = "block";
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(canvas, config);
+      } else {
+        canvas.style.display = "none";
+        if (chartInstance) chartInstance.destroy();
+      }
     }
 
     fetch(apiUrl)
@@ -233,7 +305,7 @@
           const keys = Object.keys(row);
           const newRow = {};
           keys.forEach((key, i) => {
-            if (i !== 0) newRow[key] = row[key]; // remove first column (item code)
+            if (i !== 0) newRow[key] = row[key];
           });
           return newRow;
         });
@@ -275,6 +347,5 @@
       }, 1000);
     }
   </script>
-
 </body>
 </html>
