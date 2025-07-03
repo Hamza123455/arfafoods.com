@@ -1,238 +1,162 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arfa Foods</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-    <style>
-     /* Basic styling for layout */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arfa Foods</title>
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-        /* Flexbox layout for main container */
-        .container {
-            display: flex;
-            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-        }
+    .navbar-custom {
+      background-color: #3F51B5;
+      height: 56px;
+    }
 
-        /* Sidebar styles */
-        .sidebar {
-            width: 250px;
-            background-color: #542de0;
-            color: #fff;
-            height: 100vh;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
+    .brand-title {
+      color: white;
+      font-weight: 800;
+      font-size: 18px;
+      white-space: nowrap;
+    }
 
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            display: block;
-            padding: 10px 0;
-        }
+    .unit-label {
+      color: #FFEB3B;
+      font-weight: 600;
+      font-size: 13px;
+      margin-left: 15px;
+    }
 
-        .sidebar a:hover {
-            background-color: #575757;
-        }
+    .system-select {
+      height: 32px;
+      font-size: 13px;
+      margin-left: 15px;
+      width: 280px;
+    }
 
-        /* Main content styles */
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            box-sizing: border-box; /* Ensure padding doesn't affect width */
-            width: 100%;
-        }
+    .user-img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
 
-        /* Card styles */
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+    .sidebar {
+      height: 100vh;
+      background-color: #F8F9FA;
+      width: 250px;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+      padding: 10px;
+    }
 
-        .card-header {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
+    .content {
+      margin-left: 250px;
+      padding: 20px;
+      margin-top: 56px;
+    }
 
-        /* Table styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .heading-purple {
+      color: #4A148C;
+      font-weight: bold;
+      font-weight: 900;
+    }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
+    .btn-voucher {
+      background-color: #2196F3;
+      color: white;
+    }
 
-        th {
-            background-color: #f2f2f2;
-            text-align: left;
-        }
+    .btn-purple {
+      background-color: #9C27B0;
+      color: white;
+    }
 
-        /* Popup styles */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #C2DFFF;
-            color: #373ad8;
-            padding: 20px;
-            border-radius: 8px;
-            z-index: 1000;
-        }
-
-        /* Media Queries for mobile responsiveness */
-        @media (max-width: 768px) {
-            /* Sidebar styles for smaller screens */
-            .sidebar {
-                width: 100%;
-                height: auto;
-                box-shadow: none;
-                padding: 10px;
-            }
-
-            /* Adjust main content */
-            .main-content {
-                width: 100%;
-                padding: 10px;
-            }
-
-            /* Ensure cards fit on small screens */
-            .card {
-                margin: 10px 0;
-                padding: 15px;
-            }
-
-            /* Adjust table for smaller screens */
-            table {
-                font-size: 14px;
-            }
-
-            th, td {
-                padding: 6px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            /* Further adjustments for very small screens (phones) */
-            .card-header {
-                font-size: 1.2em;
-            }
-
-            /* Adjust popup font size */
-            .popup {
-                width: 80%;
-                padding: 15px;
-            }
-                    /* WhatsApp button styling */
-      .whatsapp-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 999;
-        }
-        .whatsapp-button img {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        .whatsapp-button img:hover {
-            transform: scale(1.1);
-        }
-    </style>
+    .bg-light-blue {
+      background-color: #F1F8FF;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <h2>Admin Panel</h2>
-            <a href="leaveform.HTML">Leaveform</a>
-            <a href="barcodev1.3">Barcodes</a>
-            <a href="productionsummary">View Google Sheet</a>
-            <a href="downloadfiles.HTML">Download Excel File</a>
-            <a href="#" id="mcs">Medina Cold Storage(MCS)</a>
-            <a href="https://github.com/Hamza123455/arfafoods.com/raw/main/employee-database-template.accdb" target="_blank" download>Download Access File</a>
-            <a href="productionsummary">Production Summary</a>
-</style>
 
-            <a href="downloadvehiclecards">Vehicle Cards</a>
-        </aside>
-        <main class="main-content">
-            <div class="card">
-                <!-- Replace the static text with a dropdown -->
-                <select id="dropdown-menu">
-                    <option value="admin-pannel">Main-Menu</option>
-                    <option value="employeemasterdata">Master-File</option>
-                </select>
-                <table id="requirements-table">
-                    <thead>
-                        <tr>
-                            <th>[] [] []</th>
-                            <th>[] [] []</th>
-                            <th>[] [] []</th>
-                        </tr>
-                        <tr>
-                            <th>[] [] []</th>
-                            <th>[] [] []</th>
-                            <th>[] [] []</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows will be populated dynamically -->
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-    
-    <div class="popup" id="popup-message">
-        NOTE: THIS SHEET WILL UPDATE FROM TIME TO TIME<br>
-        TO VIEW SPECIFIC ITEM IN LIST, PLEASE SEARCH FROM BROWSER SETTING.
-    </div>
-    <!-- WhatsApp Button -->
-    <div class="whatsapp-button">
-        <a href="https://wa.me/923495822994" target="_blank">
-            <img src="df52fd3c-b0fa-45d0-96a9-14513ff6f00e.png" alt="Chat on WhatsApp">
-        </a>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <!-- Left Group: Menu + Brand + Unit + Dropdown -->
+    <div class="d-flex align-items-center">
+      <button class="btn btn-primary me-3" type="button">☰</button>
+      <span class="brand-title">Arfa Foods and Spices</span>
+      <span class="unit-label">Arfa - Top Unit</span>
+      <select class="form-select form-select-sm system-select">
+        <option selected>Accounts Management System (ver. 3.5.03)</option>
+      </select>
+      <a class="text-white ms-3" href="#"><i class="bi bi-house-door"></i> Dashboard</a>
     </div>
 
-    <script>
-        document.getElementById('google-sheet-link').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default link behavior
-            const popup = document.getElementById('popup-message');
-            popup.style.display = 'block'; // Show the popup
-            
-           setTimeout(function() {
-                popup.style.display = 'none'; // Hide the popup after 3 seconds
-                // Use window.location.href to navigate to the Google Sheet in the same tab
-                window.location.href = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRj1WwucrI3OegJqcOXf47IA7Uj_-dAGBIA8VZY940RlKm2V8xjLTBctPY0uPLsq6SEtBB5BtxIVm3k/pubhtml?gid=1176654629&single=true'; 
-            }, 6000); // After 6 seconds, navigate to the Google Sheet
-        });
+    <!-- Right Group: Bell + User -->
+    <div class="d-flex align-items-center">
+      <a class="text-white position-relative me-3" href="#">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">12</span>
+      </a>
+      <img src="https://via.placeholder.com/30" class="user-img me-2" />
+      <span class="text-white me-2">Muhammad Hamza Ghafoor</span>
+      <i class="bi bi-three-dots-vertical text-white"></i>
+    </div>
+  </div>
+</nav>
 
-         // Event listener for dropdown menu to navigate to the selected page
-         document.getElementById('dropdown-menu').addEventListener('change', function(event) {
-            var selectedValue = event.target.value;
-             
-           // Only redirect if the value is not the placeholder
-            if (selectedValue !== "#") {
-                window.location.href = selectedValue; // Redirect to the selected page
-            }
-        });
-    </script>
+<!-- Sidebar -->
+<div class="sidebar">
+  <input type="text" class="form-control mb-2" placeholder="Quick search">
+  <div class="accordion" id="sidebarMenu">
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse"><div class="accordion-body">Dashboard</div></div></div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#master">Master Files</button></h2><div id="master" class="accordion-collapse collapse"><div class="accordion-body">Items</div></div></div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#vouchers">Vouchers</button></h2><div id="vouchers" class="accordion-collapse collapse"><div class="accordion-body">Voucher List</div></div></div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#recon">Reconciliation</button></h2><div id="recon" class="accordion-collapse collapse"><div class="accordion-body">Bank Match</div></div></div>
+    <div class="accordion-item">
+    <h2 class="accordion-header">
+    <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#reports">
+      Reports
+    </button>
+  </h2>
+  <div id="reports" class="accordion-collapse collapse">
+    <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="productionsummary" class="text-decoration-none text-dark">Production Summary</a></li>
+        <li><a href="productionsummary" class="text-decoration-none text-dark">View Google Sheet</a></li>
+        <li><a href="downloadfiles" class="text-decoration-none text-dark">Download Excel Files</a></li>
+        <li><a href="leaveform" class="text-decoration-none text-dark">Leaveform</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#control">Control Data</button></h2><div id="control" class="accordion-collapse collapse"><div class="accordion-body">Data Import</div></div></div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#access">Access Control</button></h2><div id="access" class="accordion-collapse collapse"><div class="accordion-body">User Roles</div></div></div>
+  </div>  
+</div>
+
+<!-- Main Content -->
+<div class="content">
+  <h1 class="text-center heading-purple display-5 mt-3">Arfa Foods and Spices</h1>
+  <div class="text-center my-4">
+    <button class="btn btn-voucher btn-lg">Manage Vouchers</button>
+  </div>
+  <div class="bg-light-blue p-4 rounded shadow-sm">
+    <h5 class="fw-bold">Executive Reports1</h5>
+    <button class="btn btn-info btn-sm me-2"><i class="bi bi-list"></i> Summary</button>
+    <button class="btn btn-purple"><i class="bi bi-file-earmark-text"></i> All Receivables</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
