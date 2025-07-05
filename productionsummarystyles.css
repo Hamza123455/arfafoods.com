@@ -63,20 +63,21 @@ h2 {
 }
 
 @media print {
+    @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  body {
+    zoom: 65%; /* Shrink content to fit portrait width */
+  }
+
   button, #itemSearch, canvas {
     display: none !important;
   }
+
   thead tr:nth-child(2) {
     display: none !important;
   }
 }
 
-@media (max-width: 768px) {
-  input[type="text"] {
-    width: 100%;
-  }
-
-  .table-wrapper {
-    padding: 10px;
-  }
-}
