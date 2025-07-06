@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Facebook Login - Arfa Foods</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h2>Facebook Login</h2>
+
+  <!-- Facebook Login Button -->
+  <fb:login-button 
+    scope="public_profile,email"
+    onlogin="checkLoginState();">
+  </fb:login-button>
+
+  <!-- Status display -->
+  <p id="status">Waiting for login...</p>
+
+  <!-- Load Facebook SDK -->
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1257899765727988',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v19.0'
+      });
+
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    };
+
+    (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
+
+    function statusChangeCallback(response) {
+      console.log('FB login response:', response);
+      const statusText = document.getElementById('status');
+      if (response.status === 'connected') {
+        const token = response.authResponse.accessToken;
+        FB.api('/me?fields=name,email', function(profile) {
+          statusText.innerHTML = `
+            ✅ Logged in as: <strong>${profile.name}</strong><br>
+            📧 Email: ${profile.email || 'Not granted'}<br>
+            🔑 Access Token:<br><code>${token}</code>
+          `;
+        });
+      } else {
+        statusText.innerHTML = '❌ Please log in with Facebook.';
+      }
+    }
+  </script>
+</body>
+</html>
