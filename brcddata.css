@@ -1,0 +1,22 @@
+body {
+  background: #f8f9fa;
+  padding: 20px;
+}
+.table-form {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.table img {
+  width: 60px;
+  height: auto;
+  border-radius: 4px;
+}
+.search-input {
+  width: 100%;
+  margin-bottom: 6px;
+}
+#historySection {
+  margin-top: 30px;
+}
