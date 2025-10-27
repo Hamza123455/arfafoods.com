@@ -1,4 +1,4 @@
-const apiUrl = "https://script.google.com/macros/s/AKfycbwKi1rtGxO89KHaDhUgiI3lzAoWth8mP5jtqYi4kYvlX3OpzzzKlTYRJgHhAcBmK2PW/exec;
+const apiUrl = "https://script.google.com/macros/s/AKfycbwKi1rtGxO89KHaDhUgiI3lzAoWth8mP5jtqYi4kYvlX3OpzzzKlTYRJgHhAcBmK2PW/exec";
 let rawData = [];
 let headers = [];
 let chartInstance = null;
