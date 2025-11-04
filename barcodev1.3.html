@@ -128,30 +128,31 @@
                           let highlightedIndex = -1;
 
                           searchInput.addEventListener('input', function() {
-                          const query = searchInput.value.toLowerCase();
-                          itemList.innerHTML = '';
-                          highlightedIndex = -1;
-                          if (query) {
-                          const filteredItems = items.filter(item =>
-                          item.ItemName.toLowerCase().includes(query)
-                          );
-                         if (filteredItems.length > 0) {
-                                                              itemList.style.display = 'block';
-                                                              filteredItems.forEach(item => {
-                                                                                                    const option = document.createElement('div');
-                                                                                                    option.className = 'item-option';
-                                                                                                    option.innerHTML = `${item.ItemCode} - ${item.ItemName} - ${item.UrduName}`;
-                                                                                                    option.dataset.code = item.ItemCode;
-                                                                                                    option.onclick = () => selectItem(item.ItemCode.toString());
-                                                                                                    itemList.appendChild(option);
-                                                                                            });
-      } else {
-        itemList.style.display = 'none';
-      }
-    } else {
-      itemList.style.display = 'none';
-    }
-  });
+                                                                                const query = searchInput.value.toLowerCase();
+                                                                                itemList.innerHTML = '';
+                                                                                highlightedIndex = -1;
+                                                                                if (query) {
+                                                                                            const filteredItems = items.filter(item =>
+                                                                                                                                item.ItemName.toLowerCase().includes(query)
+                                                                                                                               );
+                                                                                            if (filteredItems.length > 0) {
+                                                                                                                                itemList.style.display = 'block';
+                                                                                                                                filteredItems.forEach(item => {
+                                                                                                                                                                      const option = document.createElement('div');
+                                                                                                                                                                      option.className = 'item-option';
+                                                                                                                                                                      option.innerHTML = `${item.ItemCode} - ${item.ItemName} - ${item.UrduName}`;
+                                                                                                                                                                      option.dataset.code = item.ItemCode;
+                                                                                                                                                                      option.onclick = () => selectItem(item.ItemCode.toString());
+                                                                                                                                                                      itemList.appendChild(option);
+                                                                                                                                                              });
+                                                                                                                            } 
+                                                                                    else {
+                                                                                            itemList.style.display = 'none';
+                                                                                          }
+                                                                                         } else {
+                                                                                                      itemList.style.display = 'none';
+                                                                                                }
+                                                                          });
 
   searchInput.addEventListener('keydown', function(event) {
     const options = itemList.querySelectorAll('.item-option');
@@ -318,6 +319,7 @@
 
 </body>
 </html>
+
 
 
 
