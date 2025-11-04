@@ -100,51 +100,51 @@
                       }
        </style>
 </head>
-<body>
+       <body>
 
-<input type="text" id="searchInput" placeholder="Type item name..." autocomplete="on">
-<div id="itemList"></div>
-<button id="printButton" style="display: none;">Print</button>
-<div id="results"></div>
+            <input type="text" id="searchInput" placeholder="Type item name..." autocomplete="on">
+            <div id="itemList"></div>
+            <button id="printButton" style="display: none;">Print</button>
+            <div id="results"></div>
 
-<script>
-  let items = [];
+                  <script>
+                          let items = [];
 
-  // ✅ Replace this with your actual GitHub raw JSON URL
-  fetch('https://raw.githubusercontent.com/Hamza123455/masterfile/main/items.json')
-    .then(response => response.json())
-    .then(data => {
-      items = data;
-      console.log("Items loaded from GitHub JSON:", items);
-    })
-    .catch(error => {
-      console.error("Error fetching items.json:", error);
-    });
+                          // ✅ Replace this with your actual GitHub raw JSON URL
+                          fetch('https://raw.githubusercontent.com/Hamza123455/masterfile/main/items.json')
+                         .then(response => response.json())
+                         .then(data => {
+                                                items = data;
+                                                console.log("Items loaded from GitHub JSON:", items);
+                                        })
+                          .catch(error => {
+                                                console.error("Error fetching items.json:", error);
+                                           });
 
-  const searchInput = document.getElementById('searchInput');
-  const itemList = document.getElementById('itemList');
-  const resultsDiv = document.getElementById('results');
-  const printButton = document.getElementById('printButton');
-  let highlightedIndex = -1;
+                          const searchInput = document.getElementById('searchInput');
+                          const itemList = document.getElementById('itemList');
+                          const resultsDiv = document.getElementById('results');
+                          const printButton = document.getElementById('printButton');
+                          let highlightedIndex = -1;
 
-  searchInput.addEventListener('input', function() {
-    const query = searchInput.value.toLowerCase();
-    itemList.innerHTML = '';
-    highlightedIndex = -1;
-    if (query) {
-      const filteredItems = items.filter(item =>
-        item.ItemName.toLowerCase().includes(query)
-      );
-      if (filteredItems.length > 0) {
-        itemList.style.display = 'block';
-        filteredItems.forEach(item => {
-          const option = document.createElement('div');
-          option.className = 'item-option';
-          option.innerHTML = `${item.ItemCode} - ${item.ItemName} - ${item.UrduName}`;
-          option.dataset.code = item.ItemCode;
-          option.onclick = () => selectItem(item.ItemCode.toString());
-          itemList.appendChild(option);
-        });
+                          searchInput.addEventListener('input', function() {
+                          const query = searchInput.value.toLowerCase();
+                          itemList.innerHTML = '';
+                          highlightedIndex = -1;
+                          if (query) {
+                          const filteredItems = items.filter(item =>
+                          item.ItemName.toLowerCase().includes(query)
+                          );
+                         if (filteredItems.length > 0) {
+                                                              itemList.style.display = 'block';
+                                                              filteredItems.forEach(item => {
+                                                                                                    const option = document.createElement('div');
+                                                                                                    option.className = 'item-option';
+                                                                                                    option.innerHTML = `${item.ItemCode} - ${item.ItemName} - ${item.UrduName}`;
+                                                                                                    option.dataset.code = item.ItemCode;
+                                                                                                    option.onclick = () => selectItem(item.ItemCode.toString());
+                                                                                                    itemList.appendChild(option);
+                                                                                            });
       } else {
         itemList.style.display = 'none';
       }
@@ -318,5 +318,6 @@
 
 </body>
 </html>
+
 
 
