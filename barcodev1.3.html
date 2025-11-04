@@ -146,72 +146,75 @@
                                                                                                                                                                       itemList.appendChild(option);
                                                                                                                                                               });
                                                                                                                             } 
-                                                                                    else {
-                                                                                            itemList.style.display = 'none';
-                                                                                          }
-                                                                                         } else {
+                                                                                          else {
+                                                                                                  itemList.style.display = 'none';
+                                                                                                }
+                                                                                          } else {
                                                                                                       itemList.style.display = 'none';
                                                                                                 }
                                                                           });
 
-  searchInput.addEventListener('keydown', function(event) {
-    const options = itemList.querySelectorAll('.item-option');
-    if (event.key === 'ArrowDown') {
-      highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
-      updateHighlightedOption(options);
-      event.preventDefault();
-    } else if (event.key === 'ArrowUp') {
-      highlightedIndex = Math.max(highlightedIndex - 1, 0);
-      updateHighlightedOption(options);
-      event.preventDefault();
-    } else if (event.key === 'Enter' && highlightedIndex >= 0) {
-      selectItem(options[highlightedIndex].dataset.code);
-      event.preventDefault();
-    }
-  });
+                          searchInput.addEventListener('keydown', function(event) {
+                                                                                        const options = itemList.querySelectorAll('.item-option');
+                                                                                        if (event.key === 'ArrowDown') {
+                                                                                                                              highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
+                                                                                                                              updateHighlightedOption(options);
+                                                                                                                              event.preventDefault();
+                                                                                                                        } 
+                                                                                        else if (event.key === 'ArrowUp') {
+                                                                                                                              highlightedIndex = Math.max(highlightedIndex - 1, 0);
+                                                                                                                              updateHighlightedOption(options);
+                                                                                                                              event.preventDefault();
+                                                                                                                           } 
+                                                                                        else if (event.key === 'Enter' && highlightedIndex >= 0) {
+                                                                                                                                                      selectItem(options[highlightedIndex].dataset.code);
+                                                                                                                                                       event.preventDefault();
+                                                                                                                                                  }
+                                                                                      });
 
-  function updateHighlightedOption(options) {
-    options.forEach((option, index) => {
-      option.style.backgroundColor = (index === highlightedIndex) ? '#e9ecef' : 'white';
-    });
-  }
+                          function updateHighlightedOption(options) {
+                                                                            options.forEach((option, index) => {
+                                                                                                                  option.style.backgroundColor = (index === highlightedIndex) ? '#e9ecef' : 'white';
+                                                                                                                });
+                                                                    }
 
-  function selectItem(code) {
-    searchInput.value = '';
-    itemList.style.display = 'none';
-    addItemToResults(code);
-  }
+                          function selectItem(code) {
+                                                          searchInput.value = '';
+                                                          itemList.style.display = 'none';
+                                                          addItemToResults(code);
+                                                    }
 
-  function addItemToResults(code) {
-    const foundItem = items.find(item => item.ItemCode.toString() === code);
-    resultsDiv.innerHTML = '';
-    printButton.style.display = 'none';
-    const currentDate = new Date();
-    const mfgDate = currentDate.toISOString().split('T')[0];
-    const expDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 1)).toISOString().split('T')[0];
-    if (foundItem) {
-      const itemDiv = document.createElement('div');
-      itemDiv.classList.add('item');
-      itemDiv.innerHTML = `
-        <h2>${foundItem.UrduName}</h2>
-        <div class="dates">
-          <span>MFG:</span>
-          <input type="text" value="${formatDate(new Date(mfgDate))}" />
-          <span>EXP:</span>
-          <input type="text" value="${formatDate(new Date(expDate))}" />
-        </div>
-        <img class="barcode-img" src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${foundItem.ItemCode}&scale=3" alt="Barcode">
-        <div class="barcode-number">${foundItem.ItemCode}</div>
-        <div class="info">
-          <input type="number" min="1" placeholder="Quantity" id="quantity-${foundItem.ItemCode}" />
-        </div>
-      `;
-      resultsDiv.appendChild(itemDiv);
-      printButton.style.display = 'inline';
-    } else {
-      resultsDiv.innerHTML = 'No items found.';
-    }
-  }
+                          function addItemToResults(code) {
+                                                             const foundItem = items.find(item => item.ItemCode.toString() === code);
+                                                             resultsDiv.innerHTML = '';
+                                                             printButton.style.display = 'none';
+                                                             const currentDate = new Date();
+                                                             const mfgDate = currentDate.toISOString().split('T')[0];
+                                                             const expDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 1)).toISOString().split('T')[0];
+                                                             if (foundItem) {
+                                                                                    const itemDiv = document.createElement('div');
+                                                                                    itemDiv.classList.add('item');
+                                                                                    itemDiv.innerHTML = `
+                                                                                    <h2>${foundItem.UrduName}</h2>
+                                                                                    <div class="dates">
+                                                                                          <span>MFG:</span>
+                                                                                          <input type="text" value="${formatDate(new Date(mfgDate))}" />
+                                                                                          <span>EXP:</span>
+                                                                                          <input type="text" value="${formatDate(new Date(expDate))}" />
+                                                                                    </div>
+                                                                                    <img class="barcode-img" src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${foundItem.ItemCode}&scale=3" alt="Barcode">
+                                                                                    <div class="barcode-number">${foundItem.ItemCode}</div>
+                                                                                    <div class="info">
+                                                                                        <input type="number" min="1" placeholder="Quantity" id="quantity-${foundItem.ItemCode}" />
+                                                                                    </div>
+                                                                                     `;
+                                                                                    resultsDiv.appendChild(itemDiv);
+                                                                                    printButton.style.display = 'inline';
+                                                                             } 
+                                                             else {
+                                                                                    resultsDiv.innerHTML = 'No items found.';
+                                                                  }
+                                                            }
 
   document.getElementById('printButton').addEventListener('click', function() {
     const printWindow = window.open('', '_blank');
@@ -319,6 +322,7 @@
 
 </body>
 </html>
+
 
 
 
