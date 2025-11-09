@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,16 +8,16 @@
     <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
     <style>
          body {
-            font-family: 'Times New Roman', serif;
-            margin: 0;
-            padding: 0;
-            border: 2.5px solid #000; /* Full-page border */
-            box-sizing: border-box; /* Ensure border is included in width/height */
-        }
+                font-family: 'Times New Roman', serif;
+                margin: 0;
+                padding: 0;
+                border: 2.5px solid #000; /* Full-page border */
+                box-sizing: border-box; /* Ensure border is included in width/height */
+              }
         p.MsoNormal {
-            margin-top: 0;
-            margin-right: 0;
-            margin-bottom: 8pt;
+                  margin-top: 0;
+                 margin-right: 0;
+                  margin-bottom: 8pt;
             margin-left: 0;
             line-height: 107%;
             font-size: 11pt;
@@ -211,84 +212,119 @@
 
 <div class="print-date-time"></div>
 
+<!-- ✅ BUTTONS -->
+<div class="buttons-container" style="margin:20px;">
+  <button onclick="saveToSheet()" style="font-size:16px;">Save to Google Sheet</button>
+  <button onclick="saveAndPrint()" style="font-size:16px;">Print Form</button>
+</div>
 <script>
-        const employeeInput = document.getElementById('employee-name');
-  const contactInput = document.getElementById('contactNumber');
-  const suggestionBox = document.getElementById('suggestions');
+const employeeInput = document.getElementById('employee-name');
+const contactInput = document.getElementById('contactNumber');
+const suggestionBox = document.getElementById('suggestions');
 
-  let employees = [];
+let employees = [];
 
-  // ✅ Replace with your actual raw GitHub URL:
-  const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json';
+const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json';
+const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyYfTu5rB071og5sxYhpO6UDK1D0DVYTftR_r3OREqgGCLHiHOfE6IdEn_zktpKKYnn2A/exec';
 
-  // Fetch employee data
-  fetch(GITHUB_JSON_URL)
-    .then(response => response.json())
-    .then(data => {
-      employees = data.employees; // ✅ Access inside "employees"
-    });
+// Fetch employee data
+fetch(GITHUB_JSON_URL)
+  .then(response => response.json())
+  .then(data => employees = data.employees);
 
-  // Live suggestions
-  employeeInput.addEventListener('input', function () {
-    const value = this.value.trim().toLowerCase();
-    suggestionBox.innerHTML = '';
-
-    if (!value) return;
-
-    const matches = employees.filter(emp => emp.name.toLowerCase().includes(value));
-
-    matches.forEach(match => {
-      const div = document.createElement('div');
-      div.textContent = match.name;
-      div.addEventListener('click', () => {
-        employeeInput.value = match.name;
-        contactInput.value = match.empcontactno || '';
-        suggestionBox.innerHTML = '';
-      });
-      suggestionBox.appendChild(div);
-    });
-  });
-
-  // Hide suggestions if clicked outside
-  document.addEventListener('click', function (e) {
-    if (!suggestionBox.contains(e.target) && e.target !== employeeInput) {
+// Live suggestions
+employeeInput.addEventListener('input', function () {
+  const value = this.value.trim().toLowerCase();
+  suggestionBox.innerHTML = '';
+  if (!value) return;
+  const matches = employees.filter(emp => emp.name.toLowerCase().includes(value));
+  matches.forEach(match => {
+    const div = document.createElement('div');
+    div.textContent = match.name;
+    div.addEventListener('click', () => {
+      employeeInput.value = match.name;
+      contactInput.value = match.empcontactno || '';
       suggestionBox.innerHTML = '';
-    }
+    });
+    suggestionBox.appendChild(div);
   });
-    function validateInput() {
-        var input = document.getElementById('contactNumber').value;
-        var errorMessage = document.getElementById('error-message');
-        var regex = /^\d{4}_\d{7}$/;
+});
 
-        if (regex.test(input)) {
-            errorMessage.style.display = 'none';
-        } else {
-            errorMessage.style.display = 'block';
-        }
-    }
-         // JavaScript to add current date and time for printing with seconds
-         function updatePrintDateTime() {
-            const now = new Date();
-            const formattedDate = now.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-            const formattedTime = now.toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            document.querySelector('.print-date-time').textContent = `Printed on: ${formattedDate} ${formattedTime}`;
-        }
+document.addEventListener('click', function (e) {
+  if (!suggestionBox.contains(e.target) && e.target !== employeeInput) {
+    suggestionBox.innerHTML = '';
+  }
+});
 
-        // Update the date and time immediately on load and then every second
-        //window.onload = () => 
-        {
-            updatePrintDateTime();
-            setInterval(updatePrintDateTime, 1000); // Update every second
-            alert('THE FORM HAS BEEN UPDATED,CLICK OK OR PRESS ENTER TO CONTNUE')
-        };//
+// ✅ Save data to Google Sheet
+function saveToSheet() {
+  const date = document.getElementById('date').value;
+  const name = document.getElementById('employee-name').value;
+  const contact = document.getElementById('contactNumber').value;
+  const department = document.getElementById('department-name').value;
+  const lastLeaveDate = document.getElementById('lastLeaveDate').value;
+
+  if (!name || !contact || !lastLeaveDate) {
+    alert("Please fill in all required fields before saving.");
+    return;
+  }
+
+  const data = { date, name, contact, department, lastLeaveDate };
+
+  fetch(GOOGLE_SHEET_WEBAPP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(() => alert("✅ Data saved to Google Sheet successfully!"))
+  .catch(err => alert("❌ Error saving data: " + err));
+}
+
+// ✅ Save data and then print the form
+function saveAndPrint() {
+  const buttons = document.querySelector('.buttons-container');
+  const date = document.getElementById('date').value;
+  const name = document.getElementById('employee-name').value;
+  const contact = document.getElementById('contactNumber').value;
+  const department = document.getElementById('department-name').value;
+  const lastLeaveDate = document.getElementById('lastLeaveDate').value;
+
+  if (!name || !contact || !lastLeaveDate) {
+    alert("Please fill in all required fields before printing.");
+    return;
+  }
+
+  const data = { date, name, contact, department, lastLeaveDate };
+
+  fetch(GOOGLE_SHEET_WEBAPP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    // Hide buttons before print
+    buttons.style.display = 'none';
+    setTimeout(() => {
+      window.print();
+      // Show buttons again after printing
+      setTimeout(() => { buttons.style.display = 'block'; }, 1000);
+    }, 800);
+  })
+  .catch(err => alert("❌ Error saving data: " + err));
+}
+
+// Show date and time on print
+function updatePrintDateTime() {
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const formattedTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.querySelector('.print-date-time').textContent = `Printed on: ${formattedDate} ${formattedTime}`;
+}
+
+updatePrintDateTime();
+setInterval(updatePrintDateTime, 1000);
 </script>
 
 </body>
