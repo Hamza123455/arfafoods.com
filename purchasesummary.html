@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Orders - Kanwal Trading Company</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f7ca62;
+      font-weight: bold;
+    }
+    tr:hover {
+      background-color: #f2f2f2;
+    }
+    .status {
+      color: green;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 95%;
+      padding: 6px;
+      font-size: 13px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    @media (max-width: 768px) {
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Purchase Orders Summary</h1>
+  
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>PO No</th>
+        <th>Date</th>
+        <th>Supplier</th>
+        <th>Item Description</th>
+        <th>Rate</th>
+        <th>Quantity Ordered</th>
+        <th>Total Received</th>
+        <th>Balance Pending</th>
+        <th>Status</th>
+        <th>Invoice No</th>
+        <th>Remarks</th>
+      </tr>
+      <tr id="search-row">
+        <!-- Search inputs will be created dynamically -->
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+<script>
+  const apiUrl = "https://script.google.com/macros/s/AKfycbyvLtcZEkXgwVz-iW-RoC0J8naeWNRKpFgEtihqqBW5KaiQoXddvCeK5sOwdkElWRYw5w/exec"; // paste your deployed URL
+
+  async function loadData() {
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    const tableBody = document.querySelector("#data-table tbody");
+    const searchRow = document.getElementById("search-row");
+
+    // Create search inputs
+    Object.keys(data[0]).forEach(() => {
+      const th = document.createElement("th");
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Search...";
+      input.addEventListener("keyup", filterTable);
+      th.appendChild(input);
+      searchRow.appendChild(th);
+    });
+
+    // Fill table
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      Object.values(row).forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      tableBody.appendChild(tr);
+    });
+  }
+
+  function filterTable() {
+    const table = document.getElementById("data-table");
+    const filters = Array.from(table.querySelectorAll("#search-row input")).map(input => input.value.toLowerCase());
+    const rows = table.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      let visible = true;
+      filters.forEach((filter, i) => {
+        if (filter && !cells[i].textContent.toLowerCase().includes(filter)) {
+          visible = false;
+        }
+      });
+      row.style.display = visible ? "" : "none";
+    });
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
