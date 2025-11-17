@@ -124,7 +124,7 @@ function renderChartIfOneMatch(rows) {
   if (rows.length === 1) {
     const item = rows[0];
 
-    const planned = parseFloat(item["Planned"]) || 0;
+    const planned = parseFloat(item["Estimate"]) || 0;
     const requirement = parseFloat(item["Total-Req"]) || 0;
     const produced = parseFloat(item["Produced"]) || 0;
     const furtherRequired = parseFloat(item["Further Required"]) || 0;
