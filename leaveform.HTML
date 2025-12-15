@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -232,20 +233,28 @@ fetch(GITHUB_JSON_URL)
   .then(response => response.json())
   .then(data => employees = data.employees);
 
-// Live suggestions
 employeeInput.addEventListener('input', function () {
   const value = this.value.trim().toLowerCase();
   suggestionBox.innerHTML = '';
   if (!value) return;
-  const matches = employees.filter(emp => emp.name.toLowerCase().includes(value));
-  matches.forEach(match => {
+
+  const matches = employees.filter(emp =>
+    emp.name.toLowerCase().includes(value)
+  );
+
+  matches.forEach(emp => {
     const div = document.createElement('div');
-    div.textContent = match.name;
+
+    // ✅ Show: Name_FatherName
+    div.textContent = `${emp.name}_${emp.fathername || ''}`;
+
     div.addEventListener('click', () => {
-      employeeInput.value = match.name;
-      contactInput.value = match.empcontactno || '';
+      // ✅ When clicked, only NAME goes into input
+      employeeInput.value = emp.name;
+      contactInput.value = emp.empcontactno || '';
       suggestionBox.innerHTML = '';
     });
+
     suggestionBox.appendChild(div);
   });
 });
@@ -329,4 +338,3 @@ setInterval(updatePrintDateTime, 1000);
 
 </body>
 </html>
-
