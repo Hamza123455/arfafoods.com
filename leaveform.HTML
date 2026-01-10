@@ -217,7 +217,30 @@
 <div class="buttons-container" style="margin:20px;">
   <button onclick="saveToSheet()" style="font-size:16px;">Save Data</button>
   <button onclick="saveAndPrint()" style="font-size:16px;">Print</button>
+  <input type="hidden" id="employee-id">
 </div>
+<div id="leaveDialog" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:9999;
+">
+  <div style="
+    background:#fff;
+    width:320px;
+    margin:10% auto;
+    padding:15px;
+    border-radius:6px;
+  ">
+    <h3>Select Last Leave Date</h3>
+    <div id="leaveList"></div>
+    <br>
+    <button onclick="closeLeaveDialog()">Cancel</button>
+  </div>
+</div>
+
 <script>
 const employeeInput = document.getElementById('employee-name');
 const contactInput = document.getElementById('contactNumber');
@@ -226,7 +249,7 @@ const suggestionBox = document.getElementById('suggestions');
 let employees = [];
 
 const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json';
-const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyYfTu5rB071og5sxYhpO6UDK1D0DVYTftR_r3OREqgGCLHiHOfE6IdEn_zktpKKYnn2A/exec';
+const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
 
 // Fetch employee data
 fetch(GITHUB_JSON_URL)
@@ -249,11 +272,14 @@ employeeInput.addEventListener('input', function () {
     div.textContent = `${emp.name}_${emp.fathername || ''}`;
 
     div.addEventListener('click', () => {
-      // ✅ When clicked, only NAME goes into input
-      employeeInput.value = emp.name;
-      contactInput.value = emp.empcontactno || '';
-      suggestionBox.innerHTML = '';
-    });
+  employeeInput.value = emp.name;
+  contactInput.value = emp.empcontactno || '';
+  document.getElementById('employee-id').value = emp.empid || '';
+  suggestionBox.innerHTML = '';
+
+  // 🔥 FETCH ALL LAST LEAVES
+  fetchLastLeaves(emp.empid);
+});
 
     suggestionBox.appendChild(div);
   });
@@ -264,10 +290,42 @@ document.addEventListener('click', function (e) {
     suggestionBox.innerHTML = '';
   }
 });
+function fetchLastLeaves(empid) {
+  fetch(`${GOOGLE_SHEET_WEBAPP_URL}?empid=${empid}`)
+    .then(res => res.json())
+    .then(dates => {
+      if (!dates.length) return;
+
+      const list = document.getElementById('leaveList');
+      list.innerHTML = '';
+
+      dates.forEach(date => {
+        const div = document.createElement('div');
+        div.textContent = date;
+        div.style.cursor = 'pointer';
+        div.style.padding = '6px';
+        div.style.borderBottom = '1px solid #ccc';
+
+        div.onclick = () => {
+          document.getElementById('lastLeaveDate').value = date;
+          closeLeaveDialog();
+        };
+
+        list.appendChild(div);
+      });
+
+      document.getElementById('leaveDialog').style.display = 'block';
+    });
+}
+
+function closeLeaveDialog() {
+  document.getElementById('leaveDialog').style.display = 'none';
+}
 
 // ✅ Save data to Google Sheet
 function saveToSheet() {
   const date = document.getElementById('date').value;
+  const empid = document.getElementById('employee-id').value;
   const name = document.getElementById('employee-name').value;
   const contact = document.getElementById('contactNumber').value;
   const department = document.getElementById('department-name').value;
@@ -278,7 +336,7 @@ function saveToSheet() {
     return;
   }
 
-  const data = { date, name, contact, department, lastLeaveDate };
+  const data = { date, empid, name, contact, department, lastLeaveDate };
 
   fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: 'POST',
@@ -294,6 +352,7 @@ function saveToSheet() {
 function saveAndPrint() {
   const buttons = document.querySelector('.buttons-container');
   const date = document.getElementById('date').value;
+  const empid = document.getElementById('employee-id').value;
   const name = document.getElementById('employee-name').value;
   const contact = document.getElementById('contactNumber').value;
   const department = document.getElementById('department-name').value;
@@ -304,7 +363,7 @@ function saveAndPrint() {
     return;
   }
 
-  const data = { date, name, contact, department, lastLeaveDate };
+  const data = { date, empid, name, contact, department, lastLeaveDate };
 
   fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: 'POST',
@@ -338,3 +397,4 @@ setInterval(updatePrintDateTime, 1000);
 
 </body>
 </html>
+
