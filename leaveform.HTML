@@ -298,21 +298,29 @@ function fetchLastLeaves(empid) {
 
       const list = document.getElementById('leaveList');
       list.innerHTML = '';
+dates.forEach(item => {
+  const div = document.createElement('div');
+  div.style.padding = '8px';
+  div.style.borderBottom = '1px solid #ccc';
+  div.style.cursor = 'pointer';
 
-      dates.forEach(date => {
-        const div = document.createElement('div');
-        div.textContent = date;
-        div.style.cursor = 'pointer';
-        div.style.padding = '6px';
-        div.style.borderBottom = '1px solid #ccc';
+  // ✅ DATE (COLUMN B) IS PRIMARY
+  div.innerHTML = `
+    <strong>Date Selected:</strong> ${item.date}<br>
+    <span style="color:#555">
+      Last Leave Date: ${item.lastLeaveDate}
+    </span>
+  `;
 
-        div.onclick = () => {
-          document.getElementById('lastLeaveDate').value = date;
-          closeLeaveDialog();
-        };
+  div.onclick = () => {
+    // ✅ Only Column G is written to input
+    document.getElementById('lastLeaveDate').value = item.lastLeaveDate;
+    closeLeaveDialog();
+  };
 
-        list.appendChild(div);
-      });
+  list.appendChild(div);
+});
+
 
       document.getElementById('leaveDialog').style.display = 'block';
     });
