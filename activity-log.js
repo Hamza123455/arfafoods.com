@@ -43,7 +43,7 @@ let startTime = Date.now();
 
 // First visit + returning user
 if (!localStorage.getItem("visited")) {
-  alert("This website collects activity for analytics and security.");
+  alert("Please Click Ok To Continue.");
   localStorage.setItem("visited", "yes");
   sendLog("First Visit");
 } else {
@@ -70,4 +70,5 @@ document.addEventListener("change", (e) => {
   if (e.target.tagName === "INPUT") {
     sendLog("Search", e.target.value);
   }
+
 });
