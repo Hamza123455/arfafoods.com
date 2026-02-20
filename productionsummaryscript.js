@@ -215,16 +215,74 @@ fetch(apiUrl)
 document.getElementById("itemSearch").addEventListener("input", filterTable);
 
 function exportToPDF() {
-  const originalTitle = document.title;
-  document.title = "Production Summary";
+  const choice = prompt(
+    "Select export option:\n\n" +
+    "1 = All Data\n" +
+    "2 = Production Only\n" +
+    "3 = Current Stock\n\n" +
+    "Enter 1, 2 or 3"
+  );
 
-  const filterRow = document.querySelector("#sheet-table thead tr:nth-child(2)");
-  if (filterRow) filterRow.style.display = "none";
+  if (!choice) return;
 
-  window.print();
+  applyPDFView(choice);
 
-  document.title = originalTitle;
   setTimeout(() => {
-    if (filterRow) filterRow.style.display = "";
-  }, 1000);
+    window.print();
+    resetPDFView();
+  }, 500);
+}
+function applyPDFView(choice) {
+  const table = document.getElementById("sheet-table");
+  const rows = table.querySelectorAll("tr");
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("th, td");
+
+    headers.forEach((header, i) => {
+
+      // SHOW ALL
+      if (choice === "1") {
+        cells[i].style.display = "";
+      }
+
+      // PRODUCTION VIEW
+      else if (choice === "2") {
+        if (
+          header.includes("Produced") ||
+          header.includes("Planned") ||
+          header.includes("Total-Req") ||
+          header.includes("Further Required") ||
+          header.includes("Item Name")
+        ) {
+          cells[i].style.display = "";
+        } else {
+          cells[i].style.display = "none";
+        }
+      }
+
+      // CURRENT STOCK VIEW
+      else if (choice === "3") {
+        if (
+          header.includes("Stock") ||
+          header.includes("Balance") ||
+          header.includes("Item Name")
+        ) {
+          cells[i].style.display = "";
+        } else {
+          cells[i].style.display = "none";
+        }
+      }
+
+    });
+  });
+  function resetPDFView() {
+  const table = document.getElementById("sheet-table");
+  const cells = table.querySelectorAll("th, td");
+
+  cells.forEach(cell => {
+    cell.style.display = "";
+  });
+}
+}
 }
