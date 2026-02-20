@@ -214,17 +214,49 @@ fetch(apiUrl)
 
 document.getElementById("itemSearch").addEventListener("input", filterTable);
 
-function exportToPDF() {
-  const originalTitle = document.title;
-  document.title = "Production Summary";
+function applyPDFView(choice) {
+  const table = document.getElementById("sheet-table");
+  const rows = table.querySelectorAll("tr");
 
-  const filterRow = document.querySelector("#sheet-table thead tr:nth-child(2)");
-  if (filterRow) filterRow.style.display = "none";
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("th, td");
 
-  window.print();
+    headers.forEach((header, i) => {
+      const cleanHeader = header.trim().toLowerCase();
 
-  document.title = originalTitle;
-  setTimeout(() => {
-    if (filterRow) filterRow.style.display = "";
-  }, 1000);
+      // SHOW ALL
+      if (choice === "1") {
+        cells[i].style.display = "";
+      }
+
+      // PRODUCTION VIEW
+      else if (choice === "2") {
+        if (
+          cleanHeader.includes("item name") ||
+          cleanHeader.includes("planned") ||
+          cleanHeader.includes("total-req") ||
+          cleanHeader.includes("produced") ||
+          cleanHeader.includes("further required")
+        ) {
+          cells[i].style.display = "";
+        } else {
+          cells[i].style.display = "none";
+        }
+      }
+
+      // CURRENT STOCK VIEW
+      else if (choice === "3") {
+        if (
+          cleanHeader.includes("item name") ||
+          cleanHeader.includes("stock") ||
+          cleanHeader.includes("inhand")
+        ) {
+          cells[i].style.display = "";
+        } else {
+          cells[i].style.display = "none";
+        }
+      }
+    });
+  });
+}
 }
