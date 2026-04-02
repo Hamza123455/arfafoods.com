@@ -3,6 +3,19 @@ let rawData = [];
 let headers = [];
 let chartInstance = null;
 
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const table = document.getElementById('sheet-table');
+  doc.autoTable({
+    html: '#sheet-table',
+    startY: 20,
+    headStyles: { fillColor: [22, 160, 133] },
+  });
+  doc.save('table-export.pdf');
+}
+
+
 function isNumericColumn(column) {
   return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
 }
@@ -258,15 +271,4 @@ function applyPDFView(choice) {
       }
     });
   });
-}
-function exportToPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const table = document.getElementById('sheet-table');
-  doc.autoTable({
-    html: '#sheet-table',
-    startY: 20,
-    headStyles: { fillColor: [22, 160, 133] },
-  });
-  doc.save('table-export.pdf');
 }
