@@ -4,11 +4,14 @@ let headers = [];
 let chartInstance = null;
 
 function exportToPDF() {
+  if (typeof jspdf === 'undefined') {
+    alert('jsPDF library not loaded!');
+    return;
+  }
   const doc = new jspdf.jsPDF();
-  const table = document.getElementById('sheet-table');
   doc.autoTable({
     html: '#sheet-table',
-    startY: 20, 
+    startY: 20,
     headStyles: { fillColor: [22, 160, 133] },
   });
   doc.save('table-export.pdf');
