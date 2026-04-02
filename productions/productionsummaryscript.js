@@ -4,10 +4,6 @@ let headers = [];
 let chartInstance = null;
 
 function exportToPDF() {
-  if (typeof jspdf === 'undefined') {
-    alert('jsPDF library not loaded!');
-    return;
-  }
   const doc = new jspdf.jsPDF();
   doc.autoTable({
     html: '#sheet-table',
