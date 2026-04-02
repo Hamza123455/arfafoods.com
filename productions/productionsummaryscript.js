@@ -4,7 +4,7 @@ let headers = [];
 let chartInstance = null;
 
 function exportToPDF() {
-  const { jsPDF } = window.jspdf;
+  const jsPDF = window.jspdf.jsPDF;
   const doc = new jsPDF();
   const table = document.getElementById('sheet-table');
   doc.autoTable({
