@@ -238,7 +238,7 @@ fetch(apiUrl)
 
     thead.appendChild(headerRow);
     createAdvancedFilters();
-    filterTable();
+    //filterTable();
   })
   .catch(err => {
     console.error("Error:", err);
