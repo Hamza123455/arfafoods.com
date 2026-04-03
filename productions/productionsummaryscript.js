@@ -224,7 +224,8 @@ fetch(apiUrl)
 
     headers = Object.keys(rawData[0]);
     createAdvancedFilters();
-    createColumnToggle()
+    createColumnToggle();
+    filterTable();
 
     const thead = document.querySelector("#sheet-table thead");
     const headerRow = document.createElement("tr");
