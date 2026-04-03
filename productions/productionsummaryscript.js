@@ -4,13 +4,13 @@ let headers = [];
 let chartInstance = null;
 
 function exportToPDF() {
-  const doc = new jspdf.jsPDF();
-  doc.autoTable({
-    html: '#sheet-table',
-    startY: 20,
-    headStyles: { fillColor: [22, 160, 133] },
-  });
-  doc.save('table-export.pdf');
+  var printWindow = window.open('', '', 'height=600,width=800');
+  printWindow.document.write('<html><head><title>Print Table</title>');
+  printWindow.document.write('</head><body>');
+  printWindow.document.write(document.getElementById('yourTableId').outerHTML);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
 }
 
 
