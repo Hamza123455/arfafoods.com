@@ -32,6 +32,8 @@ function createColumnToggle() {
   
   document.querySelector('.table-wrapper').prepend(container);
 }
+createAdvancedFilters();
+createColumnToggle();
 
 function isNumericColumn(column) {
   return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
