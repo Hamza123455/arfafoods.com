@@ -3,19 +3,6 @@ let rawData = [];
 let headers = [];
 let chartInstance = null;
 
-function exportToPDF() {
-  var printWindow = window.open('', '', 'height=600,width=800');
-  printWindow.document.write('<html><head><title>Print Table</title>');
-  printWindow.document.write('<link rel="stylesheet" href="https:                                                                                            
-  printWindow.document.write('//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">'); // add styles if needed
-  printWindow.document.write('</head><body>');
-  printWindow.document.write(document.getElementById('yourTableId').outerHTML);
-  printWindow.document.write('</body></html>');
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
-}
-
 
 function isNumericColumn(column) {
   return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
