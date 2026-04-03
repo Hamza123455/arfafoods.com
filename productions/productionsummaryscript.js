@@ -225,7 +225,6 @@ fetch(apiUrl)
     headers = Object.keys(rawData[0]);
     createAdvancedFilters();
     createColumnToggle();
-    filterTable();
 
     const thead = document.querySelector("#sheet-table thead");
     const headerRow = document.createElement("tr");
@@ -238,7 +237,7 @@ fetch(apiUrl)
 
     thead.appendChild(headerRow);
     createAdvancedFilters();
-    //filterTable();
+    filterTable();
   })
   .catch(err => {
     console.error("Error:", err);
