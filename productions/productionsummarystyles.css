@@ -79,5 +79,13 @@ h2 {
   thead tr:nth-child(2) {
     display: none !important;
   }
+
+  .column-toggle {
+  margin-bottom: 10px;
+}
+.column-toggle label {
+  margin-left: 5px;
+}
+
 }
 
