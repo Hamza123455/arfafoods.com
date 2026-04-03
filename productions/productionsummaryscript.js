@@ -32,8 +32,6 @@ function createColumnToggle() {
   
   document.querySelector('.table-wrapper').prepend(container);
 }
-createAdvancedFilters();
-createColumnToggle();
 
 function isNumericColumn(column) {
   return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
@@ -225,6 +223,8 @@ fetch(apiUrl)
     });
 
     headers = Object.keys(rawData[0]);
+    createAdvancedFilters();
+    createColumnToggle()
 
     const thead = document.querySelector("#sheet-table thead");
     const headerRow = document.createElement("tr");
