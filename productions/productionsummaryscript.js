@@ -3,35 +3,35 @@ let rawData = [];
 let headers = [];
 let chartInstance = null;
 
-function createColumnToggle() {
-  const container = document.createElement('div');
-  container.className = 'column-toggle';
+//function createColumnToggle() {
+//  const container = document.createElement('div');
+//  container.className = 'column-toggle';
   
-  headers.forEach(header => {
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `toggle-${header}`;
-    checkbox.checked = true;
-    checkbox.addEventListener('change', () => {
-      const index = headers.indexOf(header);
-      const rows = document.querySelectorAll('#sheet-table tr');
-      rows.forEach(row => {
-        const cell = row.cells[index];
-        cell.style.display = checkbox.checked ? '' : 'none';
-      });
-    });
+//  headers.forEach(header => {
+ //   const checkbox = document.createElement('input');
+//    checkbox.type = 'checkbox';
+  //  checkbox.id = `toggle-${header}`;
+  //  checkbox.checked = true;
+  //  checkbox.addEventListener('change', () => {
+  //    const index = headers.indexOf(header);
+ //     const rows = document.querySelectorAll('#sheet-table tr');
+ //     rows.forEach(row => {
+ //       const cell = row.cells[index];
+ //       cell.style.display = checkbox.checked ? '' : 'none';
+ //     });
+ //   });
     
-    const label = document.createElement('label');
-    label.htmlFor = `toggle-${header}`;
-    label.textContent = header;
+ //   const label = document.createElement('label');
+//    label.htmlFor = `toggle-${header}`;
+//    label.textContent = header;
     
-    container.appendChild(checkbox);
-    container.appendChild(label);
-    container.appendChild(document.createElement('br'));
-  });
+ //   container.appendChild(checkbox);
+//    container.appendChild(label);
+//    container.appendChild(document.createElement('br'));
+//  });
   
-  document.querySelector('.table-wrapper').prepend(container);
-}
+ // document.querySelector('.table-wrapper').prepend(container);
+//}
 
 function isNumericColumn(column) {
   return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
