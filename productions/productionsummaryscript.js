@@ -3,35 +3,16 @@ let rawData = [];
 let headers = [];
 let chartInstance = null;
 
-//function createColumnToggle() {
-//  const container = document.createElement('div');
-//  container.className = 'column-toggle';
-  
-//  headers.forEach(header => {
- //   const checkbox = document.createElement('input');
-//    checkbox.type = 'checkbox';
-  //  checkbox.id = `toggle-${header}`;
-  //  checkbox.checked = true;
-  //  checkbox.addEventListener('change', () => {
-  //    const index = headers.indexOf(header);
- //     const rows = document.querySelectorAll('#sheet-table tr');
- //     rows.forEach(row => {
- //       const cell = row.cells[index];
- //       cell.style.display = checkbox.checked ? '' : 'none';
- //     });
- //   });
-    
- //   const label = document.createElement('label');
-//    label.htmlFor = `toggle-${header}`;
-//    label.textContent = header;
-    
- //   container.appendChild(checkbox);
-//    container.appendChild(label);
-//    container.appendChild(document.createElement('br'));
-//  });
-  
- // document.querySelector('.table-wrapper').prepend(container);
-//}
+function exportToPDF() {
+  const doc = new jspdf.jsPDF();
+  doc.autoTable({
+    html: '#sheet-table',
+    startY: 20,
+    headStyles: { fillColor: [22, 160, 133] },
+  });
+  doc.save('table-export.pdf');
+}
+
 
 function isNumericColumn(column) {
   return rawData.every(row => !isNaN(parseFloat(row[column])) || row[column] === "");
@@ -223,8 +204,6 @@ fetch(apiUrl)
     });
 
     headers = Object.keys(rawData[0]);
-    createAdvancedFilters();
-    createColumnToggle();
 
     const thead = document.querySelector("#sheet-table thead");
     const headerRow = document.createElement("tr");
