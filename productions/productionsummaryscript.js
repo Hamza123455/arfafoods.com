@@ -118,7 +118,8 @@ function filterTable() {
       const tr = document.createElement("tr");
       headers.forEach((header) => {
         const td = document.createElement("td");
-        td.textContent = row[header];
+td.textContent = isNumericColumn(header) ? 
+                 Math.round(row[header]) : row[header];
         if (header.toLowerCase().includes("item name")) td.classList.add("left-align");
         tr.appendChild(td);
       });
