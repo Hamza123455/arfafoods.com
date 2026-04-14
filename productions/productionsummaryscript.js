@@ -115,9 +115,8 @@ function filterTable() {
 
     if (show) {
       visibleRows.push(row);
-      const td = document.createElement("td");
-                 td.textContent = isNumericColumn(header) ? 
-                 Math.round(row[header]) : row[header];
+const td = document.createElement("td");
+td.textContent = row[header];
         if (header.toLowerCase().includes("item name")) td.classList.add("left-align");
         tr.appendChild(td);
       });
