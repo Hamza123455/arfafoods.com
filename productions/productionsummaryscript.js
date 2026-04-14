@@ -115,8 +115,10 @@ function filterTable() {
 
     if (show) {
       visibleRows.push(row);
-const td = document.createElement("td");
-td.textContent = row[header];
+      const tr = document.createElement("tr");
+      headers.forEach((header) => {
+        const td = document.createElement("td");
+        td.textContent = row[header];
         if (header.toLowerCase().includes("item name")) td.classList.add("left-align");
         tr.appendChild(td);
       });
