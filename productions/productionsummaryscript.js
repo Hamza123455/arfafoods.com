@@ -256,6 +256,56 @@ function applyPDFView(choice) {
           cells[i].style.display = "none";
         }
       }
+        // Show loader and animate bar to 90% while fetching
+const loader = document.getElementById("loader");
+const progressFill = document.querySelector(".progress-fill");
+const contentEls = document.querySelectorAll(".table-wrapper, #itemSearch, button, h2");
+
+let progress = 0;
+const progressInterval = setInterval(() => {
+  if (progress < 90) {
+    progress += Math.random() * 15; // Random increment to look natural
+    progressFill.style.width = progress + "%";
+  }
+}, 200);
+
+fetch(apiUrl)
+ .then(res => res.json())
+ .then(data => {
+    rawData = data.map(row => {
+      const keys = Object.keys(row);
+      const newRow = {};
+      keys.forEach((key, i) => {
+        if (i!== 0) newRow[key] = row[key];
+      });
+      return newRow;
+    });
+    headers = Object.keys(rawData[0]);
+    const thead = document.querySelector("#sheet-table thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(h => {
+      const th = document.createElement("th");
+      th.innerHTML = h.replaceAll("\n", "<br>");
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    createAdvancedFilters();
+    filterTable();
+  })
+ .catch(err => {
+    console.error("Error:", err);
+    document.querySelector(".table-wrapper").innerHTML = "<p style='color:red;'>Failed to load data.</p>";
+  })
+ .finally(() => {
+    clearInterval(progressInterval);
+    progressFill.style.width = "100%"; // Complete the bar
+
+    // Wait 300ms so user sees 100% before hiding
+    setTimeout(() => {
+      loader.style.display = "none";
+      contentEls.forEach(el => el.style.display = ""); // Show content
+    }, 300);
+  });
 
       // CURRENT STOCK VIEW
       else if (choice === "3") {
