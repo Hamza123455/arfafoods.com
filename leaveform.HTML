@@ -249,7 +249,7 @@ const suggestionBox = document.getElementById('suggestions');
 let employees = [];
 
 const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json';
-const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
+const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/CcijrCfZBuqDzBWp3qSrBEZCqBUfQVz4CWGHWF91iaEw1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
 
 // Fetch employee data
 fetch(GITHUB_JSON_URL)
@@ -352,7 +352,7 @@ function saveToSheet() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
-  .then(() => alert("✅ Data saved to Google Sheet successfully!"))
+  .then(() => alert("✅ Data saved successfully!"))
   .catch(err => alert("❌ Error saving data: " + err));
 }
 
@@ -388,7 +388,7 @@ function saveAndPrint() {
       setTimeout(() => { buttons.style.display = 'block'; }, 1000);
     }, 800);
   })
-  .catch(err => alert("❌ Error saving data: " + err));
+  .catch(err => alert(" Error saving data: " + err));
 }
 
 // Show date and time on print
