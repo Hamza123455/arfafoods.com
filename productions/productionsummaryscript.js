@@ -194,20 +194,26 @@ function renderChartIfOneMatch(rows) {
 }
 
 fetch(apiUrl)
-  .then(res => res.json())
-  .then(data => {
-    rawData = data.map(row => {
+ .then(res => {
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  })
+ .then(data => {
+    rawData = data.rows.map(row => {
       const keys = Object.keys(row);
       const newRow = {};
       keys.forEach((key, i) => {
-        if (i !== 0) newRow[key] = row[key];
+        if (i!== 0) newRow[key] = row[key];
       });
       return newRow;
     });
 
-    headers = Object.keys(rawData[0]);
+    document.getElementById("lastUpdate").textContent =
+      "Last Production Update: " + data.lastUpdate;
 
+    headers = Object.keys(rawData[0]);
     const thead = document.querySelector("#sheet-table thead");
+    thead.innerHTML = ""; // clear old headers
     const headerRow = document.createElement("tr");
 
     headers.forEach(h => {
@@ -220,12 +226,12 @@ fetch(apiUrl)
     createAdvancedFilters();
     filterTable();
   })
-  .catch(err => {
-    console.error("Error:", err);
-    document.querySelector(".table-wrapper").innerHTML = "<p style='color:red;'>Failed to load data.</p>";
+ .catch(err => {
+    console.error("Fetch error:", err);
+    document.querySelector(".table-wrapper").innerHTML =
+      "<p style='color:red; text-align:center;'>Failed to load data: " + err.message + "</p>";
+    document.getElementById("lastUpdate").textContent = "Last Production Update: Error";
   });
-
-document.getElementById("itemSearch").addEventListener("input", filterTable);
 
 function applyPDFView(choice) {
   const table = document.getElementById("sheet-table");
