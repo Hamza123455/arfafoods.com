@@ -79,8 +79,11 @@ function createAdvancedFilters() {
 
 function filterTable() {
   const tbody = document.querySelector("#sheet-table tbody");
-  const searchText = document.getElementById("itemSearch").value.toLowerCase();
+  const searchText = document.getElementById("itemSearch").value.toLowerCase().trim();
   const filterCells = document.querySelectorAll("#sheet-table thead tr:nth-child(2) th");
+
+  // Find the index of the Item Name column once
+  const itemNameIndex = headers.findIndex(h => h.trim().toLowerCase().includes("item name"));
 
   tbody.innerHTML = "";
   let visibleRows = [];
@@ -88,40 +91,48 @@ function filterTable() {
   rawData.forEach(row => {
     let show = true;
 
-    headers.forEach((header, i) => {
-      const cell = filterCells[i];
+    // 1. Search box filter - only check the Item Name column
+    if (searchText!== "" && itemNameIndex!== -1) {
+      const itemNameCol = headers[itemNameIndex];
+      const value = (row[itemNameCol] || "").toString().toLowerCase();
+      if (!value.includes(searchText)) show = false;
+    }
 
-      if (header.toLowerCase().includes("item name")) {
-        const value = (row[header] || "").toString().toLowerCase();
-        if (!value.includes(searchText)) show = false;
-        return;
-      }
+    // 2. Column filters
+    if (show) {
+      headers.forEach((header, i) => {
+        // Skip item name column here since we already handled it
+        if (i === itemNameIndex) return;
 
-      if (isNumericColumn(header)) {
-        const op = cell.querySelector("select")?.value;
-        const val1 = parseFloat(cell.querySelectorAll("input")[0]?.value || "");
-        const val2 = parseFloat(cell.querySelectorAll("input")[1]?.value || "");
-        const actual = parseFloat(row[header]);
+        const cell = filterCells[i];
+        if (!cell) return;
 
-        if (op === "=" && actual !== val1) show = false;
-        if (op === ">" && actual <= val1) show = false;
-        if (op === "<" && actual >= val1) show = false;
-        if (op === "between" && (actual < val1 || actual > val2)) show = false;
-      } else {
-        const selVal = cell.querySelector("select")?.value;
-        if (selVal && row[header] !== selVal) show = false;
-      }
-    });
+        if (isNumericColumn(header)) {
+          const op = cell.querySelector("select")?.value;
+          const val1 = parseFloat(cell.querySelectorAll("input")[0]?.value || "");
+          const val2 = parseFloat(cell.querySelectorAll("input")[1]?.value || "");
+          const actual = parseFloat(row[header]);
+
+          if (op === "=" && actual!== val1) show = false;
+          if (op === ">" && actual <= val1) show = false;
+          if (op === "<" && actual >= val1) show = false;
+          if (op === "between" && (actual < val1 || actual > val2)) show = false;
+        } else {
+          const selVal = cell.querySelector("select")?.value;
+          if (selVal && row[header]!== selVal) show = false;
+        }
+      });
+    }
 
     if (show) {
       visibleRows.push(row);
       const tr = document.createElement("tr");
       headers.forEach((header) => {
         const td = document.createElement("td");
-const value = row[header];
-td.textContent = !isNaN(value) && value !== '' ? 
-                 Math.round(+value) : value;
-        if (header.toLowerCase().includes("item name")) td.classList.add("left-align");
+        const value = row[header];
+        td.textContent =!isNaN(value) && value!== ''?
+                       Math.round(+value) : value;
+        if (header.trim().toLowerCase().includes("item name")) td.classList.add("left-align");
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
@@ -130,7 +141,7 @@ td.textContent = !isNaN(value) && value !== '' ?
 
   renderChartIfOneMatch(visibleRows);
 }
-
+document.getElementById("itemSearch").addEventListener("input", filterTable);
 function renderChartIfOneMatch(rows) {
   const canvas = document.getElementById("itemChart");
 
@@ -200,32 +211,37 @@ fetch(apiUrl)
   })
  .then(data => {
     rawData = data.rows.map(row => {
-      const keys = Object.keys(row);
-      const newRow = {};
-      keys.forEach((key, i) => {
-        if (i!== 0) newRow[key] = row[key];
-      });
-      return newRow;
+    const newRow = {};
+    Object.keys(row).forEach(key => {
+      newRow[key] = row[key];
     });
+    return newRow;
+  });
 
-    document.getElementById("lastUpdate").textContent =
-      "Last Production Update: " + data.lastUpdate;
+  document.getElementById("lastUpdate").textContent =
+    "Last Production Update: " + data.lastUpdate;
 
-    headers = Object.keys(rawData[0]);
-    const thead = document.querySelector("#sheet-table thead");
-    thead.innerHTML = ""; // clear old headers
-    const headerRow = document.createElement("tr");
+  headers = Object.keys(rawData[0] || {});
+  if (!headers.length) {
+    document.querySelector(".table-wrapper").innerHTML =
+      "<p style='text-align:center;'>No data returned</p>";
+    return;
+  }
 
-    headers.forEach(h => {
-      const th = document.createElement("th");
-      th.innerHTML = h.replaceAll("\n", "<br>");
-      headerRow.appendChild(th);
-    });
+  const thead = document.querySelector("#sheet-table thead");
+  thead.innerHTML = "";
+  const headerRow = document.createElement("tr");
 
-    thead.appendChild(headerRow);
-    createAdvancedFilters();
-    filterTable();
-  })
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.innerHTML = h.replaceAll("\n", "<br>");
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  createAdvancedFilters();
+  filterTable();
+})
  .catch(err => {
     console.error("Fetch error:", err);
     document.querySelector(".table-wrapper").innerHTML =
