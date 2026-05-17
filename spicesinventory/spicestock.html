@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arfa Foods</title>
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <link rel="stylesheet" href="spicestockstyles.css">
+</head>
+
+<body>
+<div class="container">
+    <h2>Spice Stock</h2>
+
+    <div class="toolbar">
+      <button class="btn-add" onclick="addRow()">+ Add Row</button>
+      <button class="btn-save" id="saveBtn" onclick="saveAll()">Save All</button>
+      <button class="btn-view" onclick="openViewModal()">View History</button>
+      <span id="countdown"></span>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="entryTable">
+        <thead>
+          <tr>
+            <th style="width: 40px;">#</th>
+            <th style="width: 140px;">Date</th>
+            <th>Item</th>
+            <th>Voucher Type</th>
+            <th>Voucher No</th>
+            <th>Description</th>
+            <th>Qty In</th>
+            <th>Qty Out</th>
+            <th style="width: 50px;">Del</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <datalist id="itemList"></datalist>
+
+  <!-- History Modal -->
+  <div id="viewModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Item History</h3>
+        <button class="close-btn" onclick="closeViewModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="viewItemSearch" list="itemList" placeholder="Select item to view">
+        <button onclick="loadSheetData()">Load</button>
+        <div class="table-wrapper">
+          <table id="historyTable">
+            <thead id="historyHead"></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="spicestockscript.js"></script>
+</body>
+</html>
+

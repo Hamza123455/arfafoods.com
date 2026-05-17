@@ -1,0 +1,39 @@
+body { font-family: Arial, sans-serif; padding: 15px; background: #f5f5f5; margin: 0; }
+   .container { max-width: 100%; margin: auto; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #051ab8; margin: 0 0 15px 0; }
+
+   .toolbar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+   .toolbar button { width: auto; padding: 8px 15px; margin: 0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+   .btn-add { background: #28a745; }
+   .btn-add:hover { background: #218838; }
+   .btn-save { background: #051ab8; }
+   .btn-save:hover { background: #032a8f; }
+   .btn-view { background: #17a2b8; }
+   .btn-view:hover { background: #138496; }
+   .btn-delete { background: #dc3545; padding: 5px 10px; width: auto; }
+   .btn-delete:hover { background: #c82333; }
+    #countdown { font-weight: bold; color: #051ab8; }
+
+   .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #051ab8; color: white; position: sticky; top: 0; font-size: 14px; }
+    td input, td select { width: 100%; padding: 6px; margin: 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
+    td { vertical-align: middle; }
+
+   .msg { text-align: center; margin-top: 15px; font-weight: bold; min-height: 20px; }
+   .hidden { display: none; }
+
+   .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+   .modal.hidden { display: none; }
+   .modal-content { background: white; width: 95%; max-width: 1200px; max-height: 90vh; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+   .modal-header { padding: 15px; background: #6d930c; color: white; display: flex; justify-content: space-between; align-items: center; }
+   .modal-header h3 { margin: 0; }
+   .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+   .modal-body { padding: 15px; overflow: auto; }
+   .modal-body input,.modal-body button { width: auto; display: inline-block; margin-right: 10px; padding: 8px; }
+
+    @media (orientation: landscape) {
+      body { padding: 10px 20px; }
+     .container { max-width: 1400px; }
+    }
