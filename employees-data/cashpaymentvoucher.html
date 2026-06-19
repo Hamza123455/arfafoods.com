@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cash Payment Voucher</title>
+    <title>Arfa Foods</title>
     <style>
         @page {
             size: A4 portrait; /* Set the page size to A4 in portrait orientation */
@@ -14,14 +14,14 @@
             font-family: Arial black;
             margin: 0;
             padding: 0;
-            background-color: #fff; /* Ensure the background is white */
-            overflow: hidden; /* Prevent scrollbars */
+            background-color: #fff; 
+            overflow: hidden; 
         }
         .voucher {
             border: 1px solid #000;
             padding: 20px;
-            width: 100%; /* Full width */
-            height: 100vh; /* Full viewport height */
+            width: 100%; 
+            height: 100vh; 
             box-sizing: border-box;
             background-color: #fff;
             page-break-inside: avoid;
@@ -56,7 +56,7 @@
         }
         .voucher-content input, .voucher-content select {
             font-family: Arial black;
-            width: calc(100% - 22px); /* Full width minus padding */
+            width: calc(100% - 22px); 
             padding: 10px;
             margin: 5px 0;
             box-sizing: border-box;
@@ -65,7 +65,7 @@
             border: 1px solid #000;
         }
         .voucher-content .bold {
-            font-weight: bold; /* Bold text */
+            font-weight: bold; 
         }
         .voucher-footer {
             text-align: center;
@@ -92,7 +92,6 @@
             color: #0e0101;
         }
 
-        /* --- Employee autocomplete --- */
         .employee-field-wrapper {
             position: relative;
         }
@@ -145,7 +144,6 @@
             min-height: 14px;
         }
 
-        /* --- Action buttons (Save / Print) --- */
         .action-buttons {
             display: flex;
             justify-content: center;
@@ -184,11 +182,13 @@
         .save-status.error { color: #c62828; }
         .save-status.pending { color: #777; }
 
-        /* --- Print-only formatted voucher (matches reference layout) --- */
         .print-preview {
-            display: none; /* only shown via @media print */
+            display: none; 
             font-family: 'Times New Roman', Times, serif;
             color: #000;
+            height: 100%;
+            box-sizing: border-box;
+            padding-bottom: 14mm; 
         }
         .pp-company {
             font-size: 14px;
@@ -266,7 +266,8 @@
         .pp-signatures {
             display: flex;
             justify-content: space-between;
-            margin-top: 60px;
+            margin-top: auto;
+            padding-top: 60px;
             font-size: 13px;
         }
         .pp-signatures div {
@@ -280,10 +281,12 @@
         @media print {
             .print-date-time {
                 position: absolute;
-                top: 10mm;
+                bottom: 4mm;
                 right: 10mm;
-                font-size: 12px;
-                color: #000;
+                font-size: 9px;
+                font-family: Arial, sans-serif;
+                font-weight: normal;
+                color: #555;
             }
             body {
                 margin: 0;
@@ -299,29 +302,30 @@
                 display: none !important;
             }
             .print-preview {
-                display: block;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
             }
         }
     </style>
 </head>
 <body>
     <div class="voucher">
-        <div class="print-date-time"></div> <!-- Placeholder for print date and time -->
+        <div class="print-date-time"></div>
         <div class="voucher-subheader">
-            <h2>ARFA Foods</h2>
+            <h2>Arfa - Humak</h2>
         </div>
         <div class="voucher-header">
-            <h1>Cash Payment Voucher</h1>
+            <h1>Advance Cash Payment Voucher</h1>
         </div>
         <div class="voucher-content">
             <form>
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="date" value="0-0-0">
+                <input type="date" id="date" name="date">
 
-                <!-- Employee autocomplete, sourced live from GitHub employees.json -->
                 <label for="employee-search">Employee:</label>
                 <div class="employee-field-wrapper">
-                    <input type="text" id="employee-search" name="employee-search" autocomplete="off" placeholder="Start typing employee name...">
+                    <input type="text" id="employee-search" name="employee-search" autocomplete="off" placeholder="Hint: id or name">
                     <div id="employee-dropdown" class="employee-dropdown"></div>
                 </div>
                 <div class="employee-status" id="employee-status"></div>
@@ -355,11 +359,9 @@
         </div>
         <div class="save-status" id="save-status"></div>
 
-        <!-- Print-only formatted voucher. Hidden on screen; populated by JS and
-             shown only inside the print media query, matching the reference layout. -->
         <div class="print-preview" id="print-preview">
-            <div class="pp-company">ARFA Foods</div>
-            <div class="pp-title">Cash Payment Voucher</div>
+            <div class="pp-company">Arfa - Humak</div>
+            <div class="pp-title">Advance Payment Voucher</div>
             <div class="pp-meta-row">
                 <div class="pp-account-box" id="pp-account-box"></div>
                 <div class="pp-date">Date: <strong id="pp-date"></strong></div>
@@ -373,7 +375,6 @@
                     </tr>
                 </thead>
                 <tbody id="pp-table-body">
-                    <!-- rows injected by JS: bold account row, line-item row, filler rows -->
                 </tbody>
             </table>
             <div class="pp-words-row" id="pp-words"></div>
@@ -386,7 +387,6 @@
         </div>
     </div>
     <script>
-        // Returns a formatted "DD/MM/YYYY, HH:MM:SS" string for the current moment
         function getFormattedDateTime() {
             const now = new Date();
             const formattedDate = now.toLocaleDateString('en-GB', {
@@ -402,7 +402,6 @@
             return `${formattedDate}, ${formattedTime}`;
         }
 
-        // Formats a date string like "2026-06-19" (from <input type="date">) as "19-06-2026"
         function formatDateForPrint(isoDate) {
             if (!isoDate) return '';
             const parts = isoDate.split('-');
@@ -411,7 +410,6 @@
             return `${d}-${m}-${y}`;
         }
 
-        // Extracts the numeric portion from a free-text amount field (e.g. "PKR. 144,800")
         function parseAmountValue(raw) {
             if (!raw) return 0;
             const match = raw.match(/[\d,]+(\.\d+)?/);
@@ -421,13 +419,11 @@
             return isNaN(num) ? 0 : num;
         }
 
-        // Formats a number with thousand separators, e.g. 144800 -> "144,800"
         function formatWithCommas(num) {
             const rounded = Math.round(num);
             return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
-        // Converts an integer to English words, e.g. 144800 -> "One Hundred Forty-Four Thousand Eight Hundred"
         function numberToWords(num) {
             num = Math.round(num);
             if (num === 0) return 'Zero';
@@ -468,9 +464,6 @@
             return result.trim();
         }
 
-        // Populates the hidden .print-preview block from the current form values.
-        // Called right before window.print() so the printed page matches the
-        // reference voucher layout.
         function populatePrintPreview() {
             const dateValue = document.getElementById('date').value;
             const employeeRaw = document.getElementById('employee-search').value.trim();
@@ -492,8 +485,7 @@
                 ? `${employeeId} - ${employeeName}`
                 : employeeName;
 
-            // Table body: bold "account" row carrying the full amount, a description
-            // line below it (dash, no repeated amount), then blank filler rows, then Total.
+
             const tbody = document.getElementById('pp-table-body');
             tbody.innerHTML = '';
 
@@ -514,7 +506,7 @@
             `;
             tbody.appendChild(lineRow);
 
-            const FILLER_ROWS = 8;
+            const FILLER_ROWS = 11;
             for (let i = 0; i < FILLER_ROWS; i++) {
                 const fillerRow = document.createElement('tr');
                 fillerRow.className = 'pp-fill-row';
@@ -540,27 +532,32 @@
             document.getElementById('pp-approved-by').textContent = approvedBy ? `${approvedBy}\nApproved by` : 'Approved by';
         }
 
-        // Always populate the print preview immediately before printing.
         function doPrint() {
             populatePrintPreview();
             window.print();
         }
 
-        // JavaScript to add current date and time for printing with seconds
         function updatePrintDateTime() {
             document.querySelector('.print-date-time').textContent = `Printed on: ${getFormattedDateTime()}`;
         }
 
-        // Update the date and time immediately on load and then every second
+        function setDefaultDate() {
+            const dateInput = document.getElementById('date');
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+
         window.onload = () => {
+            setDefaultDate();
             updatePrintDateTime();
-            setInterval(updatePrintDateTime, 1000); // Update every second
+            setInterval(updatePrintDateTime, 1000); 
             initEmployeeAutocomplete();
             initActionButtons();
         };
 
-        /* ===================== Employee Autocomplete ===================== */
-        // Raw GitHub JSON source. Update the branch/path here if it ever changes.
         const EMPLOYEES_JSON_URL = "https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json";
 
         let allEmployees = [];
@@ -580,7 +577,6 @@
                     return res.json();
                 })
                 .then(data => {
-                    // The JSON is an object: { password: "...", employees: [ ... ] }
                     allEmployees = Array.isArray(data) ? data : (data.employees || []);
                     statusEl.textContent = `Loaded ${allEmployees.length} employees.`;
                 })
@@ -598,9 +594,11 @@
                     return;
                 }
 
-                filteredEmployees = allEmployees.filter(emp =>
-                    (emp.name || "").toLowerCase().includes(term)
-                ).slice(0, 25); // cap results for performance
+                filteredEmployees = allEmployees.filter(emp => {
+                    const nameMatch = (emp.name || "").toLowerCase().includes(term);
+                    const idMatch = String(emp.empid || "").toLowerCase().includes(term);
+                    return nameMatch || idMatch;
+                }).slice(0, 25); 
 
                 renderDropdown();
             });
@@ -677,13 +675,7 @@
             }
         }
 
-        /* ===================== Save Data + Print ===================== */
-        // 1. Create a Google Sheet with header row:
-        //    Date Selected | Employee ID | Employee Name | Amount | Payment Description | Print Date and Time
-        // 2. In that Sheet, go to Extensions > Apps Script, paste the doPost() script
-        //    provided alongside this file, then Deploy > New deployment > Web app
-        //    (Execute as: Me, Who has access: Anyone).
-        // 3. Paste the resulting /exec URL below.
+
         const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3ptGMtgW7HAyjmENU4hLwNhNtyRld-jFfpwR2CxD4NEVFLkLdooPNe_Qg4Mb386lXQw/exec";
 
         function initActionButtons() {
@@ -691,17 +683,15 @@
             const printBtn = document.getElementById('print-btn');
             const statusEl = document.getElementById('save-status');
 
-            let dataSaved = false; // becomes true after a successful save
+            let dataSaved = false; 
 
-            // Any edit to the voucher fields invalidates the previous save,
-            // so Print will trigger a fresh save again.
+
             ['date', 'employee-search', 'amount-paid', 'payment-description'].forEach(id => {
                 document.getElementById(id).addEventListener('input', () => {
                     dataSaved = false;
                 });
             });
 
-            // Returns a Promise<boolean> — true if the row was saved successfully.
             function saveData() {
                 return new Promise((resolve) => {
                     statusEl.className = 'save-status';
@@ -720,8 +710,7 @@
                         return;
                     }
 
-                    // Employee field is expected in "empid_name" form (set by selecting
-                    // a suggestion from the dropdown).
+
                     const underscoreIndex = employeeRaw.indexOf('_');
                     if (underscoreIndex === -1) {
                         statusEl.className = 'save-status error';
@@ -752,8 +741,7 @@
                     statusEl.className = 'save-status pending';
                     statusEl.textContent = 'Saving...';
 
-                    // text/plain avoids a CORS preflight request, which Apps Script
-                    // web apps do not handle.
+
                     fetch(GOOGLE_SHEET_WEB_APP_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -793,8 +781,6 @@
                     doPrint();
                     return;
                 }
-                // Not saved yet (or fields changed since last save) — save first,
-                // then open the print dialog once the save attempt has finished.
                 printBtn.disabled = true;
                 saveData().finally(() => {
                     printBtn.disabled = false;
