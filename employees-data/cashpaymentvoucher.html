@@ -77,9 +77,10 @@
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            gap: 10px;
         }
         .signature div {
-            width: 48%;
+            width: 32%;
             text-align: center;
         }
         .signature input {
@@ -183,6 +184,99 @@
         .save-status.error { color: #c62828; }
         .save-status.pending { color: #777; }
 
+        /* --- Print-only formatted voucher (matches reference layout) --- */
+        .print-preview {
+            display: none; /* only shown via @media print */
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+        }
+        .pp-company {
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+        .pp-title {
+            text-align: center;
+            font-size: 17px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+        }
+        .pp-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        .pp-account-box {
+            border: 1px solid #000;
+            padding: 8px 12px;
+            font-size: 13px;
+            width: 60%;
+            box-sizing: border-box;
+            min-height: 40px;
+        }
+        .pp-date {
+            font-size: 13px;
+            padding-top: 8px;
+            white-space: nowrap;
+        }
+        .pp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+        .pp-table th, .pp-table td {
+            border: 1px solid #000;
+            padding: 6px 8px;
+        }
+        .pp-table th {
+            font-weight: bold;
+            text-align: center;
+        }
+        .pp-col-dash {
+            width: 25px;
+            text-align: center;
+        }
+        .pp-table .pp-amount-col {
+            width: 110px;
+            text-align: right;
+        }
+        .pp-bold-row td {
+            font-weight: bold;
+        }
+        .pp-fill-row td {
+            height: 22px;
+        }
+        .pp-total-row td {
+            font-weight: bold;
+        }
+        .pp-total-label {
+            text-align: right;
+        }
+        .pp-words-row, .pp-desc-row {
+            border: 1px solid #000;
+            border-top: none;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+        .pp-desc-row {
+            margin-bottom: 24px;
+        }
+        .pp-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            font-size: 13px;
+        }
+        .pp-signatures div {
+            width: 30%;
+            text-align: left;
+            border-top: 1px solid #000;
+            padding-top: 4px;
+            white-space: pre-line;
+        }
+
         @media print {
             .print-date-time {
                 position: absolute;
@@ -197,8 +291,15 @@
             .employee-dropdown,
             .employee-status,
             .action-buttons,
-            .save-status {
+            .save-status,
+            .voucher-subheader,
+            .voucher-header,
+            .voucher-content,
+            .voucher-footer {
                 display: none !important;
+            }
+            .print-preview {
+                display: block;
             }
         }
     </style>
@@ -235,12 +336,16 @@
         <div class="voucher-footer">
             <div class="signature">
                 <div>
+                    <label for="prepared-by">Prepared By:</label>
+                    <input type="text" id="prepared-by" name="prepared-by" placeholder="Signature:____________________________________">
+                </div>
+                <div>
                     <label for="reviewed-by">Reviewed By:</label>
-                    <input type="text" id="reviewed-by" name="reviewed-by" placeholder="Signature:______________________________________________________________________">
+                    <input type="text" id="reviewed-by" name="reviewed-by" placeholder="Signature:____________________________________">
                 </div>
                 <div>
                     <label for="approved-by">Approved By:</label>
-                    <input type="text" id="approved-by" name="approved-by" placeholder="Signature:______________________________________________________________________">
+                    <input type="text" id="approved-by" name="approved-by" placeholder="Signature:____________________________________">
                 </div>
             </div>
         </div>
@@ -249,6 +354,36 @@
             <button type="button" id="print-btn">🖨️ Print</button>
         </div>
         <div class="save-status" id="save-status"></div>
+
+        <!-- Print-only formatted voucher. Hidden on screen; populated by JS and
+             shown only inside the print media query, matching the reference layout. -->
+        <div class="print-preview" id="print-preview">
+            <div class="pp-company">ARFA Foods</div>
+            <div class="pp-title">Cash Payment Voucher</div>
+            <div class="pp-meta-row">
+                <div class="pp-account-box" id="pp-account-box"></div>
+                <div class="pp-date">Date: <strong id="pp-date"></strong></div>
+            </div>
+            <table class="pp-table">
+                <thead>
+                    <tr>
+                        <th class="pp-col-dash"></th>
+                        <th>Description</th>
+                        <th class="pp-amount-col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="pp-table-body">
+                    <!-- rows injected by JS: bold account row, line-item row, filler rows -->
+                </tbody>
+            </table>
+            <div class="pp-words-row" id="pp-words"></div>
+            <div class="pp-desc-row" id="pp-desc-line"></div>
+            <div class="pp-signatures">
+                <div id="pp-prepared-by">Prepared by</div>
+                <div id="pp-reviewed-by">Reviewed by</div>
+                <div id="pp-approved-by">Approved by</div>
+            </div>
+        </div>
     </div>
     <script>
         // Returns a formatted "DD/MM/YYYY, HH:MM:SS" string for the current moment
@@ -265,6 +400,150 @@
                 second: '2-digit'
             });
             return `${formattedDate}, ${formattedTime}`;
+        }
+
+        // Formats a date string like "2026-06-19" (from <input type="date">) as "19-06-2026"
+        function formatDateForPrint(isoDate) {
+            if (!isoDate) return '';
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return isoDate;
+            const [y, m, d] = parts;
+            return `${d}-${m}-${y}`;
+        }
+
+        // Extracts the numeric portion from a free-text amount field (e.g. "PKR. 144,800")
+        function parseAmountValue(raw) {
+            if (!raw) return 0;
+            const match = raw.match(/[\d,]+(\.\d+)?/);
+            if (!match) return 0;
+            const cleaned = match[0].replace(/,/g, '');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // Formats a number with thousand separators, e.g. 144800 -> "144,800"
+        function formatWithCommas(num) {
+            const rounded = Math.round(num);
+            return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        // Converts an integer to English words, e.g. 144800 -> "One Hundred Forty-Four Thousand Eight Hundred"
+        function numberToWords(num) {
+            num = Math.round(num);
+            if (num === 0) return 'Zero';
+
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const scales = ['', 'Thousand', 'Million', 'Billion'];
+
+            function threeDigitsToWords(n) {
+                let str = '';
+                if (n >= 100) {
+                    str += ones[Math.floor(n / 100)] + ' Hundred ';
+                    n %= 100;
+                }
+                if (n >= 20) {
+                    str += tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
+                } else if (n >= 10) {
+                    str += teens[n - 10];
+                } else if (n > 0) {
+                    str += ones[n];
+                }
+                return str.trim();
+            }
+
+            let result = '';
+            let scaleIndex = 0;
+            while (num > 0) {
+                const chunk = num % 1000;
+                if (chunk) {
+                    const chunkWords = threeDigitsToWords(chunk);
+                    const suffix = scales[scaleIndex] ? ' ' + scales[scaleIndex] : '';
+                    result = chunkWords + suffix + (result ? ' ' + result : '');
+                }
+                num = Math.floor(num / 1000);
+                scaleIndex++;
+            }
+            return result.trim();
+        }
+
+        // Populates the hidden .print-preview block from the current form values.
+        // Called right before window.print() so the printed page matches the
+        // reference voucher layout.
+        function populatePrintPreview() {
+            const dateValue = document.getElementById('date').value;
+            const employeeRaw = document.getElementById('employee-search').value.trim();
+            const amountRaw = document.getElementById('amount-paid').value.trim();
+            const paymentDescription = document.getElementById('payment-description').value.trim();
+            const preparedBy = document.getElementById('prepared-by').value.trim();
+            const reviewedBy = document.getElementById('reviewed-by').value.trim();
+            const approvedBy = document.getElementById('approved-by').value.trim();
+
+            const underscoreIndex = employeeRaw.indexOf('_');
+            const employeeId = underscoreIndex === -1 ? '' : employeeRaw.substring(0, underscoreIndex);
+            const employeeName = underscoreIndex === -1 ? employeeRaw : employeeRaw.substring(underscoreIndex + 1);
+
+            const amount = parseAmountValue(amountRaw);
+            const formattedAmount = formatWithCommas(amount);
+
+            document.getElementById('pp-date').textContent = formatDateForPrint(dateValue);
+            document.getElementById('pp-account-box').textContent = employeeId
+                ? `${employeeId} - ${employeeName}`
+                : employeeName;
+
+            // Table body: bold "account" row carrying the full amount, a description
+            // line below it (dash, no repeated amount), then blank filler rows, then Total.
+            const tbody = document.getElementById('pp-table-body');
+            tbody.innerHTML = '';
+
+            const headerRow = document.createElement('tr');
+            headerRow.className = 'pp-bold-row';
+            headerRow.innerHTML = `
+                <td></td>
+                <td>Cash Paid - ${employeeName || ''}</td>
+                <td class="pp-amount-col">${formattedAmount}</td>
+            `;
+            tbody.appendChild(headerRow);
+
+            const lineRow = document.createElement('tr');
+            lineRow.innerHTML = `
+                <td class="pp-col-dash">-</td>
+                <td>${paymentDescription}</td>
+                <td class="pp-amount-col">-</td>
+            `;
+            tbody.appendChild(lineRow);
+
+            const FILLER_ROWS = 8;
+            for (let i = 0; i < FILLER_ROWS; i++) {
+                const fillerRow = document.createElement('tr');
+                fillerRow.className = 'pp-fill-row';
+                fillerRow.innerHTML = `<td class="pp-col-dash">-</td><td></td><td class="pp-amount-col"></td>`;
+                tbody.appendChild(fillerRow);
+            }
+
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'pp-total-row';
+            totalRow.innerHTML = `
+                <td colspan="2" class="pp-total-label">Total</td>
+                <td class="pp-amount-col">(${formattedAmount})</td>
+            `;
+            tbody.appendChild(totalRow);
+
+            document.getElementById('pp-words').textContent =
+                `Rupees ${numberToWords(amount)} Only`;
+            document.getElementById('pp-desc-line').textContent =
+                `Description: ${paymentDescription}`;
+
+            document.getElementById('pp-prepared-by').textContent = preparedBy ? `${preparedBy}\nPrepared by` : 'Prepared by';
+            document.getElementById('pp-reviewed-by').textContent = reviewedBy ? `${reviewedBy}\nReviewed by` : 'Reviewed by';
+            document.getElementById('pp-approved-by').textContent = approvedBy ? `${approvedBy}\nApproved by` : 'Approved by';
+        }
+
+        // Always populate the print preview immediately before printing.
+        function doPrint() {
+            populatePrintPreview();
+            window.print();
         }
 
         // JavaScript to add current date and time for printing with seconds
@@ -412,81 +691,115 @@
             const printBtn = document.getElementById('print-btn');
             const statusEl = document.getElementById('save-status');
 
-            printBtn.addEventListener('click', () => {
-                window.print();
+            let dataSaved = false; // becomes true after a successful save
+
+            // Any edit to the voucher fields invalidates the previous save,
+            // so Print will trigger a fresh save again.
+            ['date', 'employee-search', 'amount-paid', 'payment-description'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    dataSaved = false;
+                });
             });
 
-            saveBtn.addEventListener('click', () => {
-                statusEl.className = 'save-status';
-                statusEl.textContent = '';
+            // Returns a Promise<boolean> — true if the row was saved successfully.
+            function saveData() {
+                return new Promise((resolve) => {
+                    statusEl.className = 'save-status';
+                    statusEl.textContent = '';
 
-                const dateSelected = document.getElementById('date').value;
-                const employeeRaw = document.getElementById('employee-search').value.trim();
-                const amount = document.getElementById('amount-paid').value.trim();
-                const paymentDescription = document.getElementById('payment-description').value.trim();
-                const printDateTime = getFormattedDateTime();
+                    const dateSelected = document.getElementById('date').value;
+                    const employeeRaw = document.getElementById('employee-search').value.trim();
+                    const amount = document.getElementById('amount-paid').value.trim();
+                    const paymentDescription = document.getElementById('payment-description').value.trim();
+                    const printDateTime = getFormattedDateTime();
 
-                if (!dateSelected) {
-                    statusEl.className = 'save-status error';
-                    statusEl.textContent = 'Please select a date first.';
-                    return;
-                }
-
-                // Employee field is expected in "empid_name" form (set by selecting
-                // a suggestion from the dropdown).
-                const underscoreIndex = employeeRaw.indexOf('_');
-                if (underscoreIndex === -1) {
-                    statusEl.className = 'save-status error';
-                    statusEl.textContent = 'Please pick an employee from the dropdown before saving.';
-                    return;
-                }
-                const employeeId = employeeRaw.substring(0, underscoreIndex);
-                const employeeName = employeeRaw.substring(underscoreIndex + 1);
-
-                if (GOOGLE_SHEET_WEB_APP_URL.indexOf('PASTE_YOUR') === 0) {
-                    statusEl.className = 'save-status error';
-                    statusEl.textContent = 'Google Sheet link is not configured yet. See setup instructions.';
-                    return;
-                }
-
-                const payload = {
-                    dateSelected,
-                    employeeId,
-                    employeeName,
-                    amount,
-                    paymentDescription,
-                    printDateTime
-                };
-
-                saveBtn.disabled = true;
-                statusEl.className = 'save-status pending';
-                statusEl.textContent = 'Saving...';
-
-                // text/plain avoids a CORS preflight request, which Apps Script
-                // web apps do not handle.
-                fetch(GOOGLE_SHEET_WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result && result.status === 'success') {
-                            statusEl.className = 'save-status success';
-                            statusEl.textContent = 'Saved to Google Sheet successfully.';
-                        } else {
-                            statusEl.className = 'save-status error';
-                            statusEl.textContent = 'Save failed: ' + (result && result.message ? result.message : 'unknown error');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Save error:', err);
+                    if (!dateSelected) {
                         statusEl.className = 'save-status error';
-                        statusEl.textContent = 'Could not reach Google Sheet. Check the web app URL/deployment.';
+                        statusEl.textContent = 'Please select a date first.';
+                        resolve(false);
+                        return;
+                    }
+
+                    // Employee field is expected in "empid_name" form (set by selecting
+                    // a suggestion from the dropdown).
+                    const underscoreIndex = employeeRaw.indexOf('_');
+                    if (underscoreIndex === -1) {
+                        statusEl.className = 'save-status error';
+                        statusEl.textContent = 'Please pick an employee from the dropdown before saving.';
+                        resolve(false);
+                        return;
+                    }
+                    const employeeId = employeeRaw.substring(0, underscoreIndex);
+                    const employeeName = employeeRaw.substring(underscoreIndex + 1);
+
+                    if (GOOGLE_SHEET_WEB_APP_URL.indexOf('PASTE_YOUR') === 0) {
+                        statusEl.className = 'save-status error';
+                        statusEl.textContent = 'Google Sheet link is not configured yet. See setup instructions.';
+                        resolve(false);
+                        return;
+                    }
+
+                    const payload = {
+                        dateSelected,
+                        employeeId,
+                        employeeName,
+                        amount,
+                        paymentDescription,
+                        printDateTime
+                    };
+
+                    saveBtn.disabled = true;
+                    statusEl.className = 'save-status pending';
+                    statusEl.textContent = 'Saving...';
+
+                    // text/plain avoids a CORS preflight request, which Apps Script
+                    // web apps do not handle.
+                    fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
                     })
-                    .finally(() => {
-                        saveBtn.disabled = false;
-                    });
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result && result.status === 'success') {
+                                statusEl.className = 'save-status success';
+                                statusEl.textContent = 'Saved to Google Sheet successfully.';
+                                dataSaved = true;
+                                resolve(true);
+                            } else {
+                                statusEl.className = 'save-status error';
+                                statusEl.textContent = 'Save failed: ' + (result && result.message ? result.message : 'unknown error');
+                                resolve(false);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Save error:', err);
+                            statusEl.className = 'save-status error';
+                            statusEl.textContent = 'Could not reach Google Sheet. Check the web app URL/deployment.';
+                            resolve(false);
+                        })
+                        .finally(() => {
+                            saveBtn.disabled = false;
+                        });
+                });
+            }
+
+            saveBtn.addEventListener('click', () => {
+                saveData();
+            });
+
+            printBtn.addEventListener('click', () => {
+                if (dataSaved) {
+                    doPrint();
+                    return;
+                }
+                // Not saved yet (or fields changed since last save) — save first,
+                // then open the print dialog once the save attempt has finished.
+                printBtn.disabled = true;
+                saveData().finally(() => {
+                    printBtn.disabled = false;
+                    doPrint();
+                });
             });
         }
     </script>
