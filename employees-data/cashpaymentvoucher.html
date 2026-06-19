@@ -144,6 +144,45 @@
             min-height: 14px;
         }
 
+        /* --- Action buttons (Save / Print) --- */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 10px 25px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #save-data-btn {
+            background-color: #2e7d32;
+            color: #fff;
+        }
+        #save-data-btn:disabled {
+            background-color: #9e9e9e;
+            cursor: not-allowed;
+        }
+        #print-btn {
+            background-color: #0000FF;
+            color: #fff;
+        }
+        .save-status {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            margin-top: 8px;
+            min-height: 16px;
+        }
+        .save-status.success { color: #2e7d32; }
+        .save-status.error { color: #c62828; }
+        .save-status.pending { color: #777; }
+
         @media print {
             .print-date-time {
                 position: absolute;
@@ -156,7 +195,9 @@
                 margin: 0;
             }
             .employee-dropdown,
-            .employee-status {
+            .employee-status,
+            .action-buttons,
+            .save-status {
                 display: none !important;
             }
         }
@@ -203,10 +244,15 @@
                 </div>
             </div>
         </div>
+        <div class="action-buttons">
+            <button type="button" id="save-data-btn">💾 Save Data</button>
+            <button type="button" id="print-btn">🖨️ Print</button>
+        </div>
+        <div class="save-status" id="save-status"></div>
     </div>
     <script>
-        // JavaScript to add current date and time for printing with seconds
-        function updatePrintDateTime() {
+        // Returns a formatted "DD/MM/YYYY, HH:MM:SS" string for the current moment
+        function getFormattedDateTime() {
             const now = new Date();
             const formattedDate = now.toLocaleDateString('en-GB', {
                 day: '2-digit',
@@ -218,7 +264,12 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
-            document.querySelector('.print-date-time').textContent = `Printed on: ${formattedDate} ${formattedTime}`;
+            return `${formattedDate}, ${formattedTime}`;
+        }
+
+        // JavaScript to add current date and time for printing with seconds
+        function updatePrintDateTime() {
+            document.querySelector('.print-date-time').textContent = `Printed on: ${getFormattedDateTime()}`;
         }
 
         // Update the date and time immediately on load and then every second
@@ -226,6 +277,7 @@
             updatePrintDateTime();
             setInterval(updatePrintDateTime, 1000); // Update every second
             initEmployeeAutocomplete();
+            initActionButtons();
         };
 
         /* ===================== Employee Autocomplete ===================== */
@@ -344,6 +396,98 @@
                 dropdown.innerHTML = "";
                 highlightedIndex = -1;
             }
+        }
+
+        /* ===================== Save Data + Print ===================== */
+        // 1. Create a Google Sheet with header row:
+        //    Date Selected | Employee ID | Employee Name | Amount | Payment Description | Print Date and Time
+        // 2. In that Sheet, go to Extensions > Apps Script, paste the doPost() script
+        //    provided alongside this file, then Deploy > New deployment > Web app
+        //    (Execute as: Me, Who has access: Anyone).
+        // 3. Paste the resulting /exec URL below.
+        const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3ptGMtgW7HAyjmENU4hLwNhNtyRld-jFfpwR2CxD4NEVFLkLdooPNe_Qg4Mb386lXQw/exec";
+
+        function initActionButtons() {
+            const saveBtn = document.getElementById('save-data-btn');
+            const printBtn = document.getElementById('print-btn');
+            const statusEl = document.getElementById('save-status');
+
+            printBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+            saveBtn.addEventListener('click', () => {
+                statusEl.className = 'save-status';
+                statusEl.textContent = '';
+
+                const dateSelected = document.getElementById('date').value;
+                const employeeRaw = document.getElementById('employee-search').value.trim();
+                const amount = document.getElementById('amount-paid').value.trim();
+                const paymentDescription = document.getElementById('payment-description').value.trim();
+                const printDateTime = getFormattedDateTime();
+
+                if (!dateSelected) {
+                    statusEl.className = 'save-status error';
+                    statusEl.textContent = 'Please select a date first.';
+                    return;
+                }
+
+                // Employee field is expected in "empid_name" form (set by selecting
+                // a suggestion from the dropdown).
+                const underscoreIndex = employeeRaw.indexOf('_');
+                if (underscoreIndex === -1) {
+                    statusEl.className = 'save-status error';
+                    statusEl.textContent = 'Please pick an employee from the dropdown before saving.';
+                    return;
+                }
+                const employeeId = employeeRaw.substring(0, underscoreIndex);
+                const employeeName = employeeRaw.substring(underscoreIndex + 1);
+
+                if (GOOGLE_SHEET_WEB_APP_URL.indexOf('PASTE_YOUR') === 0) {
+                    statusEl.className = 'save-status error';
+                    statusEl.textContent = 'Google Sheet link is not configured yet. See setup instructions.';
+                    return;
+                }
+
+                const payload = {
+                    dateSelected,
+                    employeeId,
+                    employeeName,
+                    amount,
+                    paymentDescription,
+                    printDateTime
+                };
+
+                saveBtn.disabled = true;
+                statusEl.className = 'save-status pending';
+                statusEl.textContent = 'Saving...';
+
+                // text/plain avoids a CORS preflight request, which Apps Script
+                // web apps do not handle.
+                fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result && result.status === 'success') {
+                            statusEl.className = 'save-status success';
+                            statusEl.textContent = 'Saved to Google Sheet successfully.';
+                        } else {
+                            statusEl.className = 'save-status error';
+                            statusEl.textContent = 'Save failed: ' + (result && result.message ? result.message : 'unknown error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Save error:', err);
+                        statusEl.className = 'save-status error';
+                        statusEl.textContent = 'Could not reach Google Sheet. Check the web app URL/deployment.';
+                    })
+                    .finally(() => {
+                        saveBtn.disabled = false;
+                    });
+            });
         }
     </script>
 </body>
