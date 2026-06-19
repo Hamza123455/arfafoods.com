@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Payment Voucher</title>
+    <style>
+        @page {
+            size: A4 portrait; /* Set the page size to A4 in portrait orientation */
+            margin: 0; /* Remove margins for fullscreen effect */
+        }
+
+        body {
+            font-family: Arial black;
+            margin: 0;
+            padding: 0;
+            background-color: #fff; /* Ensure the background is white */
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        .voucher {
+            border: 1px solid #000;
+            padding: 20px;
+            width: 100%; /* Full width */
+            height: 100vh; /* Full viewport height */
+            box-sizing: border-box;
+            background-color: #fff;
+            page-break-inside: avoid;
+        }
+        .voucher-subheader {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .voucher-subheader h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0000FF; /* Blue color */
+        }
+        .voucher-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .voucher-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .voucher-content {
+            margin-bottom: 20px;
+        }
+        .voucher-content label {
+            display: block;
+            margin: 5px 0;
+            color: #333;
+        }
+        .voucher-content input, .voucher-content select {
+            font-family: Arial black;
+            width: calc(100% - 22px); /* Full width minus padding */
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            background-color: #f5eded;
+            color: #0c0000;
+            border: 1px solid #000;
+        }
+        .voucher-content .bold {
+            font-weight: bold; /* Bold text */
+        }
+        .voucher-footer {
+            text-align: center;
+            border-top: 2px solid #000;
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+        .signature {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .signature div {
+            width: 48%;
+            text-align: center;
+        }
+        .signature input {
+            width: 100%;
+            border: 2px solid #472525;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #eee0e0;
+            color: #0e0101;
+        }
+
+        /* --- Employee autocomplete --- */
+        .employee-field-wrapper {
+            position: relative;
+        }
+        #employee-search {
+            position: relative;
+        }
+        .employee-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% - 5px);
+            left: 0;
+            right: 0;
+            max-height: 220px;
+            overflow-y: auto;
+            background-color: #fff;
+            border: 1px solid #000;
+            border-top: none;
+            z-index: 50;
+            box-sizing: border-box;
+        }
+        .employee-dropdown.active {
+            display: block;
+        }
+        .employee-dropdown-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #0c0000;
+        }
+        .employee-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .employee-dropdown-item:hover,
+        .employee-dropdown-item.highlighted {
+            background-color: #f5eded;
+        }
+        .employee-dropdown-empty {
+            padding: 8px 10px;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            color: #777;
+        }
+        .employee-status {
+            font-size: 11px;
+            color: #777;
+            font-family: Arial, sans-serif;
+            margin: 2px 0 5px 0;
+            min-height: 14px;
+        }
+
+        @media print {
+            .print-date-time {
+                position: absolute;
+                top: 10mm;
+                right: 10mm;
+                font-size: 12px;
+                color: #000;
+            }
+            body {
+                margin: 0;
+            }
+            .employee-dropdown,
+            .employee-status {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="voucher">
+        <div class="print-date-time"></div> <!-- Placeholder for print date and time -->
+        <div class="voucher-subheader">
+            <h2>ARFA Foods</h2>
+        </div>
+        <div class="voucher-header">
+            <h1>Cash Payment Voucher</h1>
+        </div>
+        <div class="voucher-content">
+            <form>
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" value="0-0-0">
+
+                <!-- Employee autocomplete, sourced live from GitHub employees.json -->
+                <label for="employee-search">Employee:</label>
+                <div class="employee-field-wrapper">
+                    <input type="text" id="employee-search" name="employee-search" autocomplete="off" placeholder="Start typing employee name...">
+                    <div id="employee-dropdown" class="employee-dropdown"></div>
+                </div>
+                <div class="employee-status" id="employee-status"></div>
+
+                <label for="amount-paid">Amount Paid:</label>
+                <input type="text" id="amount-paid" name="amount-paid" value="PKR.">
+
+                <label for="payment-description">Payment Description:</label>
+                <input type="text" id="payment-description" name="payment-description" value="Cash Paid">
+            </form>
+        </div>
+        <div class="voucher-footer">
+            <div class="signature">
+                <div>
+                    <label for="reviewed-by">Reviewed By:</label>
+                    <input type="text" id="reviewed-by" name="reviewed-by" placeholder="Signature:______________________________________________________________________">
+                </div>
+                <div>
+                    <label for="approved-by">Approved By:</label>
+                    <input type="text" id="approved-by" name="approved-by" placeholder="Signature:______________________________________________________________________">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // JavaScript to add current date and time for printing with seconds
+        function updatePrintDateTime() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const formattedTime = now.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.querySelector('.print-date-time').textContent = `Printed on: ${formattedDate} ${formattedTime}`;
+        }
+
+        // Update the date and time immediately on load and then every second
+        window.onload = () => {
+            updatePrintDateTime();
+            setInterval(updatePrintDateTime, 1000); // Update every second
+            initEmployeeAutocomplete();
+        };
+
+        /* ===================== Employee Autocomplete ===================== */
+        // Raw GitHub JSON source. Update the branch/path here if it ever changes.
+        const EMPLOYEES_JSON_URL = "https://raw.githubusercontent.com/Hamza123455/masterfile/main/employees.json";
+
+        let allEmployees = [];
+        let filteredEmployees = [];
+        let highlightedIndex = -1;
+
+        function initEmployeeAutocomplete() {
+            const searchInput = document.getElementById('employee-search');
+            const dropdown = document.getElementById('employee-dropdown');
+            const statusEl = document.getElementById('employee-status');
+
+            statusEl.textContent = "Loading employee list...";
+
+            fetch(EMPLOYEES_JSON_URL, { cache: "no-store" })
+                .then(res => {
+                    if (!res.ok) throw new Error("HTTP " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    // The JSON is an object: { password: "...", employees: [ ... ] }
+                    allEmployees = Array.isArray(data) ? data : (data.employees || []);
+                    statusEl.textContent = `Loaded ${allEmployees.length} employees.`;
+                })
+                .catch(err => {
+                    console.error("Failed to load employees.json:", err);
+                    statusEl.textContent = "Could not load employee list. Check connection / GitHub URL.";
+                });
+
+            searchInput.addEventListener('input', () => {
+                const term = searchInput.value.trim().toLowerCase();
+                highlightedIndex = -1;
+
+                if (term.length === 0) {
+                    closeDropdown();
+                    return;
+                }
+
+                filteredEmployees = allEmployees.filter(emp =>
+                    (emp.name || "").toLowerCase().includes(term)
+                ).slice(0, 25); // cap results for performance
+
+                renderDropdown();
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                const items = dropdown.querySelectorAll('.employee-dropdown-item');
+                if (!items.length) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+                    updateHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlightedIndex = Math.max(highlightedIndex - 1, 0);
+                    updateHighlight(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (highlightedIndex >= 0 && filteredEmployees[highlightedIndex]) {
+                        selectEmployee(filteredEmployees[highlightedIndex]);
+                    }
+                } else if (e.key === 'Escape') {
+                    closeDropdown();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            function renderDropdown() {
+                dropdown.innerHTML = "";
+
+                if (filteredEmployees.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'employee-dropdown-empty';
+                    empty.textContent = "No matching employee found.";
+                    dropdown.appendChild(empty);
+                    dropdown.classList.add('active');
+                    return;
+                }
+
+                filteredEmployees.forEach((emp) => {
+                    const item = document.createElement('div');
+                    item.className = 'employee-dropdown-item';
+                    const father = emp.fathername ? emp.fathername : "N/A";
+                    item.textContent = `${emp.empid} - ${emp.name} - ${father}`;
+                    item.addEventListener('click', () => selectEmployee(emp));
+                    dropdown.appendChild(item);
+                });
+
+                dropdown.classList.add('active');
+            }
+
+            function updateHighlight(items) {
+                items.forEach(i => i.classList.remove('highlighted'));
+                if (items[highlightedIndex]) {
+                    items[highlightedIndex].classList.add('highlighted');
+                    items[highlightedIndex].scrollIntoView({ block: 'nearest' });
+                }
+            }
+
+            function selectEmployee(emp) {
+                searchInput.value = `${emp.empid}_${emp.name}`;
+                closeDropdown();
+            }
+
+            function closeDropdown() {
+                dropdown.classList.remove('active');
+                dropdown.innerHTML = "";
+                highlightedIndex = -1;
+            }
+        }
+    </script>
+</body>
+</html>
