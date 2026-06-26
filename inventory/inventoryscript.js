@@ -268,3 +268,34 @@ function applyPDFView(choice) {
     });
   });
 }
+
+// Triggers the browser's print dialog (use "Save as PDF" as the destination).
+// Relies on the existing @media print rules in the CSS to hide buttons,
+// the search box, the chart, and the filter row before printing.
+function exportToPDF() {
+  applyPDFView("1");
+  window.print();
+}
+
+// Requests permission to show browser notifications.
+function askNotificationPermission() {
+  if (!("Notification" in window)) {
+    alert("This browser does not support notifications.");
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    alert("Notifications are already enabled.");
+    return;
+  }
+
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      new Notification("Notifications enabled", {
+        body: "You'll be notified about inventory updates."
+      });
+    } else {
+      alert("Notification permission was not granted.");
+    }
+  });
+}
