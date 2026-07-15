@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,6 +102,7 @@
               <label for="employee-name">Name:</label>
               <input type="text" id="employee-name" autocomplete="off" />
               <div id="suggestions" class="suggestions"></div>
+              <div id="employee-status" style="font-size: 11px; color: #777; font-family: Arial, sans-serif; margin-top: 2px; min-height: 14px;"></div>
             </div><br><br>
         <div class="field-group">
             <label for="contactNumber">Contact Number:</label>
@@ -255,12 +258,19 @@ const EMPLOYEES_JSON_URL = 'https://script.google.com/macros/s/AKfycbxEBOL9LWqrP
 const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
 
 // Fetch employee data — same source as the voucher, live from Google Sheet
+
+const statusEl = document.getElementById('employee-status');
+statusEl.textContent = "Loading employee list...";
 fetch(EMPLOYEES_JSON_URL, { cache: "no-store" })
   .then(response => response.json())
   .then(data => {
     employees = Array.isArray(data) ? data : (data.employees || []);
+    statusEl.textContent = `Loaded ${employees.length} employees.`;
   })
-  .catch(err => console.error("Failed to load employees:", err));
+  .catch(err => {
+    statusEl.textContent = "Could not load employee list.";
+    console.error("Failed to load employees:", err);
+  });
 
 employeeInput.addEventListener('input', function () {
   const value = this.value.trim().toLowerCase();
@@ -414,3 +424,4 @@ setInterval(updatePrintDateTime, 1000);
 <script src="activity-log.js"></script>
 </body>
 </html>
+
