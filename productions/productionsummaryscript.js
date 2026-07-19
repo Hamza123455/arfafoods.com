@@ -314,29 +314,35 @@ function saveTokenToSheet(token){
  .then(d => console.log("Token saved", d))
 }
 
+// Make sure you are using compat version in <head>
+// <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+// <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+
 function initPush(){
   if(!('serviceWorker' in navigator)) return;
 
-  // 1. Register YOUR sw with correct scope first
+  // 1. Register YOUR sw with correct scope
   navigator.serviceWorker.register('firebase-messaging-sw.js', {
     scope: '/arfafoods.com/productions/'
   })
   .then(reg => {
     console.log("SW Registered:", reg.scope);
 
-    // 2. IMPORTANT: Use THIS registration for Firebase Messaging
     const messaging = firebase.messaging();
-    messaging.useServiceWorker(reg); // <-- THIS LINE stops the 404
 
-    // 3. Now request permission + get token
+    // 2. Request permission
     Notification.requestPermission().then(permission => {
       if(permission === "granted"){
+        // 3. Pass the registration to getToken - this replaces useServiceWorker()
         messaging.getToken({
-          vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2"
+          vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2",
+          serviceWorkerRegistration: reg  // <-- KEY FIX
         }).then(token => {
           if(token){
             console.log("FCM Token:", token);
             saveTokenToSheet(token);
+          } else {
+            console.log("No token received");
           }
         }).catch(err => console.log('No token', err))
       }
@@ -355,7 +361,4 @@ function initPush(){
   .catch(err => console.error("SW Failed:", err))
 }
 
-initPush();
-
-// Run on page load
 initPush();
