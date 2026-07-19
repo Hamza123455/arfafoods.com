@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btn.innerText = "Enable Notifications";
   btn.onclick = initPush;
   document.body.appendChild(btn);
-}););
+});
 }
 
 // THIS IS THE MISSING FUNCTION
