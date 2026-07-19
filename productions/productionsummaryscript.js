@@ -297,12 +297,12 @@ function applyPDFView(choice) {
 }
 // ===== FIREBASE PUSH NOTIFICATION SETUP =====
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID"
+  apiKey: "AIzaSyDhHrDsQ800-OL8a9p8KxD7x2FOgP70dh0",
+  authDomain: "productionsummary-de8b2.firebaseapp.com",
+  projectId: "productionsummary-de8b2",
+  storageBucket: "productionsummary-de8b2.firebasestorage.app",
+  messagingSenderId: "954992538861",
+  appId: "1:954992538861:web:b4f15a0cde8338e71808e4"
 };
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
@@ -322,7 +322,7 @@ function initPush(){
 
   Notification.requestPermission().then(permission => {
     if(permission === "granted"){
-      messaging.getToken({vapidKey: "PASTE_YOUR_VAPID_KEY"}).then(token => {
+      messaging.getToken({vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2"}).then(token => {
         console.log("FCM Token:", token);
         saveTokenToSheet(token);
       }).catch(err => console.log('No token', err))
