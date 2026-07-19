@@ -1,91 +1,189 @@
+/* ==========================================================================
+   Item Table / Report styles
+   Modernized to match the Arfa Foods dashboard design language
+   (Inter UI font, #0f97c7 accent, soft shadows, rounded corners)
+   ========================================================================== */
+
 body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  background: #f9f9f9;
+  font-family: "Inter UI", Arial, sans-serif;
+  padding: 24px;
+  background: #f1f5f9;
   margin: 0;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
 }
 
 .table-wrapper {
   overflow-x: auto;
-  background: #fff;
+  background: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  padding: 20px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  padding: 24px;
 }
 
-input[type="text"], input[type="number"], select {
-  padding: 6px;
+/* Controls: search box, selects, number inputs */
+input[type="text"],
+input[type="number"],
+select {
+  padding: 8px 10px;
   margin-top: 4px;
+  margin-bottom: 8px;
   width: 90%;
   box-sizing: border-box;
-  margin-bottom: 6px;
   font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #1e293b;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #0f97c7;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 151, 199, 0.15);
+}
+
+/* Buttons (e.g. export/print/column-toggle triggers) */
+button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0f97c7;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 6px rgba(15, 151, 199, 0.25);
+}
+
+button:hover {
+  background-color: #0d81ab;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Table */
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   min-width: 1000px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-th, td {
-  padding: 10px;
-  border: 1px solid #ccc;
+th,
+td {
+  padding: 12px 10px;
+  border: 1px solid #e2e8f0;
   text-align: center;
   white-space: pre-line;
+  font-size: 13.5px;
 }
 
 th {
-  background-color: #051ab8;
-  color: white;
+  background-color: #0f97c7;
+  background-image: linear-gradient(180deg, #10a5da 0%, #0f97c7 55%, #0d85af 100%);
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-color: #0d85af;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 td.left-align {
   text-align: left;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
+tbody tr {
+  transition: background-color 0.15s ease;
 }
 
+tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+tbody tr:hover {
+  background-color: #eff6ff;
+}
+
+/* Headings */
 h2 {
   text-align: center;
-  color: #053dcb;
-  font-weight: bolder;
-  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+  color: #0f172a;
+  font-weight: 700;
+  font-family: "Inter UI", 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px 0;
 }
 
+/* Chart */
 #itemChart {
   max-width: 100%;
   height: 400px;
   display: none;
   margin: 40px auto 0;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  box-sizing: border-box;
 }
 
+/* Column visibility toggles */
+.column-toggle {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #475569;
+}
+
+.column-toggle input[type="checkbox"] {
+  margin-right: 6px;
+  accent-color: #0f97c7;
+}
+
+/* Print layout */
 @media print {
-    @page {
+  @page {
     size: A4 portrait;
     margin: 10mm;
   }
-
   body {
     zoom: 65%; /* Shrink content to fit portrait width */
+    background: #ffffff;
   }
-
-  button, #itemSearch, canvas {
+  button,
+  #itemSearch,
+  canvas {
     display: none !important;
   }
-
   thead tr:nth-child(2) {
     display: none !important;
   }
-
-  .column-toggle {
-  margin-bottom: 10px;
+  .table-wrapper {
+    box-shadow: none;
+    padding: 0;
+  }
+  th {
+    background-image: none;
+    background-color: #0f97c7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
-.column-toggle input[type="checkbox"] {
-  margin-right: 5px;
-}
-
-}
-
