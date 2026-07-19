@@ -327,7 +327,7 @@ async function initPush(){
 
     // 4. Now get token with the active registration
     const token = await messaging.getToken({
-      vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2",
+      vapidKey: "BJ32KI9w2XpHbF1LjvUMxOywFv5WBrQi-s8ktts-ngCP8Hm_naG-m-TixVldidWR3lbLpXuk9IhFN_JPET_2PSo",
       serviceWorkerRegistration: reg
     });
     
