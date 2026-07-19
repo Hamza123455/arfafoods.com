@@ -295,3 +295,46 @@ function applyPDFView(choice) {
     });
   });
 }
+// ===== FIREBASE PUSH NOTIFICATION SETUP =====
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
+  appId: "PASTE_YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+function saveTokenToSheet(token){
+  // Send token to your Google Script to save in "Tokens" sheet
+  fetch(apiUrl + "?action=saveToken&token=" + token)
+ .then(res => res.json())
+ .then(d => console.log("Token saved", d))
+}
+
+function initPush(){
+  // Register service worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('firebase-messaging-sw.js')
+  }
+
+  Notification.requestPermission().then(permission => {
+    if(permission === "granted"){
+      messaging.getToken({vapidKey: "PASTE_YOUR_VAPID_KEY"}).then(token => {
+        console.log("FCM Token:", token);
+        saveTokenToSheet(token);
+      }).catch(err => console.log('No token', err))
+    }
+  })
+}
+
+// Run on page load
+initPush();
+
+// Handle foreground notifications
+messaging.onMessage(function(payload) {
+  console.log('Message received. ', payload);
+  alert(payload.notification.title + "\n" + payload.notification.body);
+});
