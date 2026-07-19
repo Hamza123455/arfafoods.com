@@ -317,49 +317,45 @@ function saveTokenToSheet(token){
 function initPush(){
   if(!('serviceWorker' in navigator)) return;
 
-  // 1. Register SW with explicit scope to match your subfolder
+  // 1. Register YOUR sw with correct scope first
   navigator.serviceWorker.register('firebase-messaging-sw.js', {
-    scope: '/arfafoods.com/productions/'  // MUST match your folder
+    scope: '/arfafoods.com/productions/'
   })
   .then(reg => {
     console.log("SW Registered:", reg.scope);
 
-    // 2. Only ask permission AFTER SW is registered
-    if(Notification.permission === "denied"){
-      console.log("Notifications blocked. Reset in site settings");
-      return;
-    }
+    // 2. IMPORTANT: Use THIS registration for Firebase Messaging
+    const messaging = firebase.messaging();
+    messaging.useServiceWorker(reg); // <-- THIS LINE stops the 404
 
-    if(Notification.permission === "default" || Notification.permission === "granted"){
-      Notification.requestPermission().then(permission => {
-        if(permission === "granted"){
-          // 3. Get token with VAPID key
-          messaging.getToken({
-            vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2", 
-            serviceWorkerRegistration: reg  // IMPORTANT: tell FCM which SW to use
-          }).then(token => {
-            if(token){
-              console.log("FCM Token:", token);
-              saveTokenToSheet(token);
-            } else {
-              console.log("No token received");
-            }
-          }).catch(err => console.log('No token', err))
-        }
-      })
-    }
+    // 3. Now request permission + get token
+    Notification.requestPermission().then(permission => {
+      if(permission === "granted"){
+        messaging.getToken({
+          vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2"
+        }).then(token => {
+          if(token){
+            console.log("FCM Token:", token);
+            saveTokenToSheet(token);
+          }
+        }).catch(err => console.log('No token', err))
+      }
+    })
+
+    // 4. Foreground messages
+    messaging.onMessage(function(payload) {
+      console.log('Message received. ', payload);
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: '/arfafoods.com/productions/logo1.0.00.jpg'
+      });
+    });
+
   })
   .catch(err => console.error("SW Failed:", err))
 }
 
-// Handle foreground notifications
-messaging.onMessage(function(payload) {
-  console.log('Message received. ', payload);
-  new Notification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/arfafoods.com/productions/logo1.0.00.jpg' // full or relative path
-  });
-});
+initPush();
 
 // Run on page load
 initPush();
