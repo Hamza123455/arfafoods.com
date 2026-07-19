@@ -295,3 +295,42 @@ function applyPDFView(choice) {
     });
   });
 }
+const firebaseConfig = {<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyDhHrDsQ800-OL8a9p8KxD7x2FOgP70dh0",
+    authDomain: "productionsummary-de8b2.firebaseapp.com",
+    projectId: "productionsummary-de8b2",
+    storageBucket: "productionsummary-de8b2.firebasestorage.app",
+    messagingSenderId: "954992538861",
+    appId: "1:954992538861:web:b4f15a0cde8338e71808e4",
+    measurementId: "G-WFRQE66R5K"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script> };
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+// Ask permission + get device token
+function initPush(){
+  Notification.requestPermission().then(permission => {
+    if(permission === "granted"){
+      messaging.getToken({vapidKey: "YOUR_VAPID_KEY"}).then(token => {
+        console.log("Device Token:", token);
+        // SEND THIS TOKEN TO YOUR GOOGLE SCRIPT. Save it in a "Tokens" sheet
+        saveTokenToSheet(token);
+      })
+    }
+  })
+}
+initPush();
