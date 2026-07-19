@@ -338,3 +338,8 @@ messaging.onMessage(function(payload) {
   console.log('Message received. ', payload);
   alert(payload.notification.title + "\n" + payload.notification.body);
 });
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('firebase-messaging-sw.js')
+  .then(reg => console.log("SW Registered:", reg.scope))
+  .catch(err => console.error("SW Failed:", err))
+}
