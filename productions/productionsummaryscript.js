@@ -298,7 +298,7 @@ function applyPDFView(choice) {
 // ===== FIREBASE PUSH NOTIFICATION SETUP =====
 const firebaseConfig = {
   apiKey: "AIzaSyDhHrDsQ800-OL8a9p8KxD7x2FOgP70dh0",
-  authDomain: "productionsummary-de8b2.firebaseapp.com",
+  authDomain: "productionsummary-de8b2.firebaseapp.com", 
   projectId: "productionsummary-de8b2",
   messagingSenderId: "954992538861",
   appId: "1:954992538861:web:b4f15a0cde8338e71808e4"
@@ -306,55 +306,66 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// REPLACE WITH YOUR APPS SCRIPT WEB APP URL
+// 2. YOUR APPS SCRIPT URL - REPLACE THIS
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRUs_n-UANxDNkNxyGxnNeWKJklXg9pI4aXE0kl0_itK7S4phO5JbKWHFF5eu7DOR8/exec";
 
+// 3. FUNCTION TO SAVE TOKEN - DEFINED FIRST
+async function saveTokenToSheet(token){
+  console.log("Saving token to sheet...");
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({token: token})
+    });
+    console.log("Token saved to sheet");
+  } catch(err) {
+    console.error("Failed to save token:", err);
+  }
+}
+
+// 4. MAIN PUSH FUNCTION
 async function initPush(){
   if(!('serviceWorker' in navigator)) return;
 
   try {
-    // 1. Register SW in subfolder
     const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js', {
       scope: '/arfafoods.com/productions/'
     });
     console.log("SW Registered:", reg.scope);
-
-    // 2. Wait for it to be active
     await navigator.serviceWorker.ready;
     console.log("SW is Active");
 
-    // 3. Ask permission
     const permission = await Notification.requestPermission();
-    if(permission !== "granted") {
-      console.log("Permission denied");
-      return;
-    }
+    if(permission !== "granted") return;
 
-    // 4. Get FCM token
     const token = await messaging.getToken({
-      vapidKey: "BJ32KI9w2XpHbF1LjvUMxOywFv5WBrQi-s8ktts-ngCP8Hm_naG-m-TixVldidWR3lbLpXuk9IhFN_JPET_2PSo", // from Firebase > Cloud Messaging
+      vapidKey: "BJ32KI9w2XpHbF1LjvUMxOywFv5WBrQi-s8ktts-ngCP8Hm_naG-m-TixVldidWR3lbLpXuk9IhFN_JPET_2PSo",
       serviceWorkerRegistration: reg
     });
 
     if(token){
       console.log("FCM Token:", token);
-      saveTokenToSheet(token); // <-- now defined below
-    } else {
-      console.log("No token received");
+      saveTokenToSheet(token); // now this exists
     }
 
   } catch(err) {
     console.error("Push Failed:", err);
   }
 
-  // 5. Foreground messages
   messaging.onMessage((payload) => {
     console.log('Message received. ', payload);
-    new Notification(payload.notification.title, {
-      body: payload.notification.body,
-      icon: '/arfafoods.com/productions/logo1.0.00.jpg'
-    });
+    new Notification(payload.notification.title, {body: payload.notification.body});
   });
+}
+
+// 5. RUN IT ON BUTTON CLICK FOR SAFARI
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.createElement('button');
+  btn.innerText = "Enable Notifications";
+  btn.onclick = initPush;
+  document.body.appendChild(btn);
+}););
 }
 
 // THIS IS THE MISSING FUNCTION
