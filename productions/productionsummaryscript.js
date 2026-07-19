@@ -300,40 +300,45 @@ const firebaseConfig = {
   apiKey: "AIzaSyDhHrDsQ800-OL8a9p8KxD7x2FOgP70dh0",
   authDomain: "productionsummary-de8b2.firebaseapp.com",
   projectId: "productionsummary-de8b2",
-  storageBucket: "productionsummary-de8b2.firebasestorage.app",
   messagingSenderId: "954992538861",
   appId: "1:954992538861:web:b4f15a0cde8338e71808e4"
 };
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
+// REPLACE WITH YOUR APPS SCRIPT WEB APP URL
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRUs_n-UANxDNkNxyGxnNeWKJklXg9pI4aXE0kl0_itK7S4phO5JbKWHFF5eu7DOR8/exec";
+
 async function initPush(){
   if(!('serviceWorker' in navigator)) return;
 
   try {
-    // 1. Register SW
+    // 1. Register SW in subfolder
     const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js', {
       scope: '/arfafoods.com/productions/'
     });
     console.log("SW Registered:", reg.scope);
 
-    // 2. WAIT until it's active
+    // 2. Wait for it to be active
     await navigator.serviceWorker.ready;
     console.log("SW is Active");
 
     // 3. Ask permission
     const permission = await Notification.requestPermission();
-    if(permission !== "granted") return;
+    if(permission !== "granted") {
+      console.log("Permission denied");
+      return;
+    }
 
-    // 4. Now get token with the active registration
+    // 4. Get FCM token
     const token = await messaging.getToken({
-      vapidKey: "BJ32KI9w2XpHbF1LjvUMxOywFv5WBrQi-s8ktts-ngCP8Hm_naG-m-TixVldidWR3lbLpXuk9IhFN_JPET_2PSo",
+      vapidKey: "BJ32KI9w2XpHbF1LjvUMxOywFv5WBrQi-s8ktts-ngCP8Hm_naG-m-TixVldidWR3lbLpXuk9IhFN_JPET_2PSo", // from Firebase > Cloud Messaging
       serviceWorkerRegistration: reg
     });
-    
+
     if(token){
       console.log("FCM Token:", token);
-      saveTokenToSheet(token);
+      saveTokenToSheet(token); // <-- now defined below
     } else {
       console.log("No token received");
     }
@@ -342,11 +347,33 @@ async function initPush(){
     console.error("Push Failed:", err);
   }
 
-  // Foreground
+  // 5. Foreground messages
   messaging.onMessage((payload) => {
     console.log('Message received. ', payload);
-    new Notification(payload.notification.title, {body: payload.notification.body});
+    new Notification(payload.notification.title, {
+      body: payload.notification.body,
+      icon: '/arfafoods.com/productions/logo1.0.00.jpg'
+    });
   });
+}
+
+// THIS IS THE MISSING FUNCTION
+async function saveTokenToSheet(token){
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // github pages to apps script needs this
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: "saveToken",
+        token: token,
+        page: "production-summary"
+      })
+    });
+    console.log("Token saved to sheet");
+  } catch(err) {
+    console.error("Failed to save token:", err);
+  }
 }
 
 initPush();
