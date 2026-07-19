@@ -315,31 +315,51 @@ function saveTokenToSheet(token){
 }
 
 function initPush(){
-  // Register service worker
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('firebase-messaging-sw.js')
-  }
+  if(!('serviceWorker' in navigator)) return;
 
-  Notification.requestPermission().then(permission => {
-    if(permission === "granted"){
-      messaging.getToken({vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2"}).then(token => {
-        console.log("FCM Token:", token);
-        saveTokenToSheet(token);
-      }).catch(err => console.log('No token', err))
+  // 1. Register SW with explicit scope to match your subfolder
+  navigator.serviceWorker.register('firebase-messaging-sw.js', {
+    scope: '/arfafoods.com/productions/'  // MUST match your folder
+  })
+  .then(reg => {
+    console.log("SW Registered:", reg.scope);
+
+    // 2. Only ask permission AFTER SW is registered
+    if(Notification.permission === "denied"){
+      console.log("Notifications blocked. Reset in site settings");
+      return;
+    }
+
+    if(Notification.permission === "default" || Notification.permission === "granted"){
+      Notification.requestPermission().then(permission => {
+        if(permission === "granted"){
+          // 3. Get token with VAPID key
+          messaging.getToken({
+            vapidKey: "b38f4bfc0fa1f269c33b5641ae236f2f46c8cfa2", 
+            serviceWorkerRegistration: reg  // IMPORTANT: tell FCM which SW to use
+          }).then(token => {
+            if(token){
+              console.log("FCM Token:", token);
+              saveTokenToSheet(token);
+            } else {
+              console.log("No token received");
+            }
+          }).catch(err => console.log('No token', err))
+        }
+      })
     }
   })
+  .catch(err => console.error("SW Failed:", err))
 }
-
-// Run on page load
-initPush();
 
 // Handle foreground notifications
 messaging.onMessage(function(payload) {
   console.log('Message received. ', payload);
-  alert(payload.notification.title + "\n" + payload.notification.body);
+  new Notification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: '/arfafoods.com/productions/logo1.0.00.jpg' // full or relative path
+  });
 });
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('firebase-messaging-sw.js')
-  .then(reg => console.log("SW Registered:", reg.scope))
-  .catch(err => console.error("SW Failed:", err))
-}
+
+// Run on page load
+initPush();
