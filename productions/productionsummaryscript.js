@@ -366,7 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
   btn.onclick = initPush;
   document.body.appendChild(btn);
 });
-}
 
 // THIS IS THE MISSING FUNCTION
 async function saveTokenToSheet(token){
