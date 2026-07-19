@@ -2,22 +2,19 @@ importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID"
+  apiKey: "AIzaSyDhHrDsQ800-OL8a9p8KxD7x2FOgP70dh0",
+  authDomain: "productionsummary-de8b2.firebaseapp.com",
+  projectId: "productionsummary-de8b2",
+  storageBucket: "productionsummary-de8b2.firebasestorage.app",
+  messagingSenderId: "954992538861",
+  appId: "1:954992538861:web:b4f15a0cde8338e71808e4"
 });
 
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
-  console.log('Received background message ', payload);
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
+  self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
-    icon: 'logo1.0.00.jpg'
-  };
-  self.registration.showNotification(notificationTitle, notificationOptions);
+    icon: 'https://hamza123455.github.io/logo1.0.00.jpg' // use full URL
+  });
 });
