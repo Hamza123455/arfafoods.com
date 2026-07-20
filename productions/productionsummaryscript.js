@@ -116,8 +116,24 @@ function confirmExport() {
   runPDFExport(selectedHeaders);
 }
 
+function getExportTimestampLabel() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = now.getFullYear();
+
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const meridiem = hours >= 12 ? "Pm" : "Am";
+  hours = hours % 12;
+  if (hours === 0) hours = 12;
+
+  return `exported on ${day}/${month}/${year} - ${hours}:${minutes} ${meridiem}`;
+}
+
 function runPDFExport(selectedHeaders) {
   const doc = new jspdf.jsPDF();
+  const timestampLabel = getExportTimestampLabel();
 
   const head = [selectedHeaders.map(h => h.replaceAll("\n", " "))];
   const body = currentVisibleRows.map(row =>
@@ -132,9 +148,21 @@ function runPDFExport(selectedHeaders) {
     body: body,
     startY: 20,
     headStyles: { fillColor: [22, 160, 133] },
+    didDrawPage: function (data) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(
+        timestampLabel,
+        pageWidth - data.settings.margin.right,
+        pageHeight - 10,
+        { align: "right" }
+      );
+    },
   });
 
-  doc.save('Exported-Table.pdf');
+  doc.save('table-export.pdf');
 }
 
 
@@ -510,4 +538,5 @@ async function saveTokenToSheet(token){
     console.error("Failed to save token:", err);
   }
 }
+
 initPush();
