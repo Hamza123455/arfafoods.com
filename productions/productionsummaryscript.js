@@ -510,5 +510,4 @@ async function saveTokenToSheet(token){
     console.error("Failed to save token:", err);
   }
 }
-
 initPush();
