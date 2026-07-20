@@ -2,14 +2,138 @@ const apiUrl = "https://script.google.com/macros/s/AKfycbyRUs_n-UANxDNkNxyGxnNeW
 let rawData = [];
 let headers = [];
 let chartInstance = null;
+let currentVisibleRows = []; // NEW: tracks whatever rows are currently visible/filtered
 
+// ===== EXPORT (now opens a column-selection dialog first) =====
 function exportToPDF() {
+  openExportDialog();
+}
+
+function openExportDialog() {
+  // Remove any existing instance so we always rebuild with current headers
+  const existing = document.getElementById("exportDialogOverlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "exportDialogOverlay";
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+  `;
+
+  const box = document.createElement("div");
+  box.style.cssText = `
+    background: #fff; padding: 20px 24px; border-radius: 8px;
+    max-width: 420px; width: 90%; max-height: 80vh; overflow-y: auto;
+    font-family: Arial, sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  `;
+
+  const title = document.createElement("h3");
+  title.textContent = "Select Columns to Export";
+  title.style.marginTop = "0";
+  box.appendChild(title);
+
+  const subtitle = document.createElement("p");
+  subtitle.textContent = "Uncheck any columns you want to omit. The export will only include rows that match your current search/filters.";
+  subtitle.style.cssText = "font-size: 13px; color: #666; margin-top: -8px;";
+  box.appendChild(subtitle);
+
+  const selectAllRow = document.createElement("div");
+  selectAllRow.style.cssText = "margin: 8px 0 4px; font-size: 13px;";
+  const selectAllLink = document.createElement("a");
+  selectAllLink.textContent = "Select All";
+  selectAllLink.href = "#";
+  selectAllLink.style.marginRight = "12px";
+  selectAllLink.onclick = (e) => {
+    e.preventDefault();
+    document.querySelectorAll("#exportColumnList input[type=checkbox]").forEach(cb => cb.checked = true);
+  };
+  const selectNoneLink = document.createElement("a");
+  selectNoneLink.textContent = "Select None";
+  selectNoneLink.href = "#";
+  selectNoneLink.onclick = (e) => {
+    e.preventDefault();
+    document.querySelectorAll("#exportColumnList input[type=checkbox]").forEach(cb => cb.checked = false);
+  };
+  selectAllRow.appendChild(selectAllLink);
+  selectAllRow.appendChild(selectNoneLink);
+  box.appendChild(selectAllRow);
+
+  const list = document.createElement("div");
+  list.id = "exportColumnList";
+  list.style.cssText = "border-top: 1px solid #eee; padding-top: 8px;";
+  headers.forEach((h) => {
+    const label = document.createElement("label");
+    label.style.cssText = "display:block; margin:6px 0; cursor:pointer; font-size: 14px;";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.value = h;
+    cb.checked = true;
+    cb.style.marginRight = "8px";
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(h.replaceAll("\n", " ")));
+    list.appendChild(label);
+  });
+  box.appendChild(list);
+
+  const btnRow = document.createElement("div");
+  btnRow.style.cssText = "margin-top:16px; text-align:right; border-top: 1px solid #eee; padding-top: 12px;";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.style.cssText = "margin-right:10px; padding:6px 14px; cursor:pointer;";
+  cancelBtn.onclick = closeExportDialog;
+
+  const exportBtn = document.createElement("button");
+  exportBtn.textContent = "Export PDF";
+  exportBtn.style.cssText = "padding:6px 14px; background:#16a085; color:#fff; border:none; border-radius:4px; cursor:pointer;";
+  exportBtn.onclick = confirmExport;
+
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(exportBtn);
+  box.appendChild(btnRow);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function closeExportDialog() {
+  const overlay = document.getElementById("exportDialogOverlay");
+  if (overlay) overlay.remove();
+}
+
+function confirmExport() {
+  const checkboxes = document.querySelectorAll("#exportColumnList input[type=checkbox]");
+  const selectedHeaders = [...checkboxes].filter(cb => cb.checked).map(cb => cb.value);
+
+  if (!selectedHeaders.length) {
+    alert("Please select at least one column to export.");
+    return;
+  }
+
+  closeExportDialog();
+  runPDFExport(selectedHeaders);
+}
+
+function runPDFExport(selectedHeaders) {
   const doc = new jspdf.jsPDF();
+
+  const head = [selectedHeaders.map(h => h.replaceAll("\n", " "))];
+  const body = currentVisibleRows.map(row =>
+    selectedHeaders.map(h => {
+      const value = row[h];
+      return (!isNaN(value) && value !== "") ? Math.round(+value) : value;
+    })
+  );
+
   doc.autoTable({
-    html: '#sheet-table',
+    head: head,
+    body: body,
     startY: 20,
     headStyles: { fillColor: [22, 160, 133] },
   });
+
   doc.save('table-export.pdf');
 }
 
@@ -139,6 +263,7 @@ function filterTable() {
     }
   });
 
+  currentVisibleRows = visibleRows; // NEW: keep the export in sync with active filters
   renderChartIfOneMatch(visibleRows);
 }
 document.getElementById("itemSearch").addEventListener("input", filterTable);
