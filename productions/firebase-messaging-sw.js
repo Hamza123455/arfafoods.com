@@ -12,9 +12,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-  self.registration.showNotification(payload.notification.title, {
+// THIS handles notifications when tab is closed
+messaging.onBackgroundMessage((payload) => {
+  console.log('[SW] Received background message ', payload);
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
     body: payload.notification.body,
-    icon: 'https://hamza123455.github.io/logo1.0.00.jpg' // use full URL
-  });
+    icon: '/arfafoods.com/productions/logo1.0.00.jpg'
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
