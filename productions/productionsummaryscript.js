@@ -134,7 +134,7 @@ function runPDFExport(selectedHeaders) {
     headStyles: { fillColor: [22, 160, 133] },
   });
 
-  doc.save('table-export.pdf');
+  doc.save('Exported-Table.pdf');
 }
 
 
