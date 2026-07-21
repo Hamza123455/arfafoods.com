@@ -36,14 +36,14 @@ function getDeviceSpecs() {
 // 4. IP + Country from free API
 async function getIPandLocation() {
   try {
-    const res = await fetch("https://ipapi.co/json/");
+    const res = await fetch("https://ipwho.is/");
     const data = await res.json();
     return {
       ip: data.ip,
-      country: data.country_name,
+      country: data.country,
       city: data.city,
       region: data.region,
-      isp: data.org
+      isp: data.connection?.isp || data.org
     };
   } catch {
     return {ip: "Unknown", country: "Unknown", city: "Unknown", region: "Unknown", isp: "Unknown"};
