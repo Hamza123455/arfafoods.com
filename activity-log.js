@@ -1,4 +1,3 @@
-<script>
 const API_URL = "https://script.google.com/macros/s/AKfycbx0aCqswSRjLkDNfE6n6ijQnfuqUZll9nvn3ulx3McFIsgG3KGnCZMLnrHZMRFUt8k2/exec"; // paste your exec URL
 
 let gpsData = {lat: "Waiting for tap", lon: "Waiting for tap", alt: "N/A", accuracy: "N/A"};
@@ -128,4 +127,3 @@ window.addEventListener("beforeunload", () => {
 ["touchstart","scroll"].forEach(evt => {
   document.addEventListener(evt, requestGPS, {once: true});
 });
-</script>
