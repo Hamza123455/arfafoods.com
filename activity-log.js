@@ -1,10 +1,10 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbx0aCqswSRjLkDNfE6n6ijQnfuqUZll9nvn3ulx3McFIsgG3KGnCZMLnrHZMRFUt8k2/exec"; // paste your exec URL
+const API_URL = "https://script.google.com/macros/s/AKfycbx0aCqswSRjLkDNfE6n6ijQnfuqUZll9nvn3ulx3McFIsgG3KGnCZMLnrHZMRFUt8k2/exec"; // <-- paste your exec URL here
 
-let gpsData = {lat: "Waiting for tap", lon: "Waiting for tap", alt: "N/A", accuracy: "N/A"};
+let gpsData = {lat: "Not Asked", lon: "Not Asked", alt: "N/A", accuracy: "N/A"};
 let gpsAsked = false;
 let sessionStart = Date.now();
 
-// 1. Get IP + Location from IP
+// 1. Get IP
 async function getIPandLocation() {
   try {
     const res = await fetch("https://ipwho.is/");
@@ -45,35 +45,38 @@ function getDeviceSpecs() {
   };
 }
 
-// 4. Request GPS - only after user taps
-function requestGPS() {
+// 4. Ask for GPS only once, after first click - YOUR UPDATED CODE
+async function requestGPS() {
   if(gpsAsked) return;
   gpsAsked = true;
 
-  if (!navigator.geolocation) {
-    gpsData = {lat: "No Support", lon: "No Support", alt: "N/A", accuracy: "N/A"};
-    return;
-  }
+  gpsData = await new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve({lat: "No Support", lon: "No Support", alt: "N/A", accuracy: "N/A"});
 
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      gpsData = {
-        lat: pos.coords.latitude,
-        lon: pos.coords.longitude,
-        alt: pos.coords.altitude || "N/A",
-        accuracy: Math.round(pos.coords.accuracy) + "m"
-      };
-      sendLog("GPS Acquired"); // send one log after we get GPS
-    },
-    (err) => {
-      gpsData = {lat: "Denied", lon: "Denied", alt: "Denied", accuracy: err.message};
-    },
-    {enableHighAccuracy: true, timeout: 10000}
-  );
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          alt: pos.coords.altitude || "N/A",
+          accuracy: Math.round(pos.coords.accuracy) + "m"
+        });
+        // Send a new log now that we have GPS
+        sendLog("GPS Acquired");
+      },
+      (err) => resolve({lat: "Denied", lon: "Denied", alt: "Denied", accuracy: err.message}),
+      {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
+    );
+  });
 }
 
-// 5. Main Send Log Function
+// 5. Main Send Log Function - YOUR UPDATED CODE
 async function sendLog(action, search = "", time = "") {
+  // Ask GPS only on first "Click" or "Search" action
+  if(!gpsAsked && (action === "Click" || action === "Search")){
+    await requestGPS();
+  }
+
   const [ipData] = await Promise.all([getIPandLocation()]);
   const browserData = getBrowserInfo();
   const deviceData = getDeviceSpecs();
@@ -106,11 +109,10 @@ async function sendLog(action, search = "", time = "") {
   }).then(() => console.log("Log sent:", action));
 }
 
-// 6. Auto Events
-sendLog("Page Visit"); // sends immediately, GPS will be "Waiting for tap"
+// 6. Triggers
+sendLog("Page Visit"); // First log, GPS = "Not Asked"
 
 document.addEventListener("click", (e) => {
-  requestGPS(); // triggers GPS popup on first click
   sendLog("Click", e.target.innerText.substring(0,50));
 });
 
@@ -118,12 +120,5 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "Enter") sendLog("Search", window.location.search);
 });
 
-window.addEventListener("beforeunload", () => {
-  const timeSpent = Math.round((Date.now() - sessionStart)/1000) + "s";
-  navigator.sendBeacon(API_URL, JSON.stringify({...payload, action: "Exit", time: timeSpent}));
-});
-
-// Trigger GPS on first touch/scroll too for mobile
-["touchstart","scroll"].forEach(evt => {
-  document.addEventListener(evt, requestGPS, {once: true});
-});
+// For mobile: trigger on first touch too
+document.addEventListener("touchstart", () => requestGPS(), {once: true});
