@@ -134,6 +134,7 @@ async function saveAll() {
 
   let successCount = 0;
   let errorCount = 0;
+  const savedThisBatch = [];
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -191,8 +192,31 @@ async function saveAll() {
         body: JSON.stringify(data)
       });
       successCount++;
+      savedThisBatch.push({
+        date: date,
+        itemName: itemName,
+        voucherType: voucherType,
+        voucherNo: voucherNo,
+        description: description,
+        qtyIn: qtyInVisible ? qtyIn : '',
+        qtyOut: qtyOutVisible ? qtyOut : ''
+      });
     } catch(err) {
       errorCount++;
+    }
+  }
+
+  // Overwrite the log sheet with whatever was successfully saved this run
+  if (savedThisBatch.length > 0) {
+    try {
+      await fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveLog', entries: savedThisBatch })
+      });
+    } catch (err) {
+      console.error('Log save failed:', err);
     }
   }
 
@@ -261,6 +285,46 @@ function loadSheetData() {
     showMsg('', '');
   })
 .catch(err => showMsg('Error: ' + err.message, 'red'));
+}
+
+// Log Modal Functions
+function openLogModal() {
+  document.getElementById('logModal').classList.remove('hidden');
+  loadLog();
+}
+
+function closeLogModal() {
+  document.getElementById('logModal').classList.add('hidden');
+}
+
+function loadLog() {
+  const head = document.getElementById('logHead');
+  const body = document.getElementById('logBody');
+  head.innerHTML = '';
+  body.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading...</td></tr>';
+
+  fetch(WEB_APP_URL + '?action=getLog')
+    .then(res => res.json())
+    .then(res => {
+      if (res.error) {
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;">${res.error}</td></tr>`;
+        return;
+      }
+
+      head.innerHTML = '<tr>' + res.headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+      if (res.data.length === 0) {
+        body.innerHTML = `<tr><td colspan="${res.headers.length || 7}" style="text-align:center;">No entries saved yet</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = res.data.map(row =>
+        '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>'
+      ).join('');
+    })
+    .catch(err => {
+      body.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;">Error loading log</td></tr>`;
+    });
 }
 
 function showMsg(text, color) {
