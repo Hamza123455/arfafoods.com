@@ -1,4 +1,5 @@
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxfu-3NZxa36vgflAG4utGTIdd6vJBK-zRi8mGQUxADMDZQ3djVnUx4a7kFEA93SVg4/exec';
+const LOG_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwRk3J3FdLWQ49VHxgb3s4JxkEkqc-dyQ6j5viYeDVpKY-uscK9DYNpDzdF6tZaSR88Aw/exec';
 let itemList = [];
 let rowCount = 0;
 
@@ -206,10 +207,10 @@ async function saveAll() {
     }
   }
 
-  // Overwrite the log sheet with whatever was successfully saved this run
+  // Overwrite the separate Log sheet with whatever was successfully saved this run
   if (savedThisBatch.length > 0) {
     try {
-      await fetch(WEB_APP_URL, {
+      await fetch(LOG_WEB_APP_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -303,7 +304,7 @@ function loadLog() {
   head.innerHTML = '';
   body.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading...</td></tr>';
 
-  fetch(WEB_APP_URL + '?action=getLog')
+  fetch(LOG_WEB_APP_URL + '?action=getLog')
     .then(res => res.json())
     .then(res => {
       if (res.error) {
