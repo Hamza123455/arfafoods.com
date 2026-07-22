@@ -6,18 +6,16 @@
   <link rel="icon" href="logo 1.0.01.jpg" type="image/jpg">
   <link rel="stylesheet" href="spicestockstyles.css">
 </head>
-
 <body>
 <div class="container">
     <h2>Spice Stock</h2>
-
     <div class="toolbar">
       <button class="btn-add" onclick="addRow()">+ Add Row</button>
       <button class="btn-save" id="saveBtn" onclick="saveAll()">Save All</button>
       <button class="btn-view" onclick="openViewModal()">View History</button>
+      <button class="btn-log" onclick="openLogModal()">Log</button>
       <span id="countdown"></span>
     </div>
-
     <div class="table-wrapper">
       <table id="entryTable">
         <thead>
@@ -36,12 +34,9 @@
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-
     <div class="msg" id="msg"></div>
   </div>
-
   <datalist id="itemList"></datalist>
-
   <!-- History Modal -->
   <div id="viewModal" class="modal hidden">
     <div class="modal-content">
@@ -61,7 +56,23 @@
       </div>
     </div>
   </div>
+  <!-- Log Modal -->
+  <div id="logModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Last Saved Voucher</h3>
+        <button class="close-btn" onclick="closeLogModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-wrapper">
+          <table id="logTable">
+            <thead id="logHead"></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 <script src="spicestockscript.js"></script>
 </body>
 </html>
-
