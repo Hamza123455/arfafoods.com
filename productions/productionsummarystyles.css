@@ -15,6 +15,7 @@ body {
 
 .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
@@ -185,5 +186,91 @@ h2 {
     background-color: #0f97c7 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+}
+
+/* ==========================================================================
+   Responsive / mobile styles
+   ========================================================================== */
+
+/* Tablets and small laptops */
+@media (max-width: 768px) {
+  body {
+    padding: 12px;
+  }
+
+  .table-wrapper {
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    font-size: 13px;
+    padding: 10px 10px; /* slightly taller for touch targets */
+  }
+
+  button {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  #itemChart {
+    height: 280px;
+    padding: 10px;
+  }
+
+  .column-toggle {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+
+  .table-wrapper {
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  th,
+  td {
+    padding: 6px 5px;
+    font-size: 11px;
+  }
+
+  table {
+    min-width: 700px; /* still scrolls horizontally, just doesn't force desktop width */
+  }
+
+  button {
+    padding: 10px;
+    font-size: 12.5px;
+  }
+
+  #itemChart {
+    height: 220px;
   }
 }
