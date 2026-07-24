@@ -540,3 +540,14 @@ async function saveTokenToSheet(token){
 }
 
 initPush();
+function applyFrozenColumn() {
+  const itemNameIndex = headers.findIndex(h => h.trim().toLowerCase().includes("item name"));
+  if (itemNameIndex === -1) return;
+
+  document.querySelectorAll("#sheet-table thead tr, #sheet-table tbody tr").forEach(row => {
+    const cells = row.querySelectorAll("th, td");
+    if (cells[itemNameIndex]) {
+      cells[itemNameIndex].classList.add("frozen-col");
+    }
+  });
+}
