@@ -19,13 +19,13 @@ body {
   align-items: flex-start;
   width: 100%;
   max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  overflow: hidden; /* clips both child tables into one seamless rounded card */
 }
 
 .frozen-table-container {
   flex-shrink: 0; /* never shrinks or scrolls — this is the "frozen" part */
-  overflow: hidden;
-  border-radius: 10px 0 0 10px;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
   background: #ffffff;
 }
 
@@ -34,6 +34,7 @@ body {
   width: 130px; /* adjust to fit your Item Name column comfortably */
   border-collapse: separate;
   border-spacing: 0;
+  border-radius: 0; /* the outer .table-flex-wrapper now owns all rounding */
 }
 
 #frozen-table th,
@@ -49,19 +50,20 @@ body {
   overflow: hidden;   /* clips the shine sweep inside the card */
   flex: 1 1 auto;
   min-width: 0; /* required so this flex child can actually scroll instead of overflowing */
-  border-radius: 0 10px 10px 0;
 }
 
 .table-wrapper-inner {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   background: #ffffff;
-  border-radius: 0 10px 10px 0;
-  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
   padding: 24px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+#sheet-table {
+  border-radius: 0; /* the outer .table-flex-wrapper now owns all rounding */
 }
 
 /* Diagonal shine/shimmer sweep — header only */
