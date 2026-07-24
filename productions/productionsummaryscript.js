@@ -558,7 +558,16 @@ function applyFrozenColumn() {
     const cell = cells[itemNameIndex];
     if (!cell) return;
 
+    // Measure the row's TRUE natural height BEFORE touching anything —
+    // hiding the cell first (like before) would shrink the row and give
+    // us a wrong, already-collapsed number to sync against.
+    const rowHeight = row.getBoundingClientRect().height;
+
     cell.style.display = "none";
+
+    // Lock the main row to its original height so hiding the cell
+    // never lets it collapse shorter than the frozen row.
+    row.style.height = rowHeight + "px";
 
     const clone = cell.cloneNode(true);
     clone.style.display = "";
@@ -566,10 +575,7 @@ function applyFrozenColumn() {
     clone.style.boxSizing = "border-box";
 
     const newRow = document.createElement("tr");
-    // Force this row to match the real row's rendered height exactly —
-    // needed because the filter row (dropdown + Value input) is taller
-    // than a blank cell, and every row below it must line up.
-    newRow.style.height = row.offsetHeight + "px";
+    newRow.style.height = rowHeight + "px";
     newRow.appendChild(clone);
 
     if (row.parentElement.tagName === "THEAD") {
