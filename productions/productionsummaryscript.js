@@ -393,6 +393,7 @@ fetch(apiUrl)
 
   thead.appendChild(headerRow);
   createAdvancedFilters();
+  applyFrozenColumn();
   filterTable();
 })
  .catch(err => {
