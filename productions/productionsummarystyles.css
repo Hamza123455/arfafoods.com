@@ -29,10 +29,12 @@ body {
 
 /* Diagonal shine/shimmer sweep — header only */
 :root {
-  /* Adjust this to match your actual header row height in px.
-     If you have two header rows (e.g. a filter row under the main
-     labels, per the print rule below), set this to their combined height. */
-  --table-header-height: 46px;
+  /* Adjust this to match your actual header height in px.
+     Set to the COMBINED height of both header rows: the column-label
+     row plus the filter row underneath it (the one hidden in print via
+     "thead tr:nth-child(2)" below). Check DevTools on <thead> for the
+     exact number — this is an estimate assuming two ~46px rows. */
+  --table-header-height: 92px;
 }
 
 .table-wrapper::before {
