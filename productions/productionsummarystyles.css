@@ -11,20 +11,57 @@ body {
   margin: 0;
   color: #1e293b;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* stops the whole page from scrolling sideways on mobile */
+}
+
+.table-flex-wrapper {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.frozen-table-container {
+  flex-shrink: 0; /* never shrinks or scrolls — this is the "frozen" part */
+  overflow: hidden;
+  border-radius: 10px 0 0 10px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+}
+
+#frozen-table {
+  min-width: 0; /* override the 1000px min-width from the generic "table" rule below */
+  width: 130px; /* adjust to fit your Item Name column comfortably */
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#frozen-table th,
+#frozen-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
 }
 
 .table-wrapper {
   position: relative; /* needed for the shine overlay */
   overflow: hidden;   /* clips the shine sweep inside the card */
+  flex: 1 1 auto;
+  min-width: 0; /* required so this flex child can actually scroll instead of overflowing */
+  border-radius: 0 10px 10px 0;
 }
 
 .table-wrapper-inner {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 0 10px 10px 0;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
   padding: 24px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Diagonal shine/shimmer sweep — header only */
@@ -155,33 +192,6 @@ td.left-align {
   text-align: left;
 }
 
-/* Frozen "Item Name" column — stays fixed while other columns scroll horizontally */
-th.frozen-col,
-td.frozen-col {
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.2); /* visual edge separating it from scrolling columns */
-}
-
-th.frozen-col {
-  z-index: 4; /* header + frozen column intersection: must sit above both the sticky header and the shine */
-  background-color: #0f97c7; /* solid fallback so scrolling columns never show through */
-  background-image: none;
-}
-
-td.frozen-col {
-  background-color: #ffffff; /* must be solid, not transparent, or scrolling columns show through underneath */
-}
-
-tbody tr:nth-child(even) td.frozen-col {
-  background-color: #f8fafc; /* match the striped row color exactly */
-}
-
-tbody tr:hover td.frozen-col {
-  background-color: #eff6ff; /* match the hover color exactly */
-}
-
 tbody tr {
   transition: background-color 0.15s ease;
 }
@@ -252,7 +262,8 @@ h2 {
     display: none !important;
   }
   .table-wrapper,
-  .table-wrapper-inner {
+  .table-wrapper-inner,
+  .frozen-table-container {
     box-shadow: none;
     padding: 0;
   }
@@ -307,11 +318,14 @@ h2 {
     font-size: 12px;
   }
 
-  .frozen-col {
-    max-width: 110px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .frozen-table-container,
+  #frozen-table {
+    width: 100px;
+  }
+
+  #frozen-table th,
+  #frozen-table td {
+    max-width: 100px;
   }
 
   #itemChart {
@@ -346,8 +360,14 @@ h2 {
     font-size: 11px;
   }
 
-  .frozen-col {
-    max-width: 90px;
+  .frozen-table-container,
+  #frozen-table {
+    width: 80px;
+  }
+
+  #frozen-table th,
+  #frozen-table td {
+    max-width: 80px;
   }
 
   table {
