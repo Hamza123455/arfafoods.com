@@ -542,14 +542,36 @@ async function saveTokenToSheet(token){
 }
 
 initPush();
+
 function applyFrozenColumn() {
   const itemNameIndex = headers.findIndex(h => h.trim().toLowerCase().includes("item name"));
   if (itemNameIndex === -1) return;
 
-  document.querySelectorAll("#sheet-table thead tr, #sheet-table tbody tr").forEach(row => {
+  const mainRows = document.querySelectorAll("#sheet-table thead tr, #sheet-table tbody tr");
+  const frozenThead = document.querySelector("#frozen-table thead");
+  const frozenTbody = document.querySelector("#frozen-table tbody");
+  frozenThead.innerHTML = "";
+  frozenTbody.innerHTML = "";
+
+  mainRows.forEach(row => {
     const cells = row.querySelectorAll("th, td");
-    if (cells[itemNameIndex]) {
-      cells[itemNameIndex].classList.add("frozen-col");
+    const cell = cells[itemNameIndex];
+    if (!cell) return;
+
+    // Hide it in the main scrollable table — it now lives in the frozen table instead
+    cell.style.display = "none";
+
+    // Clone it into the frozen table so both stay perfectly in sync
+    const clone = cell.cloneNode(true);
+    clone.style.display = "";
+
+    const newRow = document.createElement("tr");
+    newRow.appendChild(clone);
+
+    if (row.parentElement.tagName === "THEAD") {
+      frozenThead.appendChild(newRow);
+    } else {
+      frozenTbody.appendChild(newRow);
     }
   });
 }
