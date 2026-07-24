@@ -155,6 +155,33 @@ td.left-align {
   text-align: left;
 }
 
+/* Frozen "Item Name" column — stays fixed while other columns scroll horizontally */
+th.frozen-col,
+td.frozen-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.2); /* visual edge separating it from scrolling columns */
+}
+
+th.frozen-col {
+  z-index: 4; /* header + frozen column intersection: must sit above both the sticky header and the shine */
+  background-color: #0f97c7; /* solid fallback so scrolling columns never show through */
+  background-image: none;
+}
+
+td.frozen-col {
+  background-color: #ffffff; /* must be solid, not transparent, or scrolling columns show through underneath */
+}
+
+tbody tr:nth-child(even) td.frozen-col {
+  background-color: #f8fafc; /* match the striped row color exactly */
+}
+
+tbody tr:hover td.frozen-col {
+  background-color: #eff6ff; /* match the hover color exactly */
+}
+
 tbody tr {
   transition: background-color 0.15s ease;
 }
@@ -280,6 +307,13 @@ h2 {
     font-size: 12px;
   }
 
+  .frozen-col {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   #itemChart {
     height: 280px;
     padding: 10px;
@@ -310,6 +344,10 @@ h2 {
   td {
     padding: 6px 5px;
     font-size: 11px;
+  }
+
+  .frozen-col {
+    max-width: 90px;
   }
 
   table {
