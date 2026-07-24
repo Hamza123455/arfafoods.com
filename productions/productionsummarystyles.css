@@ -1,3 +1,9 @@
+/* ==========================================================================
+   Item Table / Report styles
+   Modernized to match the Arfa Foods dashboard design language
+   (Inter UI font, #0f97c7 accent, soft shadows, rounded corners)
+   ========================================================================== */
+
 body {
   font-family: "Inter UI", Arial, sans-serif;
   padding: 24px;
@@ -26,33 +32,34 @@ body {
   content: "";
   position: absolute;
   top: 0;
-  left: -150%;
-  width: 60%;
+  left: -100%;
+  width: 45%;
   height: 100%;
   background: linear-gradient(
-    120deg,
+    100deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.15) 30%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.15) 70%,
     rgba(255, 255, 255, 0) 100%
   );
   transform: skewX(-20deg);
   pointer-events: none;
-  animation: shineSweep 4s ease-in-out infinite;
-  z-index: 2;
+  mix-blend-mode: overlay; /* pops against both the white card and the blue header */
+  animation: shineSweep 8s linear infinite;
+  z-index: 3; /* above sticky header (z-index: 1) */
 }
 
 @keyframes shineSweep {
   0% {
-    left: -150%;
-  }
-  50% {
-    left: 150%;
+    left: -100%;
   }
   100% {
-    left: 150%;
+    left: 250%;
   }
 }
 
+/* Controls: search box, selects, number inputs */
 input[type="text"],
 input[type="number"],
 select {
