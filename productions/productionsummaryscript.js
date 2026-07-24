@@ -558,14 +558,18 @@ function applyFrozenColumn() {
     const cell = cells[itemNameIndex];
     if (!cell) return;
 
-    // Hide it in the main scrollable table — it now lives in the frozen table instead
     cell.style.display = "none";
 
-    // Clone it into the frozen table so both stay perfectly in sync
     const clone = cell.cloneNode(true);
     clone.style.display = "";
+    clone.style.height = "100%";
+    clone.style.boxSizing = "border-box";
 
     const newRow = document.createElement("tr");
+    // Force this row to match the real row's rendered height exactly —
+    // needed because the filter row (dropdown + Value input) is taller
+    // than a blank cell, and every row below it must line up.
+    newRow.style.height = row.offsetHeight + "px";
     newRow.appendChild(clone);
 
     if (row.parentElement.tagName === "THEAD") {
