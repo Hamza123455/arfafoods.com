@@ -29,12 +29,13 @@ body {
 
 /* Diagonal shine/shimmer sweep — header only */
 :root {
-  /* Adjust this to match your actual header height in px.
-     Set to the COMBINED height of both header rows: the column-label
-     row plus the filter row underneath it (the one hidden in print via
-     "thead tr:nth-child(2)" below). Check DevTools on <thead> for the
-     exact number — this is an estimate assuming two ~46px rows. */
-  --table-header-height: 92px;
+  /* Adjust this to match your actual header height in px — this needs to
+     reach all the way down to the bottom of the filter row (the dropdown
+     + "Value" input stacked underneath the column label). Check DevTools:
+     inspect the header area and measure from the very top of the blue
+     background down to where the filter row ends. This is a rough estimate
+     assuming a label row + a taller filter row with stacked select/input. */
+  --table-header-height: 150px;
 }
 
 .table-wrapper::before {
