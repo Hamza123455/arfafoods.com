@@ -291,8 +291,9 @@ function filterTable() {
     }
   });
 
-  currentVisibleRows = visibleRows; // NEW: keep the export in sync with active filters
-  renderChartIfOneMatch(visibleRows);
+currentVisibleRows = visibleRows;
+    applyFrozenColumn();   
+    renderChartIfOneMatch(visibleRows);
 }
 document.getElementById("itemSearch").addEventListener("input", filterTable);
 function renderChartIfOneMatch(rows) {
