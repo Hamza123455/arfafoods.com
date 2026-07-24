@@ -31,7 +31,7 @@ body {
 
 #frozen-table {
   min-width: 0; /* override the 1000px min-width from the generic "table" rule below */
-  width: 130px; /* adjust to fit your Item Name column comfortably */
+  width: auto; /* sizes itself to fit the longest visible item name — never truncates */
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 0; /* the outer .table-flex-wrapper now owns all rounding */
@@ -39,10 +39,7 @@ body {
 
 #frozen-table th,
 #frozen-table td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 130px;
+  white-space: nowrap; /* keeps names on one line so row heights stay predictable */
   border-right: none; /* prevents a doubled border line at the seam with the main table */
 }
 
@@ -322,12 +319,7 @@ h2 {
 
   .frozen-table-container,
   #frozen-table {
-    width: 100px;
-  }
-
-  #frozen-table th,
-  #frozen-table td {
-    max-width: 100px;
+    width: auto;
   }
 
   #itemChart {
@@ -363,12 +355,7 @@ h2 {
 
   .frozen-table-container,
   #frozen-table {
-    width: 80px;
-  }
-
-  #frozen-table th,
-  #frozen-table td {
-    max-width: 80px;
+    width: auto;
   }
 
   table {
