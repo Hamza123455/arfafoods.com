@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arfa Foods</title>
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="rcptstyles.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-primary me-3" type="button">☰</button>
+      <span class="brand-title">Arfa Foods and Spices</span>
+      <span class="unit-label">Arfa - Top Unit</span>
+      <select class="form-select form-select-sm system-select">
+        <option value="management">Management System</option>
+        <option selected value="coldstores">Cold Store (ver. 1.0)</option>
+      </select>
+      <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+    </div>
+    <div class="d-flex align-items-center">
+      <a class="text-white position-relative me-3" href="#">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+      </a>
+      <img src="userknown.jpg" class="user-img me-2" />
+      <span class="text-white me-2">Unknown</span>
+      <i class="bi bi-three-dots-vertical text-white"></i>
+    </div>
+  </div>
+</nav>
+<div class="sidebar">
+  <input type="text" class="form-control mb-2" placeholder="Quick search">
+  <div class="accordion" id="sidebarMenu">
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse"><div class="accordion-body">Dashboard</div></div></div>
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#receipts">Receipts</button></h2>
+      <div id="receipts" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+          <ul class="list-unstyled mb-0">
+            <li><a href="receipt" class="text-decoration-none fw-bold text-primary">Receipt Voucher</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#recon">Reconciliation</button></h2><div id="recon" class="accordion-collapse collapse"><div class="accordion-body">Bank Match</div></div></div>
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#reports">Reports</button></h2>
+      <div id="reports" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          <ul class="list-unstyled mb-0">
+            <li><a href="coldstore/coldstoresummary" class="text-decoration-none text-dark">Cold Store</a></li>
+            <li><a href="coldstore/itemsummary" class="text-decoration-none text-dark">Item</a></li>
+            <li><a href="coldstore/vendorsummary" class="text-decoration-none text-dark">Vendor</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#controldata">Control Data</button></h2><div id="controldata" class="accordion-collapse collapse"><div class="accordion-body"></div></div></div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#access">Access Control</button></h2><div id="access" class="accordion-collapse collapse"><div class="accordion-body">User Roles</div></div></div>
+  </div>
+</div>
+<div class="content">
+  <h1 class="heading-purple display-6 mb-3">Cold Store Receipts</h1>
+  <div class="bg-light-blue p-3 rounded shadow-sm mb-4 d-flex align-items-center flex-wrap gap-2">
+    <div class="file-status me-3">
+      <span class="dot dot-off" id="statusDot"></span>
+      <span id="statusText">Not connected</span>
+    </div>
+    <button class="btn btn-purple btn-sm" id="configBtn"><i class="bi bi-gear"></i> Configure Connection</button>
+    <button class="btn btn-outline-secondary btn-sm" id="refreshBtn"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+    <div class="form-check form-switch ms-2">
+      <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+      <label class="form-check-label small" for="autoRefresh">Auto-refresh every 15s</label>
+    </div>
+    <span class="ms-auto text-muted small" id="lastSynced"></span>
+  </div>
+  <div class="card shadow-sm mb-4 d-none" id="configPanel">
+    <div class="card-header bg-white fw-bold">Connect to shared data source</div>
+    <div class="card-body">
+      <!--<p class="text-muted small">
+        This page reads and writes to a Google Sheet through a small Apps Script Web App, so every PC
+        shares the same live data instead of separate local files. Paste the Web App URL and the secret
+        key you set in the script (see <code>AppsScript-Code.gs</code> for setup steps). This only needs
+        to be done once per PC/browser.
+      </p>-->
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label class="form-label">Web App URL</label>
+          <input type="text" class="form-control" id="webAppUrl" placeholder="https://script.google.com/macros/s/XXXX/exec">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Secret Key</label>
+          <input type="text" class="form-control" id="secretKey" placeholder="matches SECRET_KEY in the script">
+        </div>
+      </div>
+      <button class="btn btn-voucher mt-3" id="saveConfigBtn"><i class="bi bi-check-circle"></i> Save & Connect</button>
+    </div>
+  </div>
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-bold">Manage Receipts</div>
+    <div class="card-body">
+      <form id="receiptForm">
+        <div class="row g-3">
+          <div class="col-md-2">
+            <label class="form-label">Receipt No</label>
+            <input type="text" class="form-control" id="receiptNo" required placeholder="e.g. 1001">
+            <div class="form-text" id="balanceHint"></div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Item Name</label>
+            <select class="form-select" id="itemName" required>
+              <option value="" disabled selected>Select item...</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" id="description">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Vendour</label>
+            <select class="form-select" id="vendour" required>
+              <option value="" disabled selected>Select vendour...</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Cold Store</label>
+            <select class="form-select" id="coldStore" required>
+              <option value="" disabled selected>Select cold store...</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Unit</label>
+            <input type="text" class="form-control" id="unit" placeholder="ctns / kg / bags">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Transaction Type</label>
+            <select class="form-select" id="txnType">
+              <option value="in">Stock In</option>
+              <option value="out">Stock Out</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">QTY</label>
+            <input type="number" class="form-control" id="qty" min="0" step="any" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" class="form-control" id="weight" min="0" step="any" required placeholder="auto on Stock Out">
+          </div>
+          <div class="col-md-2 stock-out-only d-none-fields">
+            <label class="form-label">Vehicle No</label>
+            <input type="text" class="form-control" id="vehicleNo" placeholder="e.g. LEB-4521">
+          </div>
+          <div class="col-md-2 stock-out-only d-none-fields">
+            <label class="form-label">Driver Name</label>
+            <input type="text" class="form-control" id="driverName" placeholder="Driver's name">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-voucher w-100" id="addBtn" disabled>
+              <i class="bi bi-plus-circle"></i> Add Receipt
+            </button>
+          </div>
+        </div>
+      </form>
+      <div class="form-text mt-2" id="disabledHint">Connect to the shared data source above before adding entries.</div>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center" style="cursor:pointer;"
+         data-bs-toggle="collapse" data-bs-target="#receiptLogBody" role="button"
+         aria-expanded="false" aria-controls="receiptLogBody">
+      <span><i class="bi bi-chevron-right" id="logChevron"></i> Receipt Log</span>
+      <span class="text-muted small" id="rowCount">0 entries</span>
+    </div>
+    <div class="collapse" id="receiptLogBody">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Ref#</th><th>Receipt No</th><th>Date</th><th>Item Name</th><th>Description</th>
+              <th>Vendour</th><th>Cold Store</th><th>Unit</th><th>QTY</th>
+              <th>Stock In</th><th>Stock Out</th><th>Weight In</th><th>Weight Out</th>
+              <th>Vehicle No</th><th>Driver</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="16" class="text-center text-muted py-4">Not connected yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="printModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Receipt Saved</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body bg-light">
+        <div id="printArea" class="print-slip"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-purple" id="printBtn"><i class="bi bi-printer"></i> Print Slip</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Receipt</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-2">Please review before saving - this will be added to the shared log immediately.</p>
+        <table class="table table-sm mb-0">
+          <tbody id="confirmSaveBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-voucher" id="confirmSaveBtn"><i class="bi bi-check-circle"></i> Confirm & Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Receipt</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editRecipt_id">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Receipt No</label>
+            <input type="text" class="form-control" id="editReceiptNo">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="editDate">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Item Name</label>
+            <select class="form-select" id="editItemName"></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Vendour</label>
+            <select class="form-select" id="editVendour"></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Cold Store</label>
+            <select class="form-select" id="editColdStore"></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Unit</label>
+            <input type="text" class="form-control" id="editUnit">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" id="editDescription">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Transaction Type</label>
+            <select class="form-select" id="editTxnType">
+              <option value="in">Stock In</option>
+              <option value="out">Stock Out</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">QTY</label>
+            <input type="number" step="any" class="form-control" id="editQty">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" step="any" class="form-control" id="editWeight">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Vehicle No</label>
+            <input type="text" class="form-control" id="editVehicleNo">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Driver Name</label>
+            <input type="text" class="form-control" id="editDriverName">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Admin Password</label>
+            <input type="password" class="form-control" id="editAdminPassword" placeholder="required to save">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-voucher" id="saveEditBtn"><i class="bi bi-check-circle"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="rcptscript.js"></script>
+</body>
+</html>
