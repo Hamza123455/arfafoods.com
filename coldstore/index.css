@@ -1,0 +1,81 @@
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .navbar-custom {
+      background-color: #3F51B5;
+      height: 56px;
+    }
+
+    .brand-title {
+      color: white;
+      font-weight: 800;
+      font-size: 18px;
+      white-space: nowrap;
+    }
+
+    .unit-label {
+      color: #FFEB3B;
+      font-weight: 600;
+      font-size: 13px;
+      margin-left: 15px;
+    }
+
+    .system-select {
+      height: 32px;
+      font-size: 13px;
+      margin-left: 15px;
+      width: 280px;
+    }
+
+    .user-img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background-color: #F8F9FA;
+      width: 250px;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+      padding: 10px;
+    }
+
+    .content {
+      margin-left: 250px;
+      padding: 20px;
+      margin-top: 56px;
+    }
+
+    .content-frame {
+      width: 100%;
+      height: calc(100vh - 56px);
+      border: none;
+      display: block;
+    }
+
+    .heading-purple {
+      color: #4A148C;
+      font-weight: bold;
+      font-weight: 900;
+    }
+
+    .btn-voucher {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .btn-purple {
+      background-color: #9C27B0;
+      color: white;
+    }
+
+    .bg-light-blue {
+      background-color: #F1F8FF;
+    }
