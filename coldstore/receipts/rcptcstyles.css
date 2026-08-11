@@ -1,0 +1,54 @@
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+    .navbar-custom { background-color: #3F51B5; height: 56px; }
+    .brand-title { color: white; font-weight: 800; font-size: 18px; white-space: nowrap; }
+    .unit-label { color: #FFEB3B; font-weight: 600; font-size: 13px; margin-left: 15px; }
+    .system-select { height: 32px; font-size: 13px; margin-left: 15px; width: 280px; }
+    .user-img { width: 30px; height: 30px; border-radius: 50%; }
+    .sidebar {
+      height: 100vh; background-color: #F8F9FA; width: 250px; position: fixed;
+      top: 56px; left: 0; overflow-y: auto; border-right: 1px solid #ddd; padding: 10px;
+    }
+    .content { padding: 16px 20px; }
+    .heading-purple { color: #4A148C; font-weight: 900; }
+    .btn-voucher { background-color: #2196F3; color: white; }
+    .btn-purple { background-color: #9C27B0; color: white; }
+    .bg-light-blue { background-color: #F1F8FF; }
+    .file-status { font-size: 13px; }
+    .file-status .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+    .dot-off { background:#dc3545; }
+    .dot-on { background:#28a745; }
+    .dot-busy { background:#ffc107; }
+    .table-sm td, .table-sm th { vertical-align: middle; font-size: 13px; white-space: nowrap; }
+    .stock-in-badge { color:#1b6b2e; font-weight:600; }
+    .stock-out-badge { color:#b02a37; font-weight:600; }
+    .d-none-fields { display: none; }
+    .print-slip {
+      width: 4in;
+      margin: 0 auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 16px 16px 60px 16px;
+      background: white;
+    }
+    .print-slip h4 { font-size: 16px; font-weight: 800; margin: 0 0 2px 0; color: #4A148C; }
+    .print-slip .sub { font-size: 11px; color: #666; margin-bottom: 10px; letter-spacing: .5px; text-transform: uppercase; }
+    .print-slip table { width: 100%; font-size: 13.5px; border-collapse: collapse; }
+    .print-slip table td { padding: 4px 0; border-bottom: 1px dotted #ddd; }
+    .print-slip .label { color: #555; width: 42%; }
+    .print-slip .value { font-weight: 700; text-align: right; }
+    .print-slip .extra { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #999; font-size: 12.5px; color: #333; }
+    .print-slip .extra strong { color: #000; }
+    .print-slip .sign-stamp-single { width: 60%; margin: 110px auto 0 auto; text-align: center; }
+    .print-slip .sign-line { border-bottom: 1px solid #333; height: 62px; display: flex; align-items: flex-end; justify-content: center; }
+    .print-slip .stamp-img { max-height: 58px; max-width: 100%; object-fit: contain; }
+    .print-slip .sign-label { margin-top: 4px; font-size: 9.5px; color: #555; }
+    .print-slip .footer-note { margin-top: 16px; font-size: 10.5px; color: #888; text-align: center; }
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea {
+        position: fixed; top: 0; left: 0;
+        border: none; margin: 0; padding: 0.25in; width: 4in;
+      }
+      @page { size: A4; margin: 0; }
+    }
