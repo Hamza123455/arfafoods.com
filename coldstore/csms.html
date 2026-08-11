@@ -36,17 +36,17 @@
         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bellDropdown" style="min-width:230px;">
           <li><h6 class="dropdown-header">Overview</h6></li>
           <li>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/coldstoresummary-content.html'); return false;">
+            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/by-store/b-loc'); return false;">
               Total Cold Stores <span class="badge bg-secondary rounded-pill" id="countColdStores">-</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/itemsummary-content.html'); return false;">
+            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/by-item/b-i'); return false;">
               Total Items <span class="badge bg-secondary rounded-pill" id="countItems">-</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/receiptnosummary-content.html'); return false;">
+            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/by-receipt/b-rcpt'); return false;">
               Total Receipts <span class="badge bg-secondary rounded-pill" id="countReceipts">-</span>
             </a>
           </li>
@@ -117,10 +117,10 @@
   <div id="reports" class="accordion-collapse collapse">
     <div class="accordion-body">
       <ul class="list-unstyled mb-0">
-        <li><a href="#" onclick="loadPage('reports/coldstoresummary-content.html'); return false;" class="text-decoration-none text-dark">By Cold Store</a></li>
-        <li><a href="#" onclick="loadPage('reports/itemsummary-content.html'); return false;" class="text-decoration-none text-dark">By Item</a></li>
-        <li><a href="#" onclick="loadPage('reports/vendorsummary-content.html'); return false;" class="text-decoration-none text-dark">By Vendor</a></li>
-        <li><a href="#" onclick="loadPage('reports/receiptnosummary-content.html'); return false;" class="text-decoration-none text-dark">By Receipt No</a></li>
+        <li><a href="#" onclick="loadPage('reports/by-store/b-loc'); return false;" class="text-decoration-none text-dark">By Cold Store</a></li>
+        <li><a href="#" onclick="loadPage('reports/by-item/b-i'); return false;" class="text-decoration-none text-dark">By Item</a></li>
+        <li><a href="#" onclick="loadPage('reports/by-vendour/b-vndr'); return false;" class="text-decoration-none text-dark">By Vendor</a></li>
+        <li><a href="#" onclick="loadPage('reports/by-receipt/b-rcpt'); return false;" class="text-decoration-none text-dark">By Receipt No</a></li>
       </ul>
     </div>
   </div>
