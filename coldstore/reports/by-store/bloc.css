@@ -1,0 +1,49 @@
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+    .content { padding: 16px 20px; }
+    .heading-purple { color: #4A148C; font-weight: 900; }
+    .btn-purple { background-color: #9C27B0; color: white; }
+    .bg-light-blue { background-color: #F1F8FF; }
+    .file-status { font-size: 13px; }
+    .file-status .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+    .dot-off { background:#dc3545; }
+    .dot-on { background:#28a745; }
+    .dot-busy { background:#ffc107; }
+    .table-sm td, .table-sm th { vertical-align: middle; font-size: 13px; }
+    .stats-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+    .stat { background:#F1F8FF; border-radius:8px; padding:10px 18px; min-width:130px; text-align:center; }
+    .stat-num { font-size:20px; font-weight:800; color:#4A148C; }
+    .stat-label { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.4px; }
+    .group-card .card-header { cursor: pointer; }
+    .group-summary { font-size: 12.5px; color: #555; }
+    .bal-pos { color: #1b6b2e; font-weight: 700; }
+    .bal-neg { color: #b02a37; font-weight: 700; }
+    .print-slip {
+      width: 4in;
+      margin: 0 auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 16px 16px 60px 16px;
+      background: white;
+    }
+    .print-slip h4 { font-size: 16px; font-weight: 800; margin: 0 0 2px 0; color: #4A148C; }
+    .print-slip .sub { font-size: 11px; color: #666; margin-bottom: 10px; letter-spacing: .5px; text-transform: uppercase; }
+    .print-slip table { width: 100%; font-size: 13.5px; border-collapse: collapse; }
+    .print-slip table td { padding: 4px 0; border-bottom: 1px dotted #ddd; }
+    .print-slip .label { color: #555; width: 42%; }
+    .print-slip .value { font-weight: 700; text-align: right; }
+    .print-slip .extra { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #999; font-size: 12.5px; color: #333; }
+    .print-slip .extra strong { color: #000; }
+    .print-slip .sign-stamp-single { width: 60%; margin: 110px auto 0 auto; text-align: center; }
+    .print-slip .sign-line { border-bottom: 1px solid #333; height: 62px; display: flex; align-items: flex-end; justify-content: center; }
+    .print-slip .stamp-img { max-height: 58px; max-width: 100%; object-fit: contain; }
+    .print-slip .sign-label { margin-top: 4px; font-size: 9.5px; color: #555; }
+    .print-slip .footer-note { margin-top: 16px; font-size: 10.5px; color: #888; text-align: center; }
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea {
+        position: fixed; top: 0; left: 0;
+        border: none; margin: 0; padding: 0.25in; width: 4in;
+      }
+      @page { size: A4; margin: 0; }
+    }
