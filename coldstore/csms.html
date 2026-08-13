@@ -19,7 +19,7 @@
       <span class="unit-label">Arfa - Top Unit</span>
       <select onchange="if (this.value) window.location.href = this.value;">
         <option value = "../index">Management System</option>
-        <option selected value = "coldstore/csms">Cold Store (ver. 1.0)</option>
+        <option selected value = "coldstore/csms">Cold Store (ver. 1.1)</option>
       </select>
       <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
     </div>
@@ -91,7 +91,7 @@
 <div class="sidebar">
   <input type="text" class="form-control mb-2" placeholder="Quick search">
   <div class="accordion" id="sidebarMenu">
-    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse"><div class="accordion-body"><a href="#" onclick="showDashboard(); return false;" class="text-decoration-none text-dark">Add New</a></div></div></div>
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse"><div class="accordion-body"><a href="#" onclick="showDashboard(); return false;" class="text-decoration-none text-dark">Dashboard</a></div></div></div>
 
     <div class="accordion-item">
     <h2 class="accordion-header">
@@ -133,6 +133,9 @@
   </h2>
   <div id="controldata" class="accordion-collapse collapse">
     <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="#" onclick="loadPage('addnew/addnew'); return false;" class="text-decoration-none text-dark">Add New</a></li>
+      </ul>
     </div>
   </div>
 </div>
