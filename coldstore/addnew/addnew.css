@@ -1,0 +1,16 @@
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+    .content { padding: 16px 20px; }
+    .heading-purple { color: #4A148C; font-weight: 900; }
+    .btn-voucher { background-color: #2196F3; color: white; }
+    .btn-purple { background-color: #9C27B0; color: white; }
+    .bg-light-blue { background-color: #F1F8FF; }
+    .file-status { font-size: 13px; }
+    .file-status .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+    .dot-off { background:#dc3545; }
+    .dot-on { background:#28a745; }
+    .dot-busy { background:#ffc107; }
+    .type-card { cursor: pointer; border: 2px solid #e5e5e5; transition: border-color .15s, background-color .15s; }
+    .type-card.active { border-color: #9C27B0; background-color: #F8F0FB; }
+    .type-card .bi { font-size: 22px; }
+    .list-scroll { max-height: 260px; overflow-y: auto; }
+    .list-scroll .list-group-item { font-size: 13.5px; }
