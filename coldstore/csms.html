@@ -17,9 +17,9 @@
       <button class="btn btn-primary me-3" type="button">☰</button>
       <span class="brand-title">Arfa Foods and Spices</span>
       <span class="unit-label">Arfa - Top Unit</span>
-      <select onchange="if (this.value) window.location.href = this.value;">
-        <option value = "../index">Management System</option>
-        <option selected value = "coldstore/csms">Cold Store (ver. 1.1)</option>
+      <select class="form-select form-select-sm system-select">
+        <option value="management">Management System</option>
+        <option selected value="coldstores">Cold Store (ver. 1.1)</option>
       </select>
       <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
     </div>
@@ -34,20 +34,20 @@
           <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="bellBadge">0</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bellDropdown" style="min-width:230px;">
-          <li><h6 class="dropdown-header">Overview</h6></li>
+          <li><h6 class="dropdown-header">Cold Store Overview</h6></li>
           <li>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/by-store/b-loc'); return false;">
-              Total Cold Stores <span class="badge bg-secondary rounded-pill" id="countColdStores">-</span>
+            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('coldstoresummary-content.html'); return false;">
+              Cold Stores <span class="badge bg-secondary rounded-pill" id="countColdStores">-</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/by-item/b-i'); return false;">
-              Total Items <span class="badge bg-secondary rounded-pill" id="countItems">-</span>
+            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('itemsummary-content.html'); return false;">
+              Items <span class="badge bg-secondary rounded-pill" id="countItems">-</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('reports/by-receipt/b-rcpt'); return false;">
-              Total Receipts <span class="badge bg-secondary rounded-pill" id="countReceipts">-</span>
+            <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" onclick="loadPage('receiptnosummary-content.html'); return false;">
+              Receipts <span class="badge bg-secondary rounded-pill" id="countReceipts">-</span>
             </a>
           </li>
           <li><hr class="dropdown-divider"></li>
@@ -64,7 +64,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Connect to Data Source</h5>
+        <h5 class="modal-title">Connect to Shared Data Source</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -89,10 +89,12 @@
   </div>
 </div>
 <div class="sidebar">
-  <input type="text" class="form-control mb-2" placeholder="Quick search">
+  <div class="input-group quick-search mb-3">
+    <input type="text" class="form-control" id="quickSearch" placeholder="Quick search">
+    <button class="btn btn-clear" type="button" id="clearSearch"><i class="bi bi-x"></i></button>
+  </div>
   <div class="accordion" id="sidebarMenu">
-    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse"><div class="accordion-body"><a href="#" onclick="showDashboard(); return false;" class="text-decoration-none text-dark">Dashboard</a></div></div></div>
-
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse show"><div class="accordion-body"><a href="#" onclick="setActiveLink(this); showDashboard(); return false;" class="active-link">Dashboard</a></div></div></div>
     <div class="accordion-item">
     <h2 class="accordion-header">
     <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#receipts">
@@ -102,7 +104,7 @@
   <div id="receipts" class="accordion-collapse collapse">
     <div class="accordion-body">
       <ul class="list-unstyled mb-0">
-        <li><a href="#" onclick="loadPage('receipts/rcptc'); return false;" class="text-decoration-none text-dark">Receipt Voucher</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('receipts/rcptc'); return false;">Advance Receipt Voucher</a></li>
       </ul>
     </div>
    </div>
@@ -134,7 +136,7 @@
   <div id="controldata" class="accordion-collapse collapse">
     <div class="accordion-body">
       <ul class="list-unstyled mb-0">
-        <li><a href="#" onclick="loadPage('addnew/addnew'); return false;" class="text-decoration-none text-dark">Add New</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('addnew/addnew'); return false;">Add New</a></li>
       </ul>
     </div>
   </div>
@@ -148,12 +150,13 @@
     <button class="btn btn-voucher btn-lg" onclick="loadPage('receipts/rcptc')">Manage Receipts</button>
   </div>
   <div class="bg-light-blue p-4 rounded shadow-sm">
-    <h5 class="fw-bold">Executive Reports1</h5>
-    <button class="btn btn-info btn-sm me-2"><i class="bi bi-list"></i> Summary</button>
-    <button class="btn btn-purple"><i class="bi bi-file-earmark-text"></i> All Receivables</button>
+    <button class="btn btn-info btn-sm text-white mb-3"><i class="bi bi-list"></i> Summary</button>
+    <div>
+      <button class="btn btn-purple btn-lg" onclick="loadPage('reports/by-receipt/b-rcpt')"><i class="bi bi-file-earmark-text"></i> Quick Reports</button>
+    </div>
   </div>
 </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="csmsscript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>  <script src="csmsscript.js"></script>
+<script src="csmsscript.js"></script>
 </body>
 </html>
