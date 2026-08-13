@@ -2,80 +2,118 @@
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
     }
-
     .navbar-custom {
-      background-color: #3F51B5;
+      background-color: #1976D2;
       height: 56px;
     }
-
     .brand-title {
       color: white;
       font-weight: 800;
       font-size: 18px;
       white-space: nowrap;
     }
-
     .unit-label {
       color: #FFEB3B;
       font-weight: 600;
       font-size: 13px;
       margin-left: 15px;
     }
-
     .system-select {
       height: 32px;
       font-size: 13px;
       margin-left: 15px;
       width: 280px;
     }
-
     .user-img {
-      width: 30px;
-      height: 30px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.5);
     }
-
     .sidebar {
       height: 100vh;
-      background-color: #F8F9FA;
+      background-color: #ffffff;
       width: 250px;
       position: fixed;
       top: 56px;
       left: 0;
       overflow-y: auto;
-      border-right: 1px solid #ddd;
-      padding: 10px;
+      border-right: 1px solid #e5e5e5;
+      padding: 12px 10px;
     }
-
+    .quick-search .form-control {
+      border-right: none;
+    }
+    .quick-search .btn-clear {
+      border: 1px solid #ced4da;
+      border-left: none;
+      background: white;
+      color: #888;
+    }
+    .sidebar .accordion-item {
+      border: none;
+    }
+    .sidebar .accordion-button {
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 8px 4px;
+      font-weight: 700;
+      font-size: 14.5px;
+      color: #222;
+    }
+    .sidebar .accordion-button:not(.collapsed) {
+      background: none;
+      color: #1976D2;
+      box-shadow: none;
+    }
+    .sidebar .accordion-button::after {
+      width: 14px;
+      height: 14px;
+      background-size: 14px;
+    }
+    .sidebar .accordion-body {
+      padding: 4px 4px 8px 14px;
+    }
+    .sidebar .accordion-body a {
+      display: block;
+      padding: 6px 4px;
+      font-size: 13.5px;
+      color: #444;
+      border-radius: 4px;
+    }
+    .sidebar .accordion-body a:hover {
+      background-color: #F1F8FF;
+    }
+    .sidebar .accordion-body a.active-link {
+      color: #1976D2;
+      font-weight: 700;
+      background-color: #E9F3FE;
+    }
     .content {
       margin-left: 250px;
       padding: 20px;
       margin-top: 56px;
     }
-
     .content-frame {
       width: 100%;
       height: calc(100vh - 56px);
       border: none;
       display: block;
     }
-
     .heading-purple {
       color: #4A148C;
       font-weight: bold;
       font-weight: 900;
     }
-
     .btn-voucher {
       background-color: #2196F3;
       color: white;
     }
-
     .btn-purple {
       background-color: #9C27B0;
       color: white;
     }
-
     .bg-light-blue {
       background-color: #F1F8FF;
     }
