@@ -30,6 +30,48 @@
       padding: 16px 16px 60px 16px;
       background: white;
     }
+#receiptNoSuggestions {
+  border: 1px solid #E0D4EC;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 4px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(74, 20, 140, 0.12);
+}
+#receiptNoSuggestions .receipt-suggestion-item {
+  border: none;
+  border-radius: 6px;
+  margin-bottom: 2px;
+  background: transparent;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+#receiptNoSuggestions .receipt-suggestion-item:last-child {
+  margin-bottom: 0;
+}
+#receiptNoSuggestions .receipt-suggestion-item:hover,
+#receiptNoSuggestions .receipt-suggestion-item:focus {
+  background-color: #F3E9FA;
+  transform: translateX(2px);
+}
+#receiptNoSuggestions .receipt-suggestion-item:active {
+  background-color: #E9D6F5;
+}
+#receiptNoSuggestions .receipt-suggestion-item .fw-bold {
+  color: #4A148C;
+}
+#receiptNoSuggestions .receipt-suggestion-item .text-muted {
+  color: #6c757d !important;
+}
+#receiptNoSuggestions::-webkit-scrollbar {
+  width: 6px;
+}
+#receiptNoSuggestions::-webkit-scrollbar-thumb {
+  background-color: #C9A6E0;
+  border-radius: 4px;
+}
+#receiptNoSuggestions::-webkit-scrollbar-track {
+  background: transparent;
+}
     .print-slip h4 { font-size: 16px; font-weight: 800; margin: 0 0 2px 0; color: #4A148C; }
     .print-slip .sub { font-size: 11px; color: #666; margin-bottom: 10px; letter-spacing: .5px; text-transform: uppercase; }
     .print-slip table { width: 100%; font-size: 13.5px; border-collapse: collapse; }

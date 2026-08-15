@@ -225,6 +225,47 @@
     hint.className = (txnType === 'out' && qty > info.balance) ? 'form-text text-danger fw-bold' : 'form-text text-success';
     suggestWeight();
   }
+function getDistinctReceiptNos() {
+  const set = new Set();
+  receipts.forEach(r => { if (r['Receipt No']) set.add(String(r['Receipt No'])); });
+  return Array.from(set).sort(naturalReceiptSort);
+}
+function naturalReceiptSort(a, b) {
+  const na = parseFloat(a), nb = parseFloat(b);
+  if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
+  return String(a).localeCompare(String(b));
+}
+function renderReceiptNoSuggestions() {
+  const input = document.getElementById('receiptNo');
+  const box = document.getElementById('receiptNoSuggestions');
+  const term = input.value.trim().toLowerCase();
+  const all = getDistinctReceiptNos();
+  const matches = (term ? all.filter(n => n.toLowerCase().includes(term)) : all).slice(0, 8);
+  if (matches.length === 0) { box.classList.add('d-none'); box.innerHTML = ''; return; }
+  box.innerHTML = matches.map(n => {
+    const info = computeBalance(n);
+    const sub = info ? `${escapeHtml(info.item)} @ ${escapeHtml(info.coldStore)} \u2014 Balance: ${info.balance} ${escapeHtml(info.unit || '')}` : 'New batch';
+    return `<button type="button" class="list-group-item list-group-item-action py-1 px-2 receipt-suggestion-item" data-value="${escapeHtml(n)}">
+      <div class="fw-bold" style="font-size:13px;">${escapeHtml(n)}</div>
+      <div class="text-muted" style="font-size:11px;">${sub}</div>
+    </button>`;
+  }).join('');
+  box.classList.remove('d-none');
+}
+document.getElementById('receiptNoSuggestions').addEventListener('mousedown', (e) => {
+  const btn = e.target.closest('.receipt-suggestion-item');
+  if (!btn) return;
+  e.preventDefault();
+  document.getElementById('receiptNo').value = btn.dataset.value;
+  document.getElementById('receiptNoSuggestions').classList.add('d-none');
+  updateBalanceHint();
+});
+
+document.getElementById('receiptNo').addEventListener('focus', renderReceiptNoSuggestions);
+document.getElementById('receiptNo').addEventListener('input', renderReceiptNoSuggestions);
+document.getElementById('receiptNo').addEventListener('blur', () => {
+  setTimeout(() => document.getElementById('receiptNoSuggestions').classList.add('d-none'), 150);
+});
   document.getElementById('receiptNo').addEventListener('input', updateBalanceHint);
   document.getElementById('qty').addEventListener('input', updateBalanceHint);
   function toggleStockOutFields() {

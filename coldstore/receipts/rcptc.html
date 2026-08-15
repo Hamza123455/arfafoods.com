@@ -29,9 +29,10 @@
     <div class="card-body">
       <form id="receiptForm">
         <div class="row g-3">
-          <div class="col-md-2">
+         <div class="col-md-2 position-relative">
             <label class="form-label">Receipt No</label>
-            <input type="text" class="form-control" id="receiptNo" required placeholder="e.g. 1001">
+            <input type="text" class="form-control" id="receiptNo" required placeholder="e.g. 1001" autocomplete="off">
+            <div class="list-group position-absolute w-100 shadow-sm d-none" id="receiptNoSuggestions" style="z-index:1000; max-height:220px; overflow-y:auto;"></div>
             <div class="form-text" id="balanceHint"></div>
           </div>
           <div class="col-md-2">
