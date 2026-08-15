@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arfa Foods</title>
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-primary me-3" type="button">☰</button>
+      <span class="brand-title">Arfa Foods and Spices</span>
+      <span class="unit-label">Arfa - Top Unit</span>
+      <select onchange="if (this.value) window.location.href = this.value;">
+        <option value = "index">Management System (ver. 1.1)</option>
+        <option value = "coldstore/csms">Cold Store (ver. 1.1)</option>
+      </select>
+      <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+    </div>
+    <div class="d-flex align-items-center">
+      <a class="text-white position-relative me-3" href="#">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+      </a>
+      <img src="userknown.jpg" class="user-img me-2" />
+      <span class="text-white me-2">Unknown</span>
+      <i class="bi bi-three-dots-vertical text-white"></i>
+    </div>
+  </div>
+</nav>
+<div class="sidebar">
+ <div class="input-group quick-search mb-3">
+    <input type="text" class="form-control" id="quickSearch" placeholder="Quick search">
+    <button class="btn btn-clear" type="button" id="clearSearch"><i class="bi bi-x"></i></button>
+  </div>
+  <div class="accordion" id="sidebarMenu">
+    <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#home">Home</button></h2><div id="home" class="accordion-collapse collapse"><div class="accordion-body">Dashboard</div></div></div>
+          <div class="accordion-item">
+    <h2 class="accordion-header">
+    <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#masterfile">
+      MasterFile
+    </button>
+  </h2>
+  <div id="masterfile" class="accordion-collapse collapse">
+    <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="dashboard.html" class="text-decoration-none text-dark">Master Data</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+    <h2 class="accordion-header">
+    <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#vouchers">
+      Vouchers
+    </button>
+  </h2>
+  <div id="vouchers" class="accordion-collapse collapse">
+    <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="employees-data/cashpaymentvoucher" class="text-decoration-none text-dark">Advance Payment Voucher</a></li>
+      </ul>
+    </div>
+   </div>
+    <h2 class="accordion-header">
+    <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#reports">
+      Reports
+    </button>
+  </h2>
+  <div id="reports" class="accordion-collapse collapse">
+    <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="productions/productionsummary" class="text-decoration-none text-dark">Production Summary</a></li>
+        <li><a href="sales summary/salessummary" class="text-decoration-none text-dark">Sales Summary</a></li>
+        <li><a href="purchasesummary" class="text-decoration-none text-dark">Purchase Summary</a></li>
+        <li><a href="employees-data/leaveform" class="text-decoration-none text-dark">Leaveform</a></li>
+        <li><a href="barcode_printing/barcodev1.3" class="text-decoration-none text-dark">Barcode</a></li>
+        <li><a href="downloadable-files/vehdata" class="text-decoration-none text-dark">Download Vehicle's Cards</a></li>
+        <li><a href="barcode_printing/brcddataindex" class="text-decoration-none text-dark">Barcode Data</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+      <div class="accordion-item">
+    <h2 class="accordion-header">
+    <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#controldata">
+      Control Data
+    </button>
+  </h2>
+  <div id="controldata" class="accordion-collapse collapse">
+    <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="facebook-login.html12345" class="text-decoration-none text-dark">Import Data</a></li>
+      </ul>
+      <ul class="list-unstyled mb-0">
+        <li><a href="spicesinventory/spicestock" class="text-decoration-none text-dark">SpicesInventory</a></li>
+      </ul>
+      <ul class="list-unstyled mb-0">
+        <li><a href="erp/erpassistant" class="text-decoration-none text-dark">ERP Assistant Code</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+     <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#access">Access Control</button></h2><div id="access" class="accordion-collapse collapse"><div class="accordion-body">User Roles</div></div></div>
+  </div>  
+</div>
+<div class="content">
+  <h1 class="text-center heading-purple display-5 mt-3">Arfa Foods and Spices</h1>
+  <div class="text-center my-4">
+    <button class="btn btn-voucher btn-lg">Manage Vouchers</button>
+  </div>
+  <div class="bg-light-blue p-4 rounded shadow-sm">
+    <h5 class="fw-bold">Executive Reports1</h5>
+    <button class="btn btn-info btn-sm me-2"><i class="bi bi-list"></i> Summary</button>
+    <button class="btn btn-purple"><i class="bi bi-file-earmark-text"></i> All Receivable</button>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="log/activity-log.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

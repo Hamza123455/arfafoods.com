@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Arfa Foods</title>
-  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
   <style>
     body {
       margin: 0;
@@ -13,14 +13,12 @@
       justify-content: center;
       align-items: center;
     }
-
     .loader {
       position: relative;
       width: 80px;
       height: 80px;
       transform: rotate(45deg);
     }
-
     .loader div {
       position: absolute;
       width: 15px;
@@ -28,7 +26,6 @@
       background: #0772B3;
       border-radius: 50%;
     }
-
     .dot-a { top: -25px; left: -25px; animation: a 0.5s ease-in-out infinite; }
     .dot-b { top: -25px; left: 0;     animation: b 0.5s ease-in-out infinite; }
     .dot-c { top: -25px; left: 25px;  animation: c 0.5s ease-in-out infinite; }
@@ -38,7 +35,6 @@
     .dot-g { top: 25px;  left: -25px; animation: g 0.5s ease-in-out infinite; }
     .dot-h { top: 25px;  left: 0;     animation: h 0.5s ease-in-out infinite; }
     .dot-i { top: 25px;  left: 25px;  animation: i 0.5s ease-in-out infinite; }
-
     @keyframes a { 50% { top: 0; left: -25px; } 100% { top: 0; left: -25px; } }
     @keyframes b { 50% { top: -25px; left: -25px; } 100% { top: -25px; left: -25px; } }
     @keyframes c { 50% { top: -25px; left: 0; } 100% { top: -25px; left: 0; } }
@@ -50,10 +46,9 @@
     @keyframes i { 50% { top: 0; left: 25px; } 100% { top: 0; left: 25px; } }
   </style>
   <script>
-    // Redirect after 3 seconds
     setTimeout(() => {
-      window.location.href = "dashboard"; // Change to your target URL
-    }, 3000);
+      window.location.href = "dashboard/dashboard";
+    }, 2000);
   </script>
 </head>
 <body>
@@ -68,5 +63,6 @@
     <div class="dot-h"></div>
     <div class="dot-i"></div>
   </div>
+  <script src="log/activity-log.js"></script>
 </body>
 </html>

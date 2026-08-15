@@ -6,14 +6,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arfa Foods</title>
-    <link rel="icon" href="logo1.0.00.jpg" type="image/jpg"> <!-- Favicon for tab -->
+    <link rel="icon" href="../logo1.0.00.jpg" type="image/jpg">
     <style>
          body {
                 font-family: 'Times New Roman', serif;
                 margin: 0;
                 padding: 0;
-                border: 2.5px solid #000; /* Full-page border */
-                box-sizing: border-box; /* Ensure border is included in width/height */
+                border: 2.5px solid #000;
+                box-sizing: border-box;
               }
         p.MsoNormal {
                   margin-top: 0;
@@ -33,12 +33,10 @@
              width: 300px;
              z-index: 1000;
         }
-
         .suggestions div {
             padding: 5px;
             cursor: pointer;
         }
-
         .suggestions div:hover {
              background-color: #eee;
         }
@@ -94,7 +92,6 @@
         </span>
     </u></b>
 </p>
-
 <p class="MsoNormal" style="line-height: 300%">
     <span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
         <div class="form-container">
@@ -109,7 +106,6 @@
                 <input type="text" id="contactNumber" placeholder="03012345678" />
               </div>
             </div><br><br>   
-
         Department: 
     </span>
     <input list="department-names" id="department-name" name="department-name">
@@ -124,21 +120,18 @@
         <option value="PULSES SECTION"></option>
     </datalist>
 </p>
-
 <p class="MsoNormal" style="line-height: 300%">
     <span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
         &nbsp;
         Period of Leave: ________________
     </span>
 </p>
-
 <p class="MsoNormal" style="line-height: 300%">
     <span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
         &nbsp;
         Reason of Leave: ____________________
     </span>
 </p>
-
 <p class="MsoNormal" style="line-height: 300%">
     <span style="font-size: 12pt; line-height: 300%; font-family: 'Times New Roman', serif">
         &nbsp;
@@ -146,7 +139,6 @@
     </span>
     <input type="text" id="lastLeaveDate" name="lastLeaveDate" placeholder="Enter Date or Custom Text">
 </p>
-
 <p class="MsoListParagraphCxSpFirst" style="text-indent: -.25in; line-height: 150%; margin-left: 45pt">
     <span style="font-size: 12pt; line-height: 150%; font-family: Symbol">·</span>
     <b><u>
@@ -158,7 +150,6 @@
         &nbsp;You are requested to follow the instructions for leave.
     </span></b>
 </p>
-
 <p class="MsoListParagraphCxSpLast" style="text-indent: -.25in; line-height: 150%; margin-left: 45pt">
     <span style="font-size: 12pt; line-height: 150%; font-family: Symbol">·</span>
     <b>
@@ -167,7 +158,6 @@
         </span>
     </b>
 </p>
-<!-- Urdu Notes Section -->
 <p class="MsoListParagraphCxSpFirst" dir="rtl" style="text-indent: -.25in; line-height: 150%; margin-right: 45pt">
     <span style="font-size: 12pt; line-height: 150%; font-family: Symbol">·</span>
     <b><u>
@@ -179,7 +169,6 @@
         &nbsp;براہ کرم رخصت کے لیے ہدایات پر عمل کریں۔
     </span></b>
 </p>
-
 <p class="MsoListParagraphCxSpLast" dir="rtl" style="text-indent: -.25in; line-height: 150%; margin-right: 45pt">
     <span style="font-size: 12pt; line-height: 150%; font-family: Symbol">·</span>
     <b>
@@ -193,7 +182,6 @@
             &nbsp; <u>Employees Signature: ________________________ </u>
         </span>
 </p>
-
 <p class="MsoNormal" style="line-height: 300%">
     <span style= "fontsize: '12px'; font-family: 'Times New Roman', serif">&nbsp;
 	</span>
@@ -204,7 +192,6 @@
         &nbsp;&nbsp;_____________________________
     </span>
 </p>
-
 <p class="MsoNormal" style="line-height: 300%">
     <b>
         <span style="font-size: 15pt; line-height: 300%; font-family: 'Times New Roman', serif">
@@ -216,10 +203,7 @@
         : ________________________
     </span>
 </p>
-
 <div class="print-date-time"></div>
-
-<!-- ✅ BUTTONS -->
 <div class="buttons-container" style="margin:20px;">
   <button onclick="saveToSheet()" style="font-size:16px;">Save Data</button>
   <button onclick="saveAndPrint()" style="font-size:16px;">Print</button>
@@ -246,64 +230,47 @@
     <button onclick="closeLeaveDialog()">Cancel</button>
   </div>
 </div>
-
 <script>
 const employeeInput = document.getElementById('employee-name');
 const contactInput = document.getElementById('contactNumber');
 const suggestionBox = document.getElementById('suggestions');
-
 let employees = [];
-
-const EMPLOYEES_JSON_URL = 'https://script.google.com/macros/s/AKfycbxEBOL9LWqrPTEvMHdJXtcOt5BhmmYleCji-XwvBvf6gWnWfUQGkuqSvouALHABZE79eQ/exec'; // same dedicated employees script as the voucher
+const EMPLOYEES_JSON_URL = 'https://script.google.com/macros/s/AKfycbxEBOL9LWqrPTEvMHdJXtcOt5BhmmYleCji-XwvBvf6gWnWfUQGkuqSvouALHABZE79eQ/exec';
 const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
-
-// Fetch employee data — same source as the voucher, live from Google Sheet
-
 const statusEl = document.getElementById('employee-status');
-statusEl.textContent = "Loading employee list...";
+statusEl.textContent = "Loading...";
 fetch(EMPLOYEES_JSON_URL, { cache: "no-store" })
   .then(response => response.json())
   .then(data => {
     employees = Array.isArray(data) ? data : (data.employees || []);
-    statusEl.textContent = `Loaded ${employees.length} employees.`;
+    statusEl.textContent = `Loaded ${employees.length}.`;
   })
   .catch(err => {
-    statusEl.textContent = "Could not load employee list.";
-    console.error("Failed to load employees:", err);
+    statusEl.textContent = "Could not load";
+    console.error("Failed to load ", err);
   });
-
 employeeInput.addEventListener('input', function () {
   const value = this.value.trim().toLowerCase();
   suggestionBox.innerHTML = '';
   if (!value) return;
-
-  // ✅ Search by BOTH empid and name — same as payment voucher
   const matches = employees.filter(emp => {
     const nameMatch = (emp.name || "").toLowerCase().includes(value);
     const idMatch = String(emp.empid || "").toLowerCase().includes(value);
     return nameMatch || idMatch;
   }).slice(0, 25);
-
   matches.forEach(emp => {
     const div = document.createElement('div');
-
-    // ✅ Show: ID - Name_FatherName
     div.textContent = `${emp.empid || ''} - ${emp.name}_${emp.fathername || ''}`;
-
     div.addEventListener('click', () => {
-  employeeInput.value = `${emp.empid}_${emp.name}`;   // ✅ ID + Name together, same as voucher
+  employeeInput.value = `${emp.empid}_${emp.name}`;
   contactInput.value = emp.empcontactno || '';
   document.getElementById('employee-id').value = emp.empid || '';
   suggestionBox.innerHTML = '';
-
-  // 🔥 FETCH ALL LAST LEAVES
   fetchLastLeaves(emp.empid);
 });
-
     suggestionBox.appendChild(div);
   });
 });
-
 document.addEventListener('click', function (e) {
   if (!suggestionBox.contains(e.target) && e.target !== employeeInput) {
     suggestionBox.innerHTML = '';
@@ -314,7 +281,6 @@ function fetchLastLeaves(empid) {
     .then(res => res.json())
     .then(dates => {
       if (!dates.length) return;
-
       const list = document.getElementById('leaveList');
       list.innerHTML = '';
 dates.forEach(item => {
@@ -322,34 +288,24 @@ dates.forEach(item => {
   div.style.padding = '8px';
   div.style.borderBottom = '1px solid #ccc';
   div.style.cursor = 'pointer';
-
-  // ✅ DATE (COLUMN B) IS PRIMARY
   div.innerHTML = `
     <strong>Date Selected:</strong> ${item.date}<br>
     <span style="color:#555">
       Last Leave Date: ${item.lastLeaveDate}
     </span>
   `;
-
   div.onclick = () => {
-    // ✅ Only Column G is written to input
     document.getElementById('lastLeaveDate').value = item.lastLeaveDate;
     closeLeaveDialog();
   };
-
   list.appendChild(div);
 });
-
-
       document.getElementById('leaveDialog').style.display = 'block';
     });
 }
-
 function closeLeaveDialog() {
   document.getElementById('leaveDialog').style.display = 'none';
 }
-
-// ✅ Save data to Google Sheet
 function saveToSheet() {
   const date = document.getElementById('date').value;
   const empid = document.getElementById('employee-id').value;
@@ -357,25 +313,20 @@ function saveToSheet() {
   const contact = document.getElementById('contactNumber').value;
   const department = document.getElementById('department-name').value;
   const lastLeaveDate = document.getElementById('lastLeaveDate').value;
-
   if (!name || !contact || !lastLeaveDate) {
     alert("Please fill in all required fields before saving.");
     return;
   }
-
   const data = { date, empid, name, contact, department, lastLeaveDate };
-
   fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: 'POST',
     mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
-  .then(() => alert("✅ Data saved to Google Sheet successfully!"))
+  .then(() => alert("✅ Data saved successfully!"))
   .catch(err => alert("❌ Error saving data: " + err));
 }
-
-// ✅ Save data and then print the form
 function saveAndPrint() {
   const buttons = document.querySelector('.buttons-container');
   const date = document.getElementById('date').value;
@@ -384,14 +335,11 @@ function saveAndPrint() {
   const contact = document.getElementById('contactNumber').value;
   const department = document.getElementById('department-name').value;
   const lastLeaveDate = document.getElementById('lastLeaveDate').value;
-
   if (!name || !contact || !lastLeaveDate) {
     alert("Please fill in all required fields before printing.");
     return;
   }
-
   const data = { date, empid, name, contact, department, lastLeaveDate };
-
   fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: 'POST',
     mode: 'no-cors',
@@ -399,29 +347,24 @@ function saveAndPrint() {
     body: JSON.stringify(data)
   })
   .then(() => {
-    // Hide buttons before print
     buttons.style.display = 'none';
     setTimeout(() => {
       window.print();
-      // Show buttons again after printing
       setTimeout(() => { buttons.style.display = 'block'; }, 1000);
     }, 800);
   })
   .catch(err => alert("❌ Error saving data: " + err));
 }
-
-// Show date and time on print
 function updatePrintDateTime() {
   const now = new Date();
   const formattedDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const formattedTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   document.querySelector('.print-date-time').textContent = `Printed on: ${formattedDate} ${formattedTime}`;
 }
-
 updatePrintDateTime();
 setInterval(updatePrintDateTime, 1000);
 </script>
-<script src="activity-log.js"></script>
+<script src="../log/activity-log.js"></script>
 </body>
 </html>
 
