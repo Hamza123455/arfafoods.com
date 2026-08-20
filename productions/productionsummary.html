@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arfa Foods</title>
-  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <link rel="icon" href="../logo1.0.00.jpg" type="image/jpg">
   <link rel="stylesheet" href="productionsummarystyles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>                                                                      
@@ -13,23 +13,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
-
-
 </head>
 <body>
-
   <h2>July - August 2026</h2>
   <p id="lastUpdate" style="text-align:center; color:#555; margin-top:-10px; font-size:14px;">
   Refresh On : Loading...
   </p>
-
   <label for="itemSearch"><strong>Search Item Name:</strong></label>
   <input type="text" id="itemSearch" placeholder="Type item name...(To View Graph Type Specific Item at One Time)">
-
   <button onclick="exportToPDF()" style="margin: 10px 0; padding: 8px 16px; font-size: 16px;">
     Export Table as PDF
   </button>
-
 <div class="table-flex-wrapper">
   <div class="frozen-table-container">
     <table id="frozen-table">
@@ -48,7 +42,6 @@
 </div>
   <div>
     <canvas id="itemChart"></canvas>
-
   <script src="productionsummaryscript.js"></script>
   <script src="https://github.com/Hamza123455/arfafoods.com/blob/main/activity-log.js"></script>
 </body>

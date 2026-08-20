@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arfa Foods</title>
+  <link rel="icon" href="logo1.0.00.jpg" type="image/jpg">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="leaveform.css">
+</head>
+<body>
+  <div id="app-screen">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+      <div class="container-fluid d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+      <button class="btn btn-primary me-3" type="button">☰</button>
+      <span class="brand-title">Arfa Foods and Spices</span>
+      <span class="unit-label">Leave Form (ver 1.1)</span>
+      <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  </div>
+    <div class="d-flex align-items-center">
+      <img src="../../userknown.jpg" class="user-img me-2" onerror="this.style.display='none'"/>
+      <span class="text-white me-2">Unknown</span>
+    </div>
+  </div>
+    </nav>
+<div class="content">
+  <h1 class="heading-purple display-6 mb-3">Employee Leave Application</h1>
+  <div class="bg-light-blue p-3 rounded shadow-sm mb-4 d-flex align-items-center flex-wrap gap-2">
+    <div class="file-status me-3">
+      <span class="dot dot-off" id="statusDot"></span>
+      <span id="statusText">Loading employee list...</span>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" id="refreshBtn"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+    <span class="ms-auto text-muted small" id="lastSynced"></span>
+  </div>
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-bold">New Leave Application</div>
+    <div class="card-body">
+      <form id="leaveForm" autocomplete="off">
+        <div class="row g-3">
+          <div class="col-md-2">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" required>
+          </div>
+          <div class="col-md-3 position-relative">
+            <label class="form-label">Employee Name</label>
+            <input type="text" class="form-control" id="employee-name" required>
+            <div id="suggestions" class="suggestions"></div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Contact Number</label>
+            <input type="text" class="form-control" id="contactNumber" placeholder="03012345678" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Department</label>
+            <input class="form-control" list="department-names" id="department-name" required>
+            <datalist id="department-names">
+              <option value="CLEANING UNIT"></option>
+              <option value="PACKING UNIT"></option>
+              <option value="BARCODE TEAM"></option>
+              <option value="SUPPLY UNIT"></option>
+              <option value="GUARD"></option>
+              <option value="COOK"></option>
+              <option value="DRIVER"></option>
+              <option value="PULSES SECTION"></option>
+            </datalist>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Period of Leave <span class="text-muted small">(optional)</span></label>
+            <input type="text" class="form-control" id="periodOfLeave" placeholder="e.g. 2 days">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Reason of Leave <span class="text-muted small">(optional)</span></label>
+            <input type="text" class="form-control" id="reasonOfLeave">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Last Leave Date/Month</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="lastLeaveDate" placeholder="Enter date or select below">
+              <button class="btn btn-outline-secondary" type="button" id="lookupLeaveBtn"><i class="bi bi-search"></i> Lookup</button>
+            </div>
+          </div>
+          <div class="col-md-4 d-flex align-items-end gap-2">
+            <input type="hidden" id="employee-id">
+            <button type="submit" class="btn btn-voucher w-100" id="addBtn">
+              <i class="bi bi-plus-circle"></i> Save
+            </button>
+            <button type="button" class="btn btn-purple w-100" id="printBtn">
+              <i class="bi bi-printer"></i> Print
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center" style="cursor:pointer;" id="logHeader">
+      <span><i class="bi bi-lock" id="logChevron"></i> Leave Log <span class="text-muted small fw-normal">(password required)</span></span>
+      <span class="text-muted small" id="rowCount"></span>
+    </div>
+    <div class="collapse" id="receiptLogBody">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Ref#</th><th>Date</th><th>Name</th><th>Contact</th><th>Department</th>
+              <th>Period</th><th>Reason</th><th>Last Leave</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="9" class="text-center text-muted py-4">Not loaded yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="lookupModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Last Leave Date</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="leaveList"></div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Leave Application</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editLeaveId">
+        <div class="row g-3">
+          <div class="col-md-3"><label class="form-label">Date</label><input type="date" class="form-control" id="editDate"></div>
+          <div class="col-md-4"><label class="form-label">Name</label><input type="text" class="form-control" id="editName"></div>
+          <div class="col-md-3"><label class="form-label">Contact</label><input type="text" class="form-control" id="editContact"></div>
+          <div class="col-md-4"><label class="form-label">Department</label><input class="form-control" list="department-names" id="editDepartment"></div>
+          <div class="col-md-3"><label class="form-label">Period of Leave</label><input type="text" class="form-control" id="editPeriod"></div>
+          <div class="col-md-5"><label class="form-label">Reason of Leave</label><input type="text" class="form-control" id="editReason"></div>
+          <div class="col-md-4"><label class="form-label">Last Leave Date</label><input type="text" class="form-control" id="editLastLeave"></div>
+          <div class="col-md-4">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="editAdminPassword" placeholder="required to save">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-voucher" id="saveEditBtn"><i class="bi bi-check-circle"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div id="printArea">
+  <div>
+    <p class="MsoNormal">
+      <span class="field-box" style="font-size:12pt;font-family:'Times New Roman',serif">Date <span id="p_date"></span></span>
+    </p>
+    <p class="MsoNormal" align="center" style="text-align:center">
+      <b><u><span style="font-size:18pt;font-family:'Times New Roman',serif">LEAVE APPLICATION FORM</span></u></b>
+    </p>
+  </div>
+  <div class="print-body">
+    <p class="MsoNormal" style="line-height:300%">
+      <span class="field-box" style="font-size:12pt;font-family:'Times New Roman',serif">Name: <b id="p_name"></b></span>
+      &nbsp;&nbsp;
+      <span class="field-box" style="font-size:12pt;font-family:'Times New Roman',serif">Contact Number: <b id="p_contact"></b></span>
+    </p>
+    <p class="MsoNormal" style="line-height:300%">
+      <span class="field-box" style="font-size:12pt;font-family:'Times New Roman',serif">Department: <b id="p_department"></b></span>
+    </p>
+    <p class="MsoNormal" style="line-height:300%">
+      <span class="field-box" style="font-size:12pt;font-family:'Times New Roman',serif;width:280px;">Period of Leave: <b id="p_period"></b></span>
+    </p>
+    <p class="MsoNormal" style="line-height:300%">
+      <span class="field-box-fill" style="font-size:12pt;font-family:'Times New Roman',serif">Reason of Leave: <b id="p_reason"></b></span>
+    </p>
+    <p class="MsoNormal" style="line-height:300%">
+      <span class="field-box" style="font-size:12pt;font-family:'Times New Roman',serif">Last Leave Date/Month: <b id="p_lastleave"></b></span>
+    </p>
+    <div>
+      <p class="note"><span style="font-family:Symbol">&middot;</span> <b><u>NOTE:</u> &nbsp;You are requested to follow the instructions for leave.</b></p>
+      <p class="note"><span style="font-family:Symbol">&middot;</span> <b>Employee can leave the warehouse after the Lunch break before the day of leave allocated and return at Lunch time after the leave finishes. Otherwise absent will be marked.</b></p>
+      <p class="note urdu" dir="rtl"><span style="font-family:Symbol">&middot;</span> <b><u>نوٹ:</u> &nbsp;براہ کرم رخصت کے لیے ہدایات پر عمل کریں۔</b></p>
+      <p class="note urdu" dir="rtl"><span style="font-family:Symbol">&middot;</span> <b>ملازم رخصت والے دن سے ایک دن پہلے دوپہر کے کھانے کے وقفے کے بعد گودام چھوڑ سکتا ہے اور حاضری والے دن دوپہر کے کھانے کے وقت واپس آنا ضروری ہے۔ بصورت دیگر غیر حاضری شمار کی جائے گی۔</b></p>
+    </div>
+    <div>
+      <p class="MsoNormal" style="line-height:300%"><span style="font-size:12pt;font-family:'Times New Roman',serif">&nbsp;<u>Employees Signature: ________________________ </u></span></p>
+      <p class="MsoNormal" style="line-height:300%"><span style="font-size:12pt;font-family:'Times New Roman',serif">&nbsp;<u>Supervisor Approval: </u>&nbsp;&nbsp;_____________________________</span></p>
+      <p class="MsoNormal" style="line-height:300%"><b><span style="font-size:15pt;font-family:'Times New Roman',serif">&nbsp;Manager Approval</span></b><span style="font-size:12pt;font-family:'Times New Roman',serif">: ________________________</span></p>
+    </div>
+  </div>
+  <p class="MsoNormal" style="font-size:10pt;color:#666" id="p_printedon"></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="leaveform.js"></script>
+<script src="../../log/activity-log.js"></script>
+</body>
+</html>
