@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDC</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card-2: #273449; --border: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #3b82f6; --accent-dark: #2563eb;
+    --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  header h1 { font-size: 18px; margin: 0; }
+  header .who { font-size: 13px; color: var(--muted); }
+  button { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; cursor: pointer; font-weight: 600; }
+  button:hover { background: var(--accent-dark); }
+  button.secondary { background: var(--card-2); color: var(--text); }
+  button.secondary:hover { background: var(--border); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-2); color: var(--text); font-size: 14px; margin-bottom: 10px; }
+  label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  #connectError { color: var(--red); font-size: 13px; margin-top: 8px; min-height: 16px; }
+  .voucher { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  .voucher-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .voucher-title { font-weight: 700; font-size: 15px; }
+  .voucher-sub { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+  .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.03em; }
+  .badge.pending { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge.posted { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .badge.delivered { background: rgba(34,197,94,0.15); color: var(--green); }
+  .images { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .images img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+  .upload-row { margin-top: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .upload-row input[type=file] { display: none; }
+  .upload-status { font-size: 12px; color: var(--muted); }
+  .toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  .footer-note { text-align: center; color: var(--muted); font-size: 12px; margin: 24px 0; }
+  #app { display: none; }
+  .voucher-error { color: var(--red); font-size: 13px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>KDC Voucher Upload</h1>
+    <div class="who" id="whoBar"></div>
+  </header>
+
+  <!-- CONNECT (to the Apps Script proxy, not the ERP) -->
+  <div class="card" id="connectCard">
+    <label for="proxyUrl">Apps Script Web App URL</label>
+    <input id="proxyUrl" placeholder="https://script.google.com/macros/s/XXXX/exec" autocomplete="off">
+
+    <label for="secret">Shared Secret</label>
+    <input id="secret" type="password" placeholder="The apiSecret you set in Script Properties" autocomplete="off">
+
+    <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px; cursor:pointer;">
+      <input type="checkbox" id="rememberBox" checked style="width:auto; margin:0;">
+      Remember on this device
+    </label>
+
+    <button id="connectBtn" style="width:100%">Connect</button>
+    <div id="connectError"></div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+    <div class="toolbar">
+      <button class="secondary" id="refreshBtn">Refresh</button>
+      <button class="secondary" id="loadMoreBtn" style="display:none">Load more</button>
+      <button class="secondary" id="disconnectBtn" style="margin-left:auto">Disconnect</button>
+    </div>
+    <div class="date-row" style="display:flex; gap:10px; margin-bottom:14px;">
+      <input id="searchBox" placeholder="Search by voucher no, customer, or amount..." style="margin-bottom:0; flex:1;">
+      <input id="dateBox" type="date" style="margin-bottom:0; width:auto;">
+      <button class="secondary" id="clearDateBtn" style="white-space:nowrap;">Clear date</button>
+    </div>
+    <div id="list"></div>
+    <div class="empty" id="emptyMsg" style="display:none">No vouchers found.</div>
+  </div>
+
+  <div class="footer-note">
+    This page never talks to the ERP directly 
+  </div>
+</div>
+
+<script>
+(() => {
+  // In-memory only — never written to localStorage/sessionStorage.
+  const NORMAL_ROWS = 25;
+  const SEARCH_ROWS = 300; // fetch a wider net when searching, since search is client-side over loaded data
+  let state = { proxyUrl: "", secret: "", rows: NORMAL_ROWS, first: 0, hasMore: true, vouchers: [], searchTerm: "", dateFilter: "" };
+
+  const $ = (id) => document.getElementById(id);
+
+  function getMapValue(obj, keys) {
+    if (!obj) return undefined;
+    for (const k of keys) {
+      if (obj[k] !== undefined) return obj[k];
+      const found = Object.keys(obj).find(ok => ok.toLowerCase() === k.toLowerCase());
+      if (found) return obj[found];
+    }
+    return undefined;
+  }
+  function readNestedName(obj, keys) {
+    if (obj && typeof obj === "object") {
+      const v = getMapValue(obj, keys);
+      return (v && String(v).trim()) ? String(v) : "-";
+    }
+    return "-";
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  // Listing goes through GET, which reliably carries a CORS header from
+  // Apps Script -- ordinary fetch, real JSON response, real error messages.
+  async function proxyGet(action, params) {
+    const url = new URL(state.proxyUrl);
+    url.searchParams.set("secret", state.secret);
+    url.searchParams.set("action", action);
+    for (const [k, v] of Object.entries(params || {})) url.searchParams.set(k, v);
+    let resp;
+    try {
+      resp = await fetch(url.toString());
+    } catch (e) {
+      throw new Error("Cannot reach the Apps Script URL: " + e.message);
+    }
+    let json;
+    try { json = await resp.json(); }
+    catch (e) { throw new Error("Proxy returned a non-JSON response (HTTP " + resp.status + "). Check the /exec URL and that the deployment is live."); }
+    if (!json.ok) throw new Error(json.error || "Request failed");
+    return json.data;
+  }
+
+  // Upload goes through POST with mode:'no-cors'. Apps Script's POST
+  // responses don't reliably carry a CORS header, so instead of trying to
+  // read the response (which fetch/XHR both fail to do), we fire the
+  // request without asking to read it back -- CORS never gets checked
+  // because we're not exposing the response to JS. We can't get a
+  // success/error message from this call, so the caller re-fetches the
+  // voucher list afterward to see whether the photo actually landed.
+  async function proxyUploadNoCors(fields) {
+    const body = new URLSearchParams({ secret: state.secret, action: "upload", ...fields });
+    try {
+      await fetch(state.proxyUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: body.toString()
+      });
+    } catch (e) {
+      throw new Error("Cannot reach the Apps Script URL: " + e.message);
+    }
+  }
+
+  function buildImageUrls(imagesRaw, erpBaseHintless) {
+    // The proxy doesn't currently return the ERP base URL, so we render
+    // image paths as returned; if your ERP serves images off the same
+    // host as the API, this generally still resolves relative to nothing —
+    // ask the proxy to return absolute URLs if thumbnails don't load.
+    if (!Array.isArray(imagesRaw)) return [];
+    const urls = [];
+    for (const row of imagesRaw) {
+      if (typeof row !== "object") continue;
+      let rel = getMapValue(row, ["relativeUrl", "RelativeUrl", "SVoucherImageRelativeURL"]);
+      let name = getMapValue(row, ["safeFileName", "SafeFileName", "SVoucherImageSafeFileName"]);
+      if (!rel || !name) continue;
+      urls.push(String(rel).replace(/\/+$/,"") + "/" + encodeURIComponent(String(name).trim()));
+    }
+    return urls;
+  }
+
+  function readAmount(row) {
+    const keys = ["amount", "Amount", "totalAmount", "TotalAmount", "SVoucherAmount", "SVoucherNetAmount", "SVoucherTotalAmount", "netAmount", "NetAmount"];
+    const v = getMapValue(row, keys);
+    if (v === undefined || v === null || v === "") return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function mapVoucherRow(row) {
+    const images = buildImageUrls(getMapValue(row, ["images", "SVoucherImages"]));
+    const isPosted = Number(getMapValue(row, ["isPosted", "SVoucherIsPost", "isPost"]) ?? 0) === 1;
+    const status = images.length > 0 ? "delivered" : (isPosted ? "posted" : "pending");
+    const id = Number(getMapValue(row, ["id", "SVoucherId"]) ?? 0);
+    const voucherNoRaw = getMapValue(row, ["voucherNo", "SVoucherNo"]);
+    const title = voucherNoRaw ? String(voucherNoRaw) : "Delivery Challan";
+    const locationName = readNestedName(getMapValue(row, ["location", "Location"]), ["name", "Name", "LocationName"]);
+    const customerName = readNestedName(getMapValue(row, ["customer", "Customer"]), ["name", "Name", "CustomerName"]);
+    const voucherDate = getMapValue(row, ["voucherDate", "SVoucherDate"]) || "-";
+    const amount = readAmount(row);
+    return { id, title, status, locationName, customerName, voucherDate, images, amount };
+  }
+
+  async function fetchVoucherPage(first, rows) {
+    const data = await proxyGet("vouchers", { first, rows });
+    const rowsArr = Array.isArray(data.result) ? data.result : [];
+    return rowsArr.map(mapVoucherRow);
+  }
+
+  function compressImage(file, maxSide = 1280, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Could not read file"));
+      reader.onload = () => {
+        img.onerror = () => reject(new Error("Could not decode image"));
+        img.onload = () => {
+          let { width, height } = img;
+          const longest = Math.max(width, height);
+          if (longest > maxSide) {
+            const scale = maxSide / longest;
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width; canvas.height = height;
+          canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Compression failed")), "image/jpeg", quality);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Could not encode image"));
+      reader.onload = () => resolve(String(reader.result).split(",")[1]); // strip data: prefix
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function uploadVoucherImage(voucherId, file) {
+    const blob = await compressImage(file);
+    const fileBase64 = await blobToBase64(blob);
+    await proxyUploadNoCors({
+      voucherId,
+      fileBase64,
+      fileName: `svoucher_${voucherId}_compressed.jpg`,
+      mimeType: "image/jpeg"
+    });
+    // mode:'no-cors' means we can't read a result from this call itself --
+    // the caller refreshes the voucher list afterward to see the outcome.
+  }
+
+  function statusBadge(status) {
+    const map = { pending: ["Pending", "pending"], posted: ["Posted", "posted"], delivered: ["Delivered", "delivered"] };
+    const [label, cls] = map[status] || ["Unknown", "pending"];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  function voucherDateKey(v) {
+    if (!v.voucherDate || v.voucherDate === "-") return null;
+    const d = new Date(v.voucherDate);
+    if (isNaN(d.getTime())) return null;
+    // Use UTC parts to avoid local-timezone shifting the date across midnight
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function matchesDate(v, dateStr) {
+    if (!dateStr) return true;
+    const key = voucherDateKey(v);
+    if (key !== null) return key === dateStr;
+    // Couldn't parse the date -- fall back to a loose substring check
+    return String(v.voucherDate).includes(dateStr);
+  }
+
+  function matchesSearch(v, term) {
+    if (!term) return true;
+    const t = term.toLowerCase();
+    return (v.title && v.title.toLowerCase().includes(t)) ||
+           (v.customerName && v.customerName.toLowerCase().includes(t)) ||
+           (v.amount !== null && String(v.amount).includes(t));
+  }
+
+  function matchesFilters(v) {
+    return matchesSearch(v, state.searchTerm) && matchesDate(v, state.dateFilter);
+  }
+
+  function renderList() {
+    const list = $("list");
+    list.innerHTML = "";
+    const filtered = state.vouchers.filter(matchesFilters);
+    $("emptyMsg").style.display = filtered.length ? "none" : "block";
+    $("emptyMsg").textContent = (state.searchTerm || state.dateFilter) ? "No vouchers match your search/date." : "No vouchers found.";
+
+    for (const v of filtered) {
+      const el = document.createElement("div");
+      el.className = "voucher";
+      el.innerHTML = `
+        <div class="voucher-top">
+          <div>
+            <div class="voucher-title">${escapeHtml(v.title)}</div>
+            <div class="voucher-sub">
+              Customer: ${escapeHtml(v.customerName)}<br>
+              Location: ${escapeHtml(v.locationName)}<br>
+              Date: ${escapeHtml(String(v.voucherDate))}<br>
+              Amount: ${v.amount !== null ? escapeHtml(v.amount.toLocaleString()) : "-"}
+            </div>
+          </div>
+          ${statusBadge(v.status)}
+        </div>
+        ${v.images.length ? `<div class="images">${v.images.map(u => `<img src="${u}" loading="lazy">`).join("")}</div>` : ""}
+        <div class="upload-row">
+          <button class="secondary pick-btn">Take / Choose Photo</button>
+          <input type="file" accept="image/*" capture="environment">
+          <span class="upload-status"></span>
+        </div>
+        <div class="voucher-error"></div>
+      `;
+      const pickBtn = el.querySelector(".pick-btn");
+      const fileInput = el.querySelector('input[type="file"]');
+      const statusSpan = el.querySelector(".upload-status");
+      const errDiv = el.querySelector(".voucher-error");
+
+      pickBtn.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        errDiv.textContent = "";
+        pickBtn.disabled = true;
+        statusSpan.textContent = "Compressing & uploading...";
+        try {
+          await uploadVoucherImage(v.id, file);
+          statusSpan.textContent = "Sent — refreshing to confirm...";
+          await refresh(true);
+          statusSpan.textContent = "";
+        } catch (e) {
+          statusSpan.textContent = "";
+          errDiv.textContent = e.message;
+          pickBtn.disabled = false;
+        }
+      });
+      list.appendChild(el);
+    }
+  }
+
+  async function refresh(reset) {
+    if (reset) { state.first = 0; state.vouchers = []; state.hasMore = true; }
+    state.rows = (state.searchTerm || state.dateFilter) ? SEARCH_ROWS : NORMAL_ROWS;
+    $("refreshBtn").disabled = true;
+    try {
+      const page = await fetchVoucherPage(state.first, state.rows);
+      state.vouchers = reset ? page : state.vouchers.concat(page);
+      state.hasMore = page.length === state.rows;
+      state.first += state.rows;
+      renderList();
+      $("loadMoreBtn").style.display = (state.hasMore && !state.searchTerm && !state.dateFilter) ? "inline-block" : "none";
+    } catch (e) {
+      alert("Failed to load vouchers: " + e.message);
+    } finally {
+      $("refreshBtn").disabled = false;
+    }
+  }
+
+  const STORAGE_KEY = "kdc_proxy_creds";
+
+  function saveCreds(proxyUrl, secret) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ proxyUrl, secret })); } catch (e) { /* storage unavailable */ }
+  }
+  function loadCreds() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function clearCreds() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* storage unavailable */ }
+  }
+
+  async function doConnect(proxyUrl, secret, remember) {
+    $("connectError").textContent = "";
+    if (!proxyUrl || !secret) {
+      $("connectError").textContent = "Please fill in both fields.";
+      return;
+    }
+    state.proxyUrl = proxyUrl;
+    state.secret = secret;
+    $("connectBtn").disabled = true;
+    $("connectBtn").textContent = "Connecting...";
+    try {
+      await refresh(true); // first real call doubles as a connectivity/secret check
+      $("connectCard").style.display = "none";
+      $("app").style.display = "block";
+      $("whoBar").textContent = "Connected";
+      if (remember) saveCreds(proxyUrl, secret); else clearCreds();
+    } catch (e) {
+      $("connectError").textContent = e.message;
+    } finally {
+      $("connectBtn").disabled = false;
+      $("connectBtn").textContent = "Connect";
+    }
+  }
+
+  $("connectBtn").addEventListener("click", () => {
+    doConnect($("proxyUrl").value.trim(), $("secret").value, $("rememberBox").checked);
+  });
+
+  $("refreshBtn").addEventListener("click", () => refresh(true));
+  $("loadMoreBtn").addEventListener("click", () => refresh(false));
+
+  let searchDebounce = null;
+  $("searchBox").addEventListener("input", () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      const newTerm = $("searchBox").value.trim();
+      const widenedNeeded = newTerm && state.searchTerm !== newTerm && !state.dateFilter;
+      state.searchTerm = newTerm;
+      if (widenedNeeded) refresh(true); // fetch a wider batch now that we're searching
+      else renderList();
+    }, 300);
+  });
+
+  $("dateBox").addEventListener("change", () => {
+    const newDate = $("dateBox").value; // yyyy-mm-dd, or "" if cleared
+    const widenedNeeded = newDate && state.dateFilter !== newDate && !state.searchTerm;
+    state.dateFilter = newDate;
+    if (widenedNeeded) refresh(true);
+    else renderList();
+  });
+
+  $("clearDateBtn").addEventListener("click", () => {
+    $("dateBox").value = "";
+    state.dateFilter = "";
+    renderList();
+  });
+
+  $("disconnectBtn").addEventListener("click", () => {
+    state = { proxyUrl: "", secret: "", rows: NORMAL_ROWS, first: 0, hasMore: true, vouchers: [], searchTerm: "", dateFilter: "" };
+    clearCreds();
+    $("app").style.display = "none";
+    $("connectCard").style.display = "block";
+    $("whoBar").textContent = "";
+    $("secret").value = "";
+    $("searchBox").value = "";
+    $("dateBox").value = "";
+  });
+
+  // Auto-connect if credentials were saved on this device from a previous visit.
+  const saved = loadCreds();
+  if (saved && saved.proxyUrl && saved.secret) {
+    $("proxyUrl").value = saved.proxyUrl;
+    $("secret").value = saved.secret;
+    $("rememberBox").checked = true;
+    doConnect(saved.proxyUrl, saved.secret, true);
+  }
+})();
+</script>
+</body>
+</html>
