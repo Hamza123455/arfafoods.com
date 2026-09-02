@@ -1,464 +1,1138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KDC</title>
-<style>
-  :root {
-    --bg: #0f172a; --card: #1e293b; --card-2: #273449; --border: #334155;
-    --text: #e2e8f0; --muted: #94a3b8; --accent: #3b82f6; --accent-dark: #2563eb;
-    --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
-  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-  header h1 { font-size: 18px; margin: 0; }
-  header .who { font-size: 13px; color: var(--muted); }
-  button { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; cursor: pointer; font-weight: 600; }
-  button:hover { background: var(--accent-dark); }
-  button.secondary { background: var(--card-2); color: var(--text); }
-  button.secondary:hover { background: var(--border); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-2); color: var(--text); font-size: 14px; margin-bottom: 10px; }
-  label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
-  #connectError { color: var(--red); font-size: 13px; margin-top: 8px; min-height: 16px; }
-  .voucher { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-  .voucher-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .voucher-title { font-weight: 700; font-size: 15px; }
-  .voucher-sub { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
-  .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.03em; }
-  .badge.pending { background: rgba(245,158,11,0.15); color: var(--amber); }
-  .badge.posted { background: rgba(59,130,246,0.15); color: var(--accent); }
-  .badge.delivered { background: rgba(34,197,94,0.15); color: var(--green); }
-  .images { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .images img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
-  .upload-row { margin-top: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .upload-row input[type=file] { display: none; }
-  .upload-status { font-size: 12px; color: var(--muted); }
-  .toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
-  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
-  .footer-note { text-align: center; color: var(--muted); font-size: 12px; margin: 24px 0; }
-  #app { display: none; }
-  .voucher-error { color: var(--red); font-size: 13px; margin-top: 6px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Arfa Foods</title>
+  <style>
+    /* --- Reset & Variables --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #f4f6f9;
+      --bg-card: #ffffff;
+      --bg-header: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-light: #e9edf2;
+      --accent-blue: #2563eb;
+      --accent-blue-dark: #1d4ed8;
+      --accent-blue-light: #dbeafe;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: all 0.2s ease;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding-bottom: 32px;
+    }
+
+    /* --- App Container --- */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px 16px;
+    }
+
+    /* --- Header --- */
+    .app-header {
+      background: var(--bg-header);
+      padding: 16px 0 12px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-header .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent-blue);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .app-header .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .app-header .version {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      margin-top: -1px;
+    }
+
+    .app-header .who {
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: var(--bg-primary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    /* --- Cards --- */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* --- Inputs & Selects --- */
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 15px;
+      transition: var(--transition);
+      outline: none;
+      font-family: inherit;
+      appearance: auto;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px var(--accent-blue-light);
+      background: white;
+    }
+
+    select {
+      cursor: pointer;
+      padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    /* --- Buttons --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      font-family: inherit;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-primary:hover { background: var(--accent-blue-dark); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-secondary:hover { background: var(--border-light); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 8px 12px;
+    }
+
+    .btn-ghost:hover { background: var(--bg-primary); }
+
+    .btn-danger {
+      color: var(--red);
+      background: transparent;
+    }
+
+    .btn-danger:hover { background: #fef2f2; }
+
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-sm { padding: 8px 14px; font-size: 13px; }
+
+    /* --- Voucher List --- */
+    .voucher-item {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .voucher-item:active { transform: scale(0.99); }
+
+    .voucher-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .voucher-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-primary);
+    }
+
+    .voucher-type-badge {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 8px;
+      background: var(--bg-primary);
+      padding: 2px 10px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .voucher-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .voucher-sub span { display: inline-block; margin-right: 12px; }
+
+    /* --- Badges --- */
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      flex-shrink: 0;
+    }
+
+    .badge-pending { background: #fef3c7; color: #b45309; }
+    .badge-posted { background: var(--accent-blue-light); color: var(--accent-blue); }
+    .badge-delivered { background: #dcfce7; color: #15803d; }
+
+    /* --- Images --- */
+    .images-grid {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .images-grid img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+    }
+
+    /* --- Upload Row --- */
+    .upload-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .upload-row input[type="file"] { display: none; }
+
+    .upload-status {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .voucher-error {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    /* --- Toolbar --- */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar .spacer { flex: 1; }
+
+    /* --- Filter Row --- */
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .filter-row .filter-group {
+      min-width: 0;
+    }
+
+    .filter-row .filter-group-full {
+      grid-column: 1 / -1;
+    }
+
+    .filter-row input, .filter-row select, .filter-row .btn {
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .filter-actions .btn {
+      flex: 1;
+    }
+
+    .filter-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      padding: 8px 12px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* --- Empty State --- */
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 48px 20px;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    /* --- Spinner --- */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid var(--border-light);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Connect Card Specific --- */
+    .connect-card .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0 8px;
+    }
+
+    .connect-card .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-blue);
+      margin: 0;
+    }
+
+    /* --- Footer --- */
+    .app-footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* --- Utility --- */
+    .hidden { display: none !important; }
+
+    /* --- Responsive tweaks --- */
+    @media (max-width: 400px) {
+      .app-container { padding: 0 12px 12px; }
+      .card { padding: 16px; }
+      .filter-row { grid-template-columns: 1fr; }
+      .filter-actions { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <h1>KDC Voucher Upload v1.2</h1>
+<div class="app-container">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">K</div>
+      <div class="brand-text">
+        <h1>KDC</h1>
+        <span class="version">ver. 1.3.0</span>
+      </div>
+    </div>
     <div class="who" id="whoBar"></div>
   </header>
 
-  <!-- CONNECT (to the Apps Script proxy, not the ERP) -->
-  <div class="card" id="connectCard">
-    <label for="proxyUrl">Apps Script Web App URL</label>
-    <input id="proxyUrl" placeholder="https://script.google.com/macros/s/XXXX/exec" autocomplete="off">
+  <!-- CONNECT CARD -->
+  <div class="card connect-card" id="connectCard">
+    <div class="card-title">Connect to Server</div>
+    <label for="proxyUrl">Apps Script URL</label>
+    <input id="proxyUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
 
-    <label for="secret">Shared Secret</label>
-    <input id="secret" type="password" placeholder="The apiSecret you set in Script Properties" autocomplete="off">
+    <label for="secret" style="margin-top:12px;">Shared Secret</label>
+    <input id="secret" type="password" placeholder="Your apiSecret" autocomplete="off">
 
-    <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px; cursor:pointer;">
-      <input type="checkbox" id="rememberBox" checked style="width:auto; margin:0;">
-      Remember on this device
-    </label>
+    <div class="checkbox-row">
+      <input type="checkbox" id="rememberBox" checked>
+      <label for="rememberBox" style="margin:0; font-weight:400; cursor:pointer;">Remember on this device</label>
+    </div>
 
-    <button id="connectBtn" style="width:100%">Connect</button>
-    <div id="connectError"></div>
+    <button class="btn btn-primary btn-block" id="connectBtn">Connect</button>
+    <div id="connectError" style="color:var(--red); font-size:13px; margin-top:8px; min-height:18px;"></div>
   </div>
 
-  <!-- APP -->
-  <div id="app">
+  <!-- APP CONTENT -->
+  <div id="app" class="hidden">
+
+    <!-- Toolbar -->
     <div class="toolbar">
-      <button class="secondary" id="refreshBtn">Refresh</button>
-      <button class="secondary" id="loadMoreBtn" style="display:none">Load more</button>
-      <button class="secondary" id="disconnectBtn" style="margin-left:auto">Disconnect</button>
+      <button class="btn btn-secondary btn-sm" id="refreshBtn">⟳ Refresh</button>
+      <button class="btn btn-secondary btn-sm hidden" id="loadMoreBtn">Load more</button>
+      <span class="spacer"></span>
+      <button class="btn btn-ghost btn-sm btn-danger" id="disconnectBtn">Disconnect</button>
     </div>
-    <div class="date-row" style="display:flex; gap:10px; margin-bottom:14px;">
-      <input id="searchBox" placeholder="Search by voucher no, customer, or amount..." style="margin-bottom:0; flex:1;">
-      <input id="dateBox" type="date" style="margin-bottom:0; width:auto;">
-      <button class="secondary" id="clearDateBtn" style="white-space:nowrap;">Clear date</button>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <div class="filter-group">
+        <input id="searchBox" placeholder="Search vouchers..." style="width:100%;">
+      </div>
+      <div class="filter-group">
+        <select id="voucherTypeBox" style="width:100%;">
+          <option value="SALES">Sales Invoice</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <select id="statusFilterBox" style="width:100%;">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="posted">Posted</option>
+          <option value="delivered">Evid.Attached</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <select id="sortByBox" style="width:100%;">
+          <option value="date-desc">Date ↓ (Newest)</option>
+          <option value="date-asc">Date ↑ (Oldest)</option>
+          <option value="number-asc">Number ↑ (A-Z)</option>
+          <option value="number-desc">Number ↓ (Z-A)</option>
+          <option value="amount-desc">Amount ↓ (High)</option>
+          <option value="amount-asc">Amount ↑ (Low)</option>
+          <option value="customer-asc">Customer ↑ (A-Z)</option>
+          <option value="customer-desc">Customer ↓ (Z-A)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <input id="dateBox" type="date" style="width:100%;">
+      </div>
     </div>
+
+    <!-- Filter Actions -->
+    <div class="filter-actions">
+      <button class="btn btn-secondary btn-sm" id="clearDateBtn">Clear Date</button>
+      <button class="btn btn-secondary btn-sm" id="clearFiltersBtn">Clear All Filters</button>
+    </div>
+
+    <!-- Filter Info -->
+    <div id="filterInfo" class="filter-info hidden">
+      <span id="filterText"></span>
+      <span id="filterCount"></span>
+    </div>
+
+    <!-- Voucher List -->
     <div id="list"></div>
-    <div class="empty" id="emptyMsg" style="display:none">No vouchers found.</div>
+
+    <!-- Empty State -->
+    <div class="empty-state hidden" id="emptyMsg">
+      <div class="empty-icon">📋</div>
+      <p id="emptyText">No vouchers found.</p>
+    </div>
   </div>
 
-  <div class="footer-note">
-    This page never talks to the ERP directly 
+  <!-- FOOTER -->
+  <div class="app-footer">
+    Secured connection · KDC App
   </div>
 </div>
 
 <script>
-(() => {
-  // In-memory only — never written to localStorage/sessionStorage.
-  const NORMAL_ROWS = 25;
-  const SEARCH_ROWS = 300; // fetch a wider net when searching, since search is client-side over loaded data
-  let state = { proxyUrl: "", secret: "", rows: NORMAL_ROWS, first: 0, hasMore: true, vouchers: [], searchTerm: "", dateFilter: "" };
+  (() => {
+    // --- State ---
+    const NORMAL_ROWS = 25;
+    const SEARCH_ROWS = 300;
+    let state = {
+      proxyUrl: "",
+      secret: "",
+      rows: NORMAL_ROWS,
+      first: 0,
+      hasMore: true,
+      vouchers: [],
+      searchTerm: "",
+      dateFilter: "",
+      voucherType: "",
+      statusFilter: "",
+      sortBy: "date-desc",
+      isLoading: false
+    };
 
-  const $ = (id) => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-  function getMapValue(obj, keys) {
-    if (!obj) return undefined;
-    for (const k of keys) {
-      if (obj[k] !== undefined) return obj[k];
-      const found = Object.keys(obj).find(ok => ok.toLowerCase() === k.toLowerCase());
-      if (found) return obj[found];
+    // --- Helpers ---
+    function getMapValue(obj, keys) {
+      if (!obj) return undefined;
+      for (const k of keys) {
+        if (obj[k] !== undefined) return obj[k];
+        const found = Object.keys(obj).find(ok => ok.toLowerCase() === k.toLowerCase());
+        if (found) return obj[found];
+      }
+      return undefined;
     }
-    return undefined;
-  }
-  function readNestedName(obj, keys) {
-    if (obj && typeof obj === "object") {
-      const v = getMapValue(obj, keys);
-      return (v && String(v).trim()) ? String(v) : "-";
+
+    function readNestedName(obj, keys) {
+      if (obj && typeof obj === "object") {
+        const v = getMapValue(obj, keys);
+        return (v && String(v).trim()) ? String(v) : "-";
+      }
+      return "-";
     }
-    return "-";
-  }
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  }
 
-  // Listing goes through GET, which reliably carries a CORS header from
-  // Apps Script -- ordinary fetch, real JSON response, real error messages.
-  async function proxyGet(action, params) {
-    const url = new URL(state.proxyUrl);
-    url.searchParams.set("secret", state.secret);
-    url.searchParams.set("action", action);
-    for (const [k, v] of Object.entries(params || {})) url.searchParams.set(k, v);
-    let resp;
-    try {
-      resp = await fetch(url.toString());
-    } catch (e) {
-      throw new Error("Cannot reach the Apps Script URL: " + e.message);
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     }
-    let json;
-    try { json = await resp.json(); }
-    catch (e) { throw new Error("Proxy returned a non-JSON response (HTTP " + resp.status + "). Check the /exec URL and that the deployment is live."); }
-    if (!json.ok) throw new Error(json.error || "Request failed");
-    return json.data;
-  }
 
-  // Upload goes through POST with mode:'no-cors'. Apps Script's POST
-  // responses don't reliably carry a CORS header, so instead of trying to
-  // read the response (which fetch/XHR both fail to do), we fire the
-  // request without asking to read it back -- CORS never gets checked
-  // because we're not exposing the response to JS. We can't get a
-  // success/error message from this call, so the caller re-fetches the
-  // voucher list afterward to see whether the photo actually landed.
-  async function proxyUploadNoCors(fields) {
-    const body = new URLSearchParams({ secret: state.secret, action: "upload", ...fields });
-    try {
-      await fetch(state.proxyUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body: body.toString()
-      });
-    } catch (e) {
-      throw new Error("Cannot reach the Apps Script URL: " + e.message);
+    // --- API ---
+    async function proxyGet(action, params) {
+      const url = new URL(state.proxyUrl);
+      url.searchParams.set("secret", state.secret);
+      url.searchParams.set("action", action);
+      for (const [k, v] of Object.entries(params || {})) {
+        if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, v);
+      }
+      let resp;
+      try {
+        resp = await fetch(url.toString());
+      } catch (e) {
+        throw new Error("Cannot reach the Apps Script URL: " + e.message);
+      }
+      let json;
+      try { json = await resp.json(); } catch (e) {
+        throw new Error("Proxy returned a non-JSON response (HTTP " + resp.status + "). Check the /exec URL and deployment.");
+      }
+      if (!json.ok) throw new Error(json.error || "Request failed");
+      return json.data;
     }
-  }
 
-  function buildImageUrls(imagesRaw, erpBaseHintless) {
-    // The proxy doesn't currently return the ERP base URL, so we render
-    // image paths as returned; if your ERP serves images off the same
-    // host as the API, this generally still resolves relative to nothing —
-    // ask the proxy to return absolute URLs if thumbnails don't load.
-    if (!Array.isArray(imagesRaw)) return [];
-    const urls = [];
-    for (const row of imagesRaw) {
-      if (typeof row !== "object") continue;
-      let rel = getMapValue(row, ["relativeUrl", "RelativeUrl", "SVoucherImageRelativeURL"]);
-      let name = getMapValue(row, ["safeFileName", "SafeFileName", "SVoucherImageSafeFileName"]);
-      if (!rel || !name) continue;
-      urls.push(String(rel).replace(/\/+$/,"") + "/" + encodeURIComponent(String(name).trim()));
+    async function proxyUploadNoCors(fields) {
+      const body = new URLSearchParams({ secret: state.secret, action: "upload", ...fields });
+      try {
+        await fetch(state.proxyUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+          body: body.toString()
+        });
+      } catch (e) {
+        throw new Error("Cannot reach the Apps Script URL: " + e.message);
+      }
     }
-    return urls;
-  }
 
-  function readAmount(row) {
-    const keys = ["amount", "Amount", "totalAmount", "TotalAmount", "SVoucherAmount", "SVoucherNetAmount", "SVoucherTotalAmount", "netAmount", "NetAmount"];
-    const v = getMapValue(row, keys);
-    if (v === undefined || v === null || v === "") return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
+    // --- Data Mapping ---
+    function buildImageUrls(imagesRaw) {
+      if (!Array.isArray(imagesRaw)) return [];
+      const urls = [];
+      for (const row of imagesRaw) {
+        if (typeof row !== "object") continue;
+        let rel = getMapValue(row, ["relativeUrl", "RelativeUrl", "SVoucherImageRelativeURL"]);
+        let name = getMapValue(row, ["safeFileName", "SafeFileName", "SVoucherImageSafeFileName"]);
+        if (!rel || !name) continue;
+        urls.push(String(rel).replace(/\/+$/, "") + "/" + encodeURIComponent(String(name).trim()));
+      }
+      return urls;
+    }
 
-  function mapVoucherRow(row) {
-    const images = buildImageUrls(getMapValue(row, ["images", "SVoucherImages"]));
-    const isPosted = Number(getMapValue(row, ["isPosted", "SVoucherIsPost", "isPost"]) ?? 0) === 1;
-    const status = images.length > 0 ? "delivered" : (isPosted ? "posted" : "pending");
-    const id = Number(getMapValue(row, ["id", "SVoucherId"]) ?? 0);
-    const voucherNoRaw = getMapValue(row, ["voucherNo", "SVoucherNo"]);
-    const title = voucherNoRaw ? String(voucherNoRaw) : "Delivery Challan";
-    const locationName = readNestedName(getMapValue(row, ["location", "Location"]), ["name", "Name", "LocationName"]);
-    const customerName = readNestedName(getMapValue(row, ["customer", "Customer"]), ["name", "Name", "CustomerName"]);
-    const voucherDate = getMapValue(row, ["voucherDate", "SVoucherDate"]) || "-";
-    const amount = readAmount(row);
-    return { id, title, status, locationName, customerName, voucherDate, images, amount };
-  }
+    function readAmount(row) {
+      const keys = ["amount", "Amount", "totalAmount", "TotalAmount", "SVoucherAmount", "SVoucherNetAmount", "SVoucherTotalAmount", "netAmount", "NetAmount"];
+      const v = getMapValue(row, keys);
+      if (v === undefined || v === null || v === "") return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
 
-  async function fetchVoucherPage(first, rows) {
-    const data = await proxyGet("vouchers", { first, rows });
-    const rowsArr = Array.isArray(data.result) ? data.result : [];
-    return rowsArr.map(mapVoucherRow);
-  }
-
-  function compressImage(file, maxSide = 1280, quality = 0.8) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error("Could not read file"));
-      reader.onload = () => {
-        img.onerror = () => reject(new Error("Could not decode image"));
-        img.onload = () => {
-          let { width, height } = img;
-          const longest = Math.max(width, height);
-          if (longest > maxSide) {
-            const scale = maxSide / longest;
-            width = Math.round(width * scale);
-            height = Math.round(height * scale);
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = width; canvas.height = height;
-          canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Compression failed")), "image/jpeg", quality);
-        };
-        img.src = reader.result;
+    function mapVoucherRow(row) {
+      const endpoint = row._voucherEndpoint || 'SVoucher';
+      const typeName = row._voucherTypeName || 'Voucher';
+      
+      const imagesField = `${endpoint}Images`;
+      const images = buildImageUrls(getMapValue(row, [imagesField, "images", "SVoucherImages"]));
+      
+      const isPosted = Number(getMapValue(row, ["isPosted", "isPost", `${endpoint}IsPost`]) ?? 0) === 1;
+      const status = images.length > 0 ? "delivered" : (isPosted ? "posted" : "pending");
+      
+      const id = Number(getMapValue(row, ["id", `${endpoint}Id`]) ?? 0);
+      
+      const voucherNoField = `${endpoint}No`;
+      const voucherNoRaw = getMapValue(row, [voucherNoField, "voucherNo", "SVoucherNo"]);
+      const title = voucherNoRaw ? String(voucherNoRaw) : `${typeName} #${id}`;
+      
+      const locationName = readNestedName(
+        getMapValue(row, ["location", "Location"]), 
+        ["name", "Name", "LocationName"]
+      );
+      const customerName = readNestedName(
+        getMapValue(row, ["customer", "Customer"]), 
+        ["name", "Name", "CustomerName"]
+      );
+      
+      const dateField = `${endpoint}Date`;
+      const voucherDate = getMapValue(row, [dateField, "voucherDate", "SVoucherDate"]) || "-";
+      
+      const amount = readAmount(row);
+      
+      return { 
+        id, 
+        title, 
+        status, 
+        locationName, 
+        customerName, 
+        voucherDate, 
+        images, 
+        amount,
+        type: typeName,
+        endpoint: endpoint
       };
-      reader.readAsDataURL(file);
-    });
-  }
+    }
 
-  function blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error("Could not encode image"));
-      reader.onload = () => resolve(String(reader.result).split(",")[1]); // strip data: prefix
-      reader.readAsDataURL(blob);
-    });
-  }
+    async function fetchVoucherPage(first, rows, dateFilter, voucherType) {
+      const params = { first, rows };
+      if (dateFilter && dateFilter.trim()) params.date = dateFilter.trim();
+      if (voucherType && voucherType.trim()) params.type = voucherType.trim();
+      const data = await proxyGet("vouchers", params);
+      const rowsArr = Array.isArray(data.result) ? data.result : [];
+      return rowsArr.map(mapVoucherRow);
+    }
 
-  async function uploadVoucherImage(voucherId, file) {
-    const blob = await compressImage(file);
-    const fileBase64 = await blobToBase64(blob);
-    await proxyUploadNoCors({
-      voucherId,
-      fileBase64,
-      fileName: `svoucher_${voucherId}_compressed.jpg`,
-      mimeType: "image/jpeg"
-    });
-    // mode:'no-cors' means we can't read a result from this call itself --
-    // the caller refreshes the voucher list afterward to see the outcome.
-  }
-
-  function statusBadge(status) {
-    const map = { pending: ["Pending", "pending"], posted: ["Posted", "posted"], delivered: ["Delivered", "delivered"] };
-    const [label, cls] = map[status] || ["Unknown", "pending"];
-    return `<span class="badge ${cls}">${label}</span>`;
-  }
-
-  function voucherDateKey(v) {
-    if (!v.voucherDate || v.voucherDate === "-") return null;
-    const d = new Date(v.voucherDate);
-    if (isNaN(d.getTime())) return null;
-    // Use UTC parts to avoid local-timezone shifting the date across midnight
-    const y = d.getUTCFullYear();
-    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function matchesDate(v, dateStr) {
-    if (!dateStr) return true;
-    const key = voucherDateKey(v);
-    if (key !== null) return key === dateStr;
-    // Couldn't parse the date -- fall back to a loose substring check
-    return String(v.voucherDate).includes(dateStr);
-  }
-
-  function matchesSearch(v, term) {
-    if (!term) return true;
-    const t = term.toLowerCase();
-    return (v.title && v.title.toLowerCase().includes(t)) ||
-           (v.customerName && v.customerName.toLowerCase().includes(t)) ||
-           (v.amount !== null && String(v.amount).includes(t));
-  }
-
-  function matchesFilters(v) {
-    return matchesSearch(v, state.searchTerm) && matchesDate(v, state.dateFilter);
-  }
-
-  function renderList() {
-    const list = $("list");
-    list.innerHTML = "";
-    const filtered = state.vouchers.filter(matchesFilters);
-    $("emptyMsg").style.display = filtered.length ? "none" : "block";
-    $("emptyMsg").textContent = (state.searchTerm || state.dateFilter) ? "No vouchers match your search/date." : "No vouchers found.";
-
-    for (const v of filtered) {
-      const el = document.createElement("div");
-      el.className = "voucher";
-      el.innerHTML = `
-        <div class="voucher-top">
-          <div>
-            <div class="voucher-title">${escapeHtml(v.title)}</div>
-            <div class="voucher-sub">
-              Customer: ${escapeHtml(v.customerName)}<br>
-              Location: ${escapeHtml(v.locationName)}<br>
-              Date: ${escapeHtml(String(v.voucherDate))}<br>
-              Amount: ${v.amount !== null ? escapeHtml(v.amount.toLocaleString()) : "-"}
-            </div>
-          </div>
-          ${statusBadge(v.status)}
-        </div>
-        ${v.images.length ? `<div class="images">${v.images.map(u => `<img src="${u}" loading="lazy">`).join("")}</div>` : ""}
-        <div class="upload-row">
-          <button class="secondary pick-btn">Take / Choose Photo</button>
-          <input type="file" accept="image/*" capture="environment">
-          <span class="upload-status"></span>
-        </div>
-        <div class="voucher-error"></div>
-      `;
-      const pickBtn = el.querySelector(".pick-btn");
-      const fileInput = el.querySelector('input[type="file"]');
-      const statusSpan = el.querySelector(".upload-status");
-      const errDiv = el.querySelector(".voucher-error");
-
-      pickBtn.addEventListener("click", () => fileInput.click());
-      fileInput.addEventListener("change", async () => {
-        const file = fileInput.files[0];
-        if (!file) return;
-        errDiv.textContent = "";
-        pickBtn.disabled = true;
-        statusSpan.textContent = "Compressing & uploading...";
-        try {
-          await uploadVoucherImage(v.id, file);
-          statusSpan.textContent = "Sent — refreshing to confirm...";
-          await refresh(true);
-          statusSpan.textContent = "";
-        } catch (e) {
-          statusSpan.textContent = "";
-          errDiv.textContent = e.message;
-          pickBtn.disabled = false;
-        }
+    // --- Image Upload ---
+    function compressImage(file, maxSide = 1280, quality = 0.8) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Could not read file"));
+        reader.onload = () => {
+          img.onerror = () => reject(new Error("Could not decode image"));
+          img.onload = () => {
+            let { width, height } = img;
+            const longest = Math.max(width, height);
+            if (longest > maxSide) {
+              const scale = maxSide / longest;
+              width = Math.round(width * scale);
+              height = Math.round(height * scale);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Compression failed")), "image/jpeg", quality);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
       });
-      list.appendChild(el);
     }
-  }
 
-  async function refresh(reset) {
-    if (reset) { state.first = 0; state.vouchers = []; state.hasMore = true; }
-    state.rows = (state.searchTerm || state.dateFilter) ? SEARCH_ROWS : NORMAL_ROWS;
-    $("refreshBtn").disabled = true;
-    try {
-      const page = await fetchVoucherPage(state.first, state.rows);
-      state.vouchers = reset ? page : state.vouchers.concat(page);
-      state.hasMore = page.length === state.rows;
-      state.first += state.rows;
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Could not encode image"));
+        reader.onload = () => resolve(String(reader.result).split(",")[1]);
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function uploadVoucherImage(voucherId, file, endpoint) {
+      const blob = await compressImage(file);
+      const fileBase64 = await blobToBase64(blob);
+      await proxyUploadNoCors({
+        voucherId,
+        fileBase64,
+        fileName: `voucher_${voucherId}_compressed.jpg`,
+        mimeType: "image/jpeg",
+        endpoint: endpoint || 'SVoucher'
+      });
+    }
+
+    // --- Sorting ---
+    function sortVouchers(vouchers, sortBy) {
+      const sorted = [...vouchers];
+      switch(sortBy) {
+        case 'date-desc':
+          return sorted.sort((a, b) => b.voucherDate.localeCompare(a.voucherDate));
+        case 'date-asc':
+          return sorted.sort((a, b) => a.voucherDate.localeCompare(b.voucherDate));
+        case 'number-asc':
+          return sorted.sort((a, b) => a.title.localeCompare(b.title));
+        case 'number-desc':
+          return sorted.sort((a, b) => b.title.localeCompare(a.title));
+        case 'amount-desc':
+          return sorted.sort((a, b) => (b.amount || 0) - (a.amount || 0));
+        case 'amount-asc':
+          return sorted.sort((a, b) => (a.amount || 0) - (b.amount || 0));
+        case 'customer-asc':
+          return sorted.sort((a, b) => a.customerName.localeCompare(b.customerName));
+        case 'customer-desc':
+          return sorted.sort((a, b) => b.customerName.localeCompare(a.customerName));
+        default:
+          return sorted;
+      }
+    }
+
+    // --- Rendering ---
+    function statusBadge(status) {
+      const map = {
+        pending: ["Pending", "badge-pending"],
+        posted: ["Posted", "badge-posted"],
+        delivered: ["Delivered", "badge-delivered"]
+      };
+      const [label, cls] = map[status] || ["Unknown", "badge-pending"];
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+
+    function voucherDateKey(v) {
+      if (!v.voucherDate || v.voucherDate === "-") return null;
+      const d = new Date(v.voucherDate);
+      if (isNaN(d.getTime())) return null;
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function matchesFilters(v) {
+      const term = state.searchTerm.toLowerCase();
+      const matchSearch = !term ||
+        (v.title && v.title.toLowerCase().includes(term)) ||
+        (v.customerName && v.customerName.toLowerCase().includes(term)) ||
+        (v.amount !== null && String(v.amount).includes(term));
+
+      const matchDate = !state.dateFilter ||
+        (() => {
+          const key = voucherDateKey(v);
+          return key !== null ? key === state.dateFilter : String(v.voucherDate).includes(state.dateFilter);
+        })();
+
+      const matchType = !state.voucherType || v.type.toUpperCase() === state.voucherType;
+      
+      const matchStatus = !state.statusFilter || v.status === state.statusFilter;
+
+      return matchSearch && matchDate && matchType && matchStatus;
+    }
+
+    function renderList() {
+      const list = $("list");
+      const empty = $("emptyMsg");
+      const filterInfo = $("filterInfo");
+      const filterText = $("filterText");
+      const filterCount = $("filterCount");
+
+      list.innerHTML = "";
+
+      // Filter and sort
+      const filtered = state.vouchers.filter(matchesFilters);
+      const sorted = sortVouchers(filtered, state.sortBy);
+
+      // Update empty state
+      if (sorted.length === 0) {
+        empty.classList.remove("hidden");
+        $("emptyText").textContent = (state.searchTerm || state.dateFilter || state.voucherType || state.statusFilter) ?
+          "No vouchers match your filters." :
+          "No vouchers found.";
+      } else {
+        empty.classList.add("hidden");
+      }
+
+      // Update filter info
+      const hasFilters = state.searchTerm || state.dateFilter || state.voucherType || state.statusFilter;
+      if (hasFilters) {
+        filterInfo.classList.remove("hidden");
+        let parts = [];
+        if (state.voucherType) {
+          const typeNames = {
+            'DELIVERY': 'Delivery Challan',
+            'CASH': 'Cash Voucher',
+            'PAYMENT': 'Payment Voucher',
+            'RECEIPT': 'Receipt Voucher',
+            'JOURNAL': 'Journal Voucher',
+            'SALES': 'Sales Invoice',
+            'PURCHASE': 'Purchase Invoice'
+          };
+          parts.push(`📋 ${typeNames[state.voucherType] || state.voucherType}`);
+        }
+        if (state.statusFilter) {
+          const statusNames = {
+            'pending': '⏳ Pending',
+            'posted': '📌 Posted',
+            'delivered': '✅ Delivered'
+          };
+          parts.push(statusNames[state.statusFilter] || state.statusFilter);
+        }
+        if (state.dateFilter) parts.push(`📅 ${state.dateFilter}`);
+        if (state.searchTerm) parts.push(`🔍 "${state.searchTerm}"`);
+        filterText.textContent = parts.join(" · ");
+        filterCount.textContent = `${sorted.length} result${sorted.length !== 1 ? 's' : ''}`;
+      } else {
+        filterInfo.classList.add("hidden");
+      }
+
+      // Loading state
+      if (state.isLoading) {
+        const loader = document.createElement("div");
+        loader.className = "empty-state";
+        loader.innerHTML = `<div class="spinner"></div><p style="margin-top:12px;">Loading vouchers...</p>`;
+        list.appendChild(loader);
+        return;
+      }
+
+      // Render items
+      for (const v of sorted) {
+        const el = document.createElement("div");
+        el.className = "voucher-item";
+        el.innerHTML = `
+          <div class="voucher-top">
+            <div>
+              <div class="voucher-title">
+                ${escapeHtml(v.title)}
+                <span class="voucher-type-badge">${escapeHtml(v.type)}</span>
+              </div>
+              <div class="voucher-sub">
+                <span>👤 ${escapeHtml(v.customerName)}</span>
+                <span>📍 ${escapeHtml(v.locationName)}</span>
+                <span>📅 ${escapeHtml(String(v.voucherDate))}</span>
+                <span>💰 ${v.amount !== null ? escapeHtml(v.amount.toLocaleString()) : "-"}</span>
+              </div>
+            </div>
+            ${statusBadge(v.status)}
+          </div>
+          ${v.images.length ? `<div class="images-grid">${v.images.map(u => `<img src="${u}" loading="lazy">`).join("")}</div>` : ""}
+          <div class="upload-row">
+            <button class="btn btn-secondary btn-sm pick-btn">📷 Take Photo</button>
+            <input type="file" accept="image/*" capture="environment">
+            <span class="upload-status"></span>
+          </div>
+          <div class="voucher-error"></div>
+        `;
+
+        const pickBtn = el.querySelector(".pick-btn");
+        const fileInput = el.querySelector('input[type="file"]');
+        const statusSpan = el.querySelector(".upload-status");
+        const errDiv = el.querySelector(".voucher-error");
+
+        pickBtn.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", async () => {
+          const file = fileInput.files[0];
+          if (!file) return;
+          errDiv.textContent = "";
+          pickBtn.disabled = true;
+          statusSpan.textContent = "Uploading...";
+          try {
+            await uploadVoucherImage(v.id, file, v.endpoint);
+            statusSpan.textContent = "✅ Sent — refreshing...";
+            await refresh(true);
+            statusSpan.textContent = "";
+          } catch (e) {
+            statusSpan.textContent = "";
+            errDiv.textContent = e.message;
+            pickBtn.disabled = false;
+          }
+        });
+
+        list.appendChild(el);
+      }
+
+      // Load more button
+      const loadMoreBtn = $("loadMoreBtn");
+      const hasActiveFilters = state.searchTerm || state.dateFilter || state.voucherType || state.statusFilter;
+      if (state.hasMore && !hasActiveFilters && !state.isLoading) {
+        loadMoreBtn.classList.remove("hidden");
+      } else {
+        loadMoreBtn.classList.add("hidden");
+      }
+    }
+
+    // --- Refresh ---
+    async function refresh(reset) {
+      if (state.isLoading) return;
+
+      if (reset) {
+        state.first = 0;
+        state.vouchers = [];
+        state.hasMore = true;
+      }
+
+      const hasFilters = state.searchTerm || state.dateFilter || state.voucherType || state.statusFilter;
+      const rowsToFetch = hasFilters ? SEARCH_ROWS : NORMAL_ROWS;
+
+      state.isLoading = true;
+      $("refreshBtn").disabled = true;
       renderList();
-      $("loadMoreBtn").style.display = (state.hasMore && !state.searchTerm && !state.dateFilter) ? "inline-block" : "none";
-    } catch (e) {
-      alert("Failed to load vouchers: " + e.message);
-    } finally {
-      $("refreshBtn").disabled = false;
+
+      try {
+        const page = await fetchVoucherPage(state.first, rowsToFetch, state.dateFilter, state.voucherType);
+        state.vouchers = reset ? page : state.vouchers.concat(page);
+        state.hasMore = page.length === rowsToFetch;
+        state.first += rowsToFetch;
+        renderList();
+      } catch (e) {
+        alert("Failed to load vouchers: " + e.message);
+      } finally {
+        state.isLoading = false;
+        $("refreshBtn").disabled = false;
+        renderList();
+      }
     }
-  }
 
-  const STORAGE_KEY = "kdc_proxy_creds";
+    // --- Connect ---
+    const STORAGE_KEY = "kdc_proxy_creds";
 
-  function saveCreds(proxyUrl, secret) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ proxyUrl, secret })); } catch (e) { /* storage unavailable */ }
-  }
-  function loadCreds() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
-  }
-  function clearCreds() {
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* storage unavailable */ }
-  }
-
-  async function doConnect(proxyUrl, secret, remember) {
-    $("connectError").textContent = "";
-    if (!proxyUrl || !secret) {
-      $("connectError").textContent = "Please fill in both fields.";
-      return;
+    function saveCreds(proxyUrl, secret) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ proxyUrl, secret })); } catch (e) { /* ignore */ }
     }
-    state.proxyUrl = proxyUrl;
-    state.secret = secret;
-    $("connectBtn").disabled = true;
-    $("connectBtn").textContent = "Connecting...";
-    try {
-      await refresh(true); // first real call doubles as a connectivity/secret check
-      $("connectCard").style.display = "none";
-      $("app").style.display = "block";
-      $("whoBar").textContent = "Connected";
-      if (remember) saveCreds(proxyUrl, secret); else clearCreds();
-    } catch (e) {
-      $("connectError").textContent = e.message;
-    } finally {
-      $("connectBtn").disabled = false;
-      $("connectBtn").textContent = "Connect";
+
+    function loadCreds() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
     }
-  }
 
-  $("connectBtn").addEventListener("click", () => {
-    doConnect($("proxyUrl").value.trim(), $("secret").value, $("rememberBox").checked);
-  });
+    function clearCreds() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+    }
 
-  $("refreshBtn").addEventListener("click", () => refresh(true));
-  $("loadMoreBtn").addEventListener("click", () => refresh(false));
+    async function doConnect(proxyUrl, secret, remember) {
+      const errEl = $("connectError");
+      errEl.textContent = "";
+      if (!proxyUrl || !secret) {
+        errEl.textContent = "Please fill in both fields.";
+        return;
+      }
+      state.proxyUrl = proxyUrl;
+      state.secret = secret;
+      const btn = $("connectBtn");
+      btn.disabled = true;
+      btn.textContent = "Connecting...";
+      try {
+        await refresh(true);
+        $("connectCard").classList.add("hidden");
+        $("app").classList.remove("hidden");
+        $("whoBar").textContent = "Connected";
+        if (remember) saveCreds(proxyUrl, secret);
+        else clearCreds();
+      } catch (e) {
+        errEl.textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Connect";
+      }
+    }
 
-  let searchDebounce = null;
-  $("searchBox").addEventListener("input", () => {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(() => {
-      const newTerm = $("searchBox").value.trim();
-      const widenedNeeded = newTerm && state.searchTerm !== newTerm && !state.dateFilter;
-      state.searchTerm = newTerm;
-      if (widenedNeeded) refresh(true); // fetch a wider batch now that we're searching
-      else renderList();
-    }, 300);
-  });
+    // --- Event Listeners ---
+    $("connectBtn").addEventListener("click", () => {
+      doConnect($("proxyUrl").value.trim(), $("secret").value, $("rememberBox").checked);
+    });
 
-  $("dateBox").addEventListener("change", () => {
-    const newDate = $("dateBox").value; // yyyy-mm-dd, or "" if cleared
-    const widenedNeeded = newDate && state.dateFilter !== newDate && !state.searchTerm;
-    state.dateFilter = newDate;
-    if (widenedNeeded) refresh(true);
-    else renderList();
-  });
+    $("refreshBtn").addEventListener("click", () => refresh(true));
 
-  $("clearDateBtn").addEventListener("click", () => {
-    $("dateBox").value = "";
-    state.dateFilter = "";
-    renderList();
-  });
+    $("loadMoreBtn").addEventListener("click", () => refresh(false));
 
-  $("disconnectBtn").addEventListener("click", () => {
-    state = { proxyUrl: "", secret: "", rows: NORMAL_ROWS, first: 0, hasMore: true, vouchers: [], searchTerm: "", dateFilter: "" };
-    clearCreds();
-    $("app").style.display = "none";
-    $("connectCard").style.display = "block";
-    $("whoBar").textContent = "";
-    $("secret").value = "";
-    $("searchBox").value = "";
-    $("dateBox").value = "";
-  });
+    let searchDebounce = null;
+    $("searchBox").addEventListener("input", () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        state.searchTerm = $("searchBox").value.trim();
+        renderList();
+      }, 300);
+    });
 
-  // Auto-connect if credentials were saved on this device from a previous visit.
-  const saved = loadCreds();
-  if (saved && saved.proxyUrl && saved.secret) {
-    $("proxyUrl").value = saved.proxyUrl;
-    $("secret").value = saved.secret;
-    $("rememberBox").checked = true;
-    doConnect(saved.proxyUrl, saved.secret, true);
-  }
-})();
+    $("dateBox").addEventListener("change", () => {
+      state.dateFilter = $("dateBox").value;
+      refresh(true);
+    });
+
+    $("voucherTypeBox").addEventListener("change", () => {
+      state.voucherType = $("voucherTypeBox").value;
+      refresh(true);
+    });
+
+    $("statusFilterBox").addEventListener("change", () => {
+      state.statusFilter = $("statusFilterBox").value;
+      renderList();
+    });
+
+    $("sortByBox").addEventListener("change", () => {
+      state.sortBy = $("sortByBox").value;
+      renderList();
+    });
+
+    $("clearDateBtn").addEventListener("click", () => {
+      $("dateBox").value = "";
+      state.dateFilter = "";
+      refresh(true);
+    });
+
+    $("clearFiltersBtn").addEventListener("click", () => {
+      $("searchBox").value = "";
+      $("dateBox").value = "";
+      $("voucherTypeBox").value = "";
+      $("statusFilterBox").value = "";
+      $("sortByBox").value = "date-desc";
+      state.searchTerm = "";
+      state.dateFilter = "";
+      state.voucherType = "";
+      state.statusFilter = "";
+      state.sortBy = "date-desc";
+      refresh(true);
+    });
+
+    $("disconnectBtn").addEventListener("click", () => {
+      state = {
+        proxyUrl: "",
+        secret: "",
+        rows: NORMAL_ROWS,
+        first: 0,
+        hasMore: true,
+        vouchers: [],
+        searchTerm: "",
+        dateFilter: "",
+        voucherType: "",
+        statusFilter: "",
+        sortBy: "date-desc",
+        isLoading: false
+      };
+      clearCreds();
+      $("app").classList.add("hidden");
+      $("connectCard").classList.remove("hidden");
+      $("whoBar").textContent = "";
+      $("secret").value = "";
+      $("searchBox").value = "";
+      $("dateBox").value = "";
+      $("voucherTypeBox").value = "";
+      $("statusFilterBox").value = "";
+      $("sortByBox").value = "date-desc";
+      $("list").innerHTML = "";
+      $("filterInfo").classList.add("hidden");
+      $("emptyMsg").classList.add("hidden");
+    });
+
+    // --- Auto-connect ---
+    const saved = loadCreds();
+    if (saved && saved.proxyUrl && saved.secret) {
+      $("proxyUrl").value = saved.proxyUrl;
+      $("secret").value = saved.secret;
+      $("rememberBox").checked = true;
+      doConnect(saved.proxyUrl, saved.secret, true);
+    }
+  })();
 </script>
+
 </body>
 </html>
