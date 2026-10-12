@@ -1,7 +1,10 @@
+/* ================= CONFIG - same endpoints as your original leave form ================= */
 const EMPLOYEES_JSON_URL = 'https://script.google.com/macros/s/AKfycbxEBOL9LWqrPTEvMHdJXtcOt5BhmmYleCji-XwvBvf6gWnWfUQGkuqSvouALHABZE79eQ/exec';
 const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
+
 let employees = [];
 let leaveEntries = [];
+
 const employeeInput = document.getElementById('employee-name');
 const contactInput = document.getElementById('contactNumber');
 const suggestionBox = document.getElementById('suggestions');
@@ -10,6 +13,7 @@ const statusText = document.getElementById('statusText');
 const lastSynced = document.getElementById('lastSynced');
 const tableBody = document.getElementById('tableBody');
 const rowCount = document.getElementById('rowCount');
+
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 document.getElementById('date').value = todayStr();
 
@@ -17,13 +21,16 @@ function escapeHtml(str) {
   return String(str === undefined || str === null ? '' : str)
     .replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
 function setStatus(state, text) {
   statusDot.classList.remove('dot-off', 'dot-on', 'dot-busy');
   statusDot.classList.add(state === 'on' ? 'dot-on' : state === 'busy' ? 'dot-busy' : 'dot-off');
   statusText.textContent = text;
 }
+
+/* ================= ON-SCREEN NOTIFICATIONS (replaces alert()) ================= */
 function showToast(message, type) {
-  type = type || 'success'; 
+  type = type || 'success'; // success | error | warning | info
   const bgClass = { success: 'text-bg-success', error: 'text-bg-danger', warning: 'text-bg-warning', info: 'text-bg-secondary' }[type] || 'text-bg-success';
   const icon = { success: 'bi-check-circle', error: 'bi-x-circle', warning: 'bi-exclamation-triangle', info: 'bi-info-circle' }[type] || 'bi-check-circle';
   const el = document.createElement('div');
@@ -39,6 +46,8 @@ function showToast(message, type) {
   t.show();
   el.addEventListener('hidden.bs.toast', () => el.remove());
 }
+
+/* ================= ON-SCREEN DELETE CONFIRM (replaces prompt()+confirm()) ================= */
 let deleteModalInstance = null;
 let deleteResolver = null;
 function showDeleteConfirm(summaryText) {
@@ -66,6 +75,8 @@ document.getElementById('deleteModal').addEventListener('hidden.bs.modal', () =>
   if (deleteResolver) deleteResolver(null);
   deleteResolver = null;
 });
+
+/* ---------- Employee autocomplete (unchanged logic) ---------- */
 setStatus('busy', 'Loading employee list...');
 fetch(EMPLOYEES_JSON_URL, { cache: 'no-store' })
   .then(r => r.json())
@@ -77,6 +88,7 @@ fetch(EMPLOYEES_JSON_URL, { cache: 'no-store' })
     setStatus('off', 'Could not load employee list.');
     console.error('Failed to load employees:', err);
   });
+
 employeeInput.addEventListener('input', function () {
   const value = this.value.trim().toLowerCase();
   suggestionBox.innerHTML = '';
@@ -86,6 +98,7 @@ employeeInput.addEventListener('input', function () {
     const idMatch = String(emp.empid || '').toLowerCase().includes(value);
     return nameMatch || idMatch;
   }).slice(0, 25);
+
   matches.forEach(emp => {
     const div = document.createElement('div');
     div.textContent = `${emp.srno || ''} - ${emp.empid || ''} - ${emp.name}_${emp.fathername || ''}`;
@@ -101,6 +114,8 @@ employeeInput.addEventListener('input', function () {
 document.addEventListener('click', function (e) {
   if (!suggestionBox.contains(e.target) && e.target !== employeeInput) suggestionBox.innerHTML = '';
 });
+
+/* ---------- Last leave date lookup (unchanged logic, now in a modal) ---------- */
 let lookupModalInstance = null;
 document.getElementById('lookupLeaveBtn').addEventListener('click', () => {
   const empid = document.getElementById('employee-id').value;
@@ -126,7 +141,10 @@ document.getElementById('lookupLeaveBtn').addEventListener('click', () => {
     })
     .catch(err => showToast('Could not fetch leave history: ' + err.message, 'error'));
 });
-let logAdminPassword = null;
+
+/* ---------- Leave log (list / edit / delete via password-checked backend) ---------- */
+let logAdminPassword = null; // cached in memory only for this page session, never stored on disk
+
 async function apiGet(action, extraParams) {
   const params = new URLSearchParams({ action, ...(extraParams || {}) });
   const res = await fetch(`${GOOGLE_SHEET_WEBAPP_URL}?${params.toString()}`);
@@ -137,13 +155,36 @@ async function apiGet(action, extraParams) {
 async function apiPost(body) {
   const res = await fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain' }, 
+    headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight on Apps Script
     body: JSON.stringify(body)
   });
   const data = await res.json();
   if (data.error) throw new Error(data.error);
+  loadPending(); // refresh the notification bell after every successful save/edit/delete
   return data;
 }
+
+/* ---------- Notification bell: forms with an empty Period of Leave (cutoff date is set in the Apps Script) ---------- */
+async function loadPending() {
+  try {
+    const result = await apiGet('pending');
+    const list = result.data || [];
+    const badge = document.getElementById('notifBadge');
+    badge.textContent = list.length;
+    badge.classList.toggle('d-none', list.length === 0);
+    document.getElementById('notifHeader').textContent = `Form To Be Update = ${list.length}`;
+    document.getElementById('notifList').innerHTML = list.length
+      ? list.slice().reverse().map(r => `
+          <div class="px-3 py-2 border-bottom small">
+            <strong>${escapeHtml(r.name)}</strong><br>
+            <span class="text-muted" style="font-size:12px;">${escapeHtml(r.date)} · Period of Leave missing</span>
+          </div>`).join('')
+      : '<div class="px-3 py-3 small text-muted">No forms to update.</div>';
+  } catch (err) {
+    console.error('Could not load pending forms:', err);
+  }
+}
+
 function renderTable() {
   rowCount.textContent = leaveEntries.length + (leaveEntries.length === 1 ? ' entry' : ' entries');
   if (!leaveEntries.length) {
@@ -170,17 +211,18 @@ function renderTable() {
     </tr>`;
   }).join('');
 }
+
 let logCollapseInstance = null;
 async function loadLog() {
-  if (!logAdminPassword) return;
+  if (!logAdminPassword) return; // locked - nothing to load yet
   try {
     const result = await apiGet('list', { admin: logAdminPassword });
-    console.log('Leave Log raw response:', result); 
+    console.log('Leave Log raw response:', result); // open browser DevTools console (F12) to inspect this
     leaveEntries = result.data || [];
     lastSynced.textContent = 'Last synced ' + new Date().toLocaleTimeString();
     renderTable();
     if (leaveEntries.length === 0) {
-      showToast('Log loaded, but the sheet returned 0 entries. Check For info.', 'warning');
+      showToast('Log loaded, but the sheet returned 0 entries. Check console (F12) for the raw response.', 'warning');
     }
   } catch (err) {
     console.error('Could not load leave log:', err);
@@ -189,20 +231,28 @@ async function loadLog() {
   }
 }
 document.getElementById('refreshBtn').addEventListener('click', () => { if (logAdminPassword) loadLog(); });
+
+// ---- Leave Log password gate (toggles visibility, never destroys the table) ----
 const logPasswordGate = document.getElementById('logPasswordGate');
 const logTableWrapper = document.getElementById('logTableWrapper');
 const logPasswordInput = document.getElementById('logPasswordInput');
 const logPasswordFeedback = document.getElementById('logPasswordFeedback');
+
 document.getElementById('logHeader').addEventListener('click', () => {
   const logBody = document.getElementById('receiptLogBody');
   if (!logCollapseInstance) logCollapseInstance = new bootstrap.Collapse(logBody, { toggle: false });
+
+  // Already unlocked - just toggle open/closed
   if (logAdminPassword) {
     logCollapseInstance.toggle();
     return;
   }
+
+  // Still locked - open the panel to reveal the password gate
   logCollapseInstance.show();
   setTimeout(() => logPasswordInput.focus(), 150);
 });
+
 async function handleLogPasswordSubmit() {
   const pwd = logPasswordInput.value.trim();
 
@@ -212,14 +262,18 @@ async function handleLogPasswordSubmit() {
     logPasswordInput.focus();
     return;
   }
+
   logPasswordFeedback.className = 'mt-2 small fw-bold text-muted';
   logPasswordFeedback.textContent = 'Verifying...';
+
   try {
     await apiPost({ action: 'verify', admin: pwd });
-    logAdminPassword = pwd;
+    logAdminPassword = pwd; // cached for this session
+
     document.getElementById('logChevron').classList.replace('bi-lock', 'bi-chevron-down');
     const lockLabel = document.getElementById('logLockLabel');
     if (lockLabel) lockLabel.remove();
+
     logPasswordGate.classList.add('d-none');
     logTableWrapper.classList.remove('d-none');
     await loadLog();
@@ -235,6 +289,7 @@ document.getElementById('submitLogPasswordBtn').addEventListener('click', handle
 logPasswordInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { e.preventDefault(); handleLogPasswordSubmit(); }
 });
+
 let editModalInstance = null;
 window.editRow = function (index) {
   const r = leaveEntries[index];
@@ -251,6 +306,7 @@ window.editRow = function (index) {
   if (!editModalInstance) editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
   editModalInstance.show();
 };
+
 document.getElementById('saveEditBtn').addEventListener('click', async () => {
   const feedback = document.getElementById('editModalFeedback');
   const pwd = document.getElementById('editAdminPassword').value;
@@ -280,10 +336,11 @@ document.getElementById('saveEditBtn').addEventListener('click', async () => {
     btn.disabled = false;
   }
 });
+
 window.deleteRow = async function (index) {
   const r = leaveEntries[index];
   const pwd = await showDeleteConfirm(`Delete the leave application for "${r.name}" (${r.date})? This cannot be undone.`);
-  if (pwd === null) return;
+  if (pwd === null) return; // cancelled
   try {
     await apiPost({ action: 'delete', admin: pwd, leave_id: r.leave_id });
     showToast('Entry deleted.', 'success');
@@ -292,6 +349,8 @@ window.deleteRow = async function (index) {
     showToast('Could not delete: ' + err.message, 'error');
   }
 };
+
+/* ---------- Print (kept as the original design) ---------- */
 function fillPrintArea(entry) {
   document.getElementById('p_date').textContent = entry.date;
   document.getElementById('p_name').textContent = entry.name;
@@ -310,6 +369,7 @@ window.reprintRow = function (index) {
   });
   window.print();
 };
+
 function currentFormEntry() {
   return {
     date: document.getElementById('date').value,
@@ -321,6 +381,7 @@ function currentFormEntry() {
     lastLeaveDate: document.getElementById('lastLeaveDate').value.trim()
   };
 }
+
 document.getElementById('printBtn').addEventListener('click', async () => {
   const entry = currentFormEntry();
   if (!entry.name || !entry.contact || !entry.lastLeaveDate) {
@@ -332,6 +393,7 @@ document.getElementById('printBtn').addEventListener('click', async () => {
   try {
     await apiPost({ action: 'add', entry: { ...entry, empid: document.getElementById('employee-id').value } });
   } catch (err) {
+    // backend may still only support the older blind-save contract; fall back to it
     await fetch(GOOGLE_SHEET_WEBAPP_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -346,6 +408,8 @@ document.getElementById('printBtn').addEventListener('click', async () => {
   await loadLog();
   btn.disabled = false;
 });
+
+/* ---------- Save new leave application ---------- */
 document.getElementById('leaveForm').addEventListener('submit', async function (e) {
   e.preventDefault();
   const entry = { ...currentFormEntry(), empid: document.getElementById('employee-id').value };
@@ -358,6 +422,7 @@ document.getElementById('leaveForm').addEventListener('submit', async function (
   try {
     await apiPost({ action: 'add', entry });
   } catch (err) {
+    // backend may still only support the older blind-save contract; fall back to it
     await fetch(GOOGLE_SHEET_WEBAPP_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -371,4 +436,6 @@ document.getElementById('leaveForm').addEventListener('submit', async function (
   await loadLog();
   btn.disabled = false;
 });
+
 loadLog();
+loadPending();
