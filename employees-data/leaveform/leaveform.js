@@ -1,6 +1,6 @@
 /* ================= CONFIG - same endpoints as your original leave form ================= */
 const EMPLOYEES_JSON_URL = 'https://script.google.com/macros/s/AKfycbxEBOL9LWqrPTEvMHdJXtcOt5BhmmYleCji-XwvBvf6gWnWfUQGkuqSvouALHABZE79eQ/exec';
-const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
+const GOOGLE_SHEET_WEBAPP_URL = window.ARFA_BACKEND_URL + '?module=leave';
 
 let employees = [];
 let leaveEntries = [];
@@ -115,12 +115,19 @@ document.addEventListener('click', function (e) {
   if (!suggestionBox.contains(e.target) && e.target !== employeeInput) suggestionBox.innerHTML = '';
 });
 
+function backendReady() {
+  if (window.ARFA_BACKEND_URL) return true;
+  showToast('Not connected - use the connection icon on the dashboard first.', 'error');
+  return false;
+}
+
 /* ---------- Last leave date lookup (unchanged logic, now in a modal) ---------- */
 let lookupModalInstance = null;
 document.getElementById('lookupLeaveBtn').addEventListener('click', () => {
   const empid = document.getElementById('employee-id').value;
   if (!empid) { showToast('Select an employee first.', 'warning'); return; }
-  fetch(`${GOOGLE_SHEET_WEBAPP_URL}?empid=${empid}`)
+  if (!backendReady()) return;
+  fetch(`${GOOGLE_SHEET_WEBAPP_URL}&empid=${empid}`)
     .then(res => res.json())
     .then(dates => {
       const list = document.getElementById('leaveList');
@@ -146,13 +153,15 @@ document.getElementById('lookupLeaveBtn').addEventListener('click', () => {
 let logAdminPassword = null; // cached in memory only for this page session, never stored on disk
 
 async function apiGet(action, extraParams) {
+  if (!window.ARFA_BACKEND_URL) throw new Error('Not connected - use the connection icon on the dashboard first.');
   const params = new URLSearchParams({ action, ...(extraParams || {}) });
-  const res = await fetch(`${GOOGLE_SHEET_WEBAPP_URL}?${params.toString()}`);
+  const res = await fetch(`${GOOGLE_SHEET_WEBAPP_URL}&${params.toString()}`);
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data;
 }
 async function apiPost(body) {
+  if (!window.ARFA_BACKEND_URL) throw new Error('Not connected - use the connection icon on the dashboard first.');
   const res = await fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight on Apps Script
@@ -164,25 +173,9 @@ async function apiPost(body) {
   return data;
 }
 
-/* ---------- Notification bell: forms with an empty Period of Leave (cutoff date is set in the Apps Script) ---------- */
-async function loadPending() {
-  try {
-    const result = await apiGet('pending');
-    const list = result.data || [];
-    const badge = document.getElementById('notifBadge');
-    badge.textContent = list.length;
-    badge.classList.toggle('d-none', list.length === 0);
-    document.getElementById('notifHeader').textContent = `Form To Be Update = ${list.length}`;
-    document.getElementById('notifList').innerHTML = list.length
-      ? list.slice().reverse().map(r => `
-          <div class="px-3 py-2 border-bottom small">
-            <strong>${escapeHtml(r.name)}</strong><br>
-            <span class="text-muted" style="font-size:12px;">${escapeHtml(r.date)} · Period of Leave missing</span>
-          </div>`).join('')
-      : '<div class="px-3 py-3 small text-muted">No forms to update.</div>';
-  } catch (err) {
-    console.error('Could not load pending forms:', err);
-  }
+/* ---------- Notification bell now lives on the dashboard: ask it to refresh (no-op when opened on its own) ---------- */
+function loadPending() {
+  if (window.parent !== window) window.parent.postMessage({ type: 'notif-refresh' }, window.location.origin);
 }
 
 function renderTable() {
@@ -388,6 +381,7 @@ document.getElementById('printBtn').addEventListener('click', async () => {
     showToast('Please fill in Employee Name, Contact Number and Last Leave Date before printing.', 'warning');
     return;
   }
+  if (!backendReady()) return;
   const btn = document.getElementById('printBtn');
   btn.disabled = true;
   try {
@@ -417,6 +411,7 @@ document.getElementById('leaveForm').addEventListener('submit', async function (
     showToast('Please fill in Employee Name, Contact Number and Last Leave Date before saving.', 'warning');
     return;
   }
+  if (!backendReady()) return;
   const btn = document.getElementById('addBtn');
   btn.disabled = true;
   try {

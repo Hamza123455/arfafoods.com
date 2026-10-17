@@ -49,7 +49,7 @@ document.getElementById('sidebar').addEventListener('click', (e) => {
 });
 
 /* ================= NOTIFICATION BELL: Leave Form + Cold Store, with total ================= */
-const LEAVE_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
+const leaveUrl = () => window.ARFA_BACKEND_URL + '?module=leave';
 
 function escHtml(v) {
   return String(v === undefined || v === null ? '' : v)
@@ -57,7 +57,8 @@ function escHtml(v) {
 }
 
 async function fetchLeavePending() {
-  const res = await fetch(`${LEAVE_WEBAPP_URL}?action=pending`);
+  if (!window.ARFA_BACKEND_URL) throw new Error('Not connected');
+  const res = await fetch(`${leaveUrl()}&action=pending`);
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data.data || [];
@@ -68,7 +69,7 @@ async function fetchColdStoreCounts() {
   const key = localStorage.getItem('coldstore_secret_key') || '';
   if (!url || !key) throw new Error('Not connected');
   const get = async (action) => {
-    const res = await fetch(`${url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(key)}`);
+    const res = await fetch(`${url}?module=coldstore&action=${encodeURIComponent(action)}&key=${encodeURIComponent(key)}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     return data.data;
@@ -102,7 +103,8 @@ async function loadNotifications() {
              ${pill(leaveList ? leaveCount : '-', 'bg-danger')}
            </div>`;
   if (!leaveList) {
-    html += '<div class="px-3 py-2 small text-muted border-bottom">Could not load leave forms</div>';
+    html += `<div class="px-3 py-2 small text-muted border-bottom">${
+      leave.reason && leave.reason.message === 'Not connected' ? 'Not connected' : 'Could not load leave forms'}</div>`;
   } else {
     html += `<div class="px-3 py-1 small text-muted border-bottom">Form To Be Update = ${leaveCount}</div>`;
     html += leaveCount
@@ -164,7 +166,7 @@ function coldConfig() {
 async function coldGet(action) {
   const cfg = coldConfig();
   if (!cfg.url || !cfg.key) throw new Error('Not connected');
-  const res = await fetch(`${cfg.url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
+  const res = await fetch(`${cfg.url}?module=coldstore&action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data;
@@ -184,7 +186,7 @@ async function checkColdConnection() {
 
 document.getElementById('connectModal').addEventListener('show.bs.modal', () => {
   const cfg = coldConfig();
-  document.getElementById('mgmtWebAppUrl').value = cfg.url;
+  document.getElementById('mgmtWebAppUrl').value = cfg.url || window.ARFA_BACKEND_URL || '';
   document.getElementById('mgmtSecretKey').value = cfg.key;
   document.getElementById('connModalStatus').innerHTML = '&nbsp;';
 });
@@ -199,6 +201,8 @@ document.getElementById('mgmtSaveConnBtn').addEventListener('click', async () =>
     return;
   }
   localStorage.setItem('coldstore_webapp_url', url);
+  localStorage.setItem('arfa_backend_url', url);
+  window.ARFA_BACKEND_URL = url;
   localStorage.setItem('coldstore_secret_key', key);
   statusEl.textContent = 'Testing connection...';
   statusEl.className = 'small text-muted';

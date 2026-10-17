@@ -309,6 +309,7 @@
             }
         }
     </style>
+<script src="../backend-config.js"></script>
 </head>
 <body>
     <div class="voucher">
@@ -677,7 +678,7 @@
         }
 
 
-        const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3ptGMtgW7HAyjmENU4hLwNhNtyRld-jFfpwR2CxD4NEVFLkLdooPNe_Qg4Mb386lXQw/exec";
+        const GOOGLE_SHEET_WEB_APP_URL = window.ARFA_BACKEND_URL + '?module=voucher';
 
         function initActionButtons() {
             const saveBtn = document.getElementById('save-data-btn');
@@ -722,9 +723,9 @@
                     const employeeId = employeeRaw.substring(0, underscoreIndex);
                     const employeeName = employeeRaw.substring(underscoreIndex + 1);
 
-                    if (GOOGLE_SHEET_WEB_APP_URL.indexOf('PASTE_YOUR') === 0) {
+                    if (!window.ARFA_BACKEND_URL) {
                         statusEl.className = 'save-status error';
-                        statusEl.textContent = 'Google Sheet link is not configured yet. See setup instructions.';
+                        statusEl.textContent = 'Not connected - use the connection icon on the dashboard first.';
                         resolve(false);
                         return;
                     }
