@@ -1,4 +1,4 @@
-  const GROUP_FIELD = 'Vendour';
+const GROUP_FIELD = 'Vendour';
   const GROUP_LABEL = 'Vendour';
   const SUB_FIELD = 'Item Name';
   const SUB_LABEL = 'Item';
@@ -31,7 +31,7 @@
   async function connectAndLoad() {
     const cfg = getConfig();
     if (!cfg.url || !cfg.key) {
-      setStatus('off', 'Not connected - configure via Cold Store Management');
+      setStatus('off', 'Not connected');
       return;
     }
     setStatus('busy', 'Connecting...');

@@ -1,4 +1,4 @@
-  let receipts = [];
+let receipts = [];
   let currentLookups = { items: [], vendours: [], coldStores: [] };
   let autoRefreshTimer = null;
   let printModalInstance = null;
@@ -103,9 +103,9 @@
   async function connectAndLoad() {
     const cfg = getConfig();
     if (!cfg.url || !cfg.key) {
-      setStatus('off', 'Not connected - configure via Cold Store Management');
+      setStatus('off', 'Not connected');
       addBtn.disabled = true;
-      disabledHint.textContent = 'Not connected. Open Cold Store Management and use the connection icon in the navbar.';
+      disabledHint.textContent = '';
       return;
     }
     setStatus('busy', 'Connecting...');

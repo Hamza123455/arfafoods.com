@@ -1,4 +1,4 @@
- let receipts = [];
+let receipts = [];
   let currentStampUrl = '';
 
   function getConfig() {
@@ -28,7 +28,7 @@
   async function connectAndLoad() {
     const cfg = getConfig();
     if (!cfg.url || !cfg.key) {
-      setStatus('off', 'Not connected - configure via Cold Store Management');
+      setStatus('off', 'Not connected');
       return;
     }
     setStatus('busy', 'Connecting...');

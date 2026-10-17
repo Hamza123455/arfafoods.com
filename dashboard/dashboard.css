@@ -124,7 +124,7 @@ body {
       .navbar-custom .container-fluid > div:last-child { flex-shrink: 0; }
       .brand-title { font-size: 14px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
       .unit-label { display: none; }
-      .nav-select { max-width: 105px; min-width: 0; font-size: 12px; margin-left: 8px; }
+      .nav-select { max-width: 105px; min-width: 0; font-size: 12px; margin-left: 8px; margin-right: 12px; }
       .sidebar {
         top: 56px;
         height: calc(100vh - 56px);

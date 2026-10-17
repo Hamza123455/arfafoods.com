@@ -122,7 +122,7 @@ async function loadNotifications() {
   if (!coldCounts) {
     html += `<div class="px-3 py-2 small text-muted border-bottom">${
       cold.reason && cold.reason.message === 'Not connected'
-        ? 'Connect via the Cold Store Receipts page first'
+        ? 'Not connected'
         : 'Could not load Cold Store counts'}</div>`;
   } else {
     const row = (label, n, path) => `
@@ -152,3 +152,64 @@ window.addEventListener('message', (e) => {
 });
 loadNotifications();
 setInterval(loadNotifications, 60000);
+
+/* ================= COLD STORE CONNECTION (icon next to the bell) ================= */
+function coldConfig() {
+  return {
+    url: localStorage.getItem('coldstore_webapp_url') || '',
+    key: localStorage.getItem('coldstore_secret_key') || ''
+  };
+}
+
+async function coldGet(action) {
+  const cfg = coldConfig();
+  if (!cfg.url || !cfg.key) throw new Error('Not connected');
+  const res = await fetch(`${cfg.url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+async function checkColdConnection() {
+  const dot = document.getElementById('connStatusDot');
+  try {
+    await coldGet('settings');
+    dot.style.background = '#28a745';
+    return true;
+  } catch (err) {
+    dot.style.background = '#dc3545';
+    return false;
+  }
+}
+
+document.getElementById('connectModal').addEventListener('show.bs.modal', () => {
+  const cfg = coldConfig();
+  document.getElementById('mgmtWebAppUrl').value = cfg.url;
+  document.getElementById('mgmtSecretKey').value = cfg.key;
+  document.getElementById('connModalStatus').innerHTML = '&nbsp;';
+});
+
+document.getElementById('mgmtSaveConnBtn').addEventListener('click', async () => {
+  const url = document.getElementById('mgmtWebAppUrl').value.trim();
+  const key = document.getElementById('mgmtSecretKey').value.trim();
+  const statusEl = document.getElementById('connModalStatus');
+  if (!url || !key) {
+    statusEl.textContent = 'Please enter both the URL and the Key.';
+    statusEl.className = 'small text-danger';
+    return;
+  }
+  localStorage.setItem('coldstore_webapp_url', url);
+  localStorage.setItem('coldstore_secret_key', key);
+  statusEl.textContent = 'Testing connection...';
+  statusEl.className = 'small text-muted';
+  const ok = await checkColdConnection();
+  statusEl.textContent = ok ? 'Connected successfully.' : 'Could not connect - check the URL and key.';
+  statusEl.className = 'small ' + (ok ? 'text-success' : 'text-danger');
+  if (ok) {
+    loadNotifications();
+    const iframe = document.querySelector('#mainContent iframe');
+    if (iframe) iframe.src = iframe.src;
+  }
+});
+
+checkColdConnection();

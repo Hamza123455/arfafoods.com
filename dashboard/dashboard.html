@@ -22,6 +22,10 @@
       <a class="text-white ms-3 d-none d-md-inline" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
     </div>
     <div class="d-flex align-items-center">
+      <a class="text-white position-relative me-3" href="#" role="button" data-bs-toggle="modal" data-bs-target="#connectModal" title="Data connection">
+        <i class="bi bi-hdd-network fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle" id="connStatusDot" style="background:#dc3545; width:10px; height:10px;"></span>
+      </a>
       <div class="dropdown me-3">
         <a class="text-white position-relative" href="#" role="button" id="notifDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
           <i class="bi bi-bell fs-5"></i>
@@ -37,6 +41,32 @@
     </div>
   </div>
 </nav>
+<div class="modal fade" id="connectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Connect to Shared Data Source</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Set this up once, here.</p>
+        <div class="mb-3">
+          <label class="form-label">URL</label>
+          <input type="text" class="form-control" id="mgmtWebAppUrl" placeholder="https://script.google.com/macros/s/XXXX/exec">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Key</label>
+          <input type="text" class="form-control" id="mgmtSecretKey" placeholder="matches SECRET_KEY in the script">
+        </div>
+        <div class="small" id="connModalStatus">&nbsp;</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="mgmtSaveConnBtn"><i class="bi bi-check-circle"></i> Save &amp; Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="sidebar" id="sidebar">
  <div class="input-group quick-search mb-3">

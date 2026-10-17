@@ -49,7 +49,7 @@ let currentLookups = { items: [], vendours: [], coldStores: [] };
   async function connectAndLoad() {
     const cfg = getConfig();
     if (!cfg.url || !cfg.key) {
-      setStatus('off', 'Not connected - configure via Cold Store Management');
+      setStatus('off', 'Not connected');
       addNewBtn.disabled = true;
       return;
     }
