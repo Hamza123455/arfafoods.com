@@ -17,15 +17,20 @@
       <span class="brand-title">Arfa Foods and Spices</span>
       <span class="unit-label">Arfa - Top Unit</span>
       <select class="nav-select" onchange="if (this.value) window.location.href = this.value;">
-        <option value = "../dashboard/dashboard" data-app="managementSystem">Management System</option>
+        <option value = "../dashboard/dashboard" data-app="managementSystem">Management System (ver. 1.1)</option>
       </select>
       <a class="text-white ms-3 d-none d-md-inline" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
     </div>
     <div class="d-flex align-items-center">
-      <a class="text-white position-relative me-3" href="#">
-        <i class="bi bi-bell fs-5"></i>
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-      </a>
+      <div class="dropdown me-3">
+        <a class="text-white position-relative" href="#" role="button" id="notifDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+          <i class="bi bi-bell fs-5"></i>
+          <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end p-0 shadow" style="width:340px;max-width:92vw;max-height:70vh;overflow-y:auto;">
+          <div id="notifBody"><div class="px-3 py-3 small text-muted">Loading...</div></div>
+        </div>
+      </div>
       <img src="../userknown.jpg" class="user-img me-2" />
       <span class="text-white me-2 d-none d-md-inline">Unknown</span>
       <i class="bi bi-three-dots-vertical text-white d-none d-md-inline"></i>

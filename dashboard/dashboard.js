@@ -47,3 +47,108 @@ document.getElementById('sidebar').addEventListener('click', (e) => {
   const a = e.target.closest('.accordion-body a');
   if (a && a.getAttribute('href') !== '#erp' && window.innerWidth < 768) setSidebar(false);
 });
+
+/* ================= NOTIFICATION BELL: Leave Form + Cold Store, with total ================= */
+const LEAVE_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxX8GDhvPBDLHnv2wMoCaa7ZY3GEPg5YnbRKrsY1Q9yFGifUwVE4mP7nRa25D5iJdPPqw/exec';
+
+function escHtml(v) {
+  return String(v === undefined || v === null ? '' : v)
+    .replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function fetchLeavePending() {
+  const res = await fetch(`${LEAVE_WEBAPP_URL}?action=pending`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data.data || [];
+}
+
+async function fetchColdStoreCounts() {
+  const url = localStorage.getItem('coldstore_webapp_url') || '';
+  const key = localStorage.getItem('coldstore_secret_key') || '';
+  if (!url || !key) throw new Error('Not connected');
+  const get = async (action) => {
+    const res = await fetch(`${url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(key)}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data.data;
+  };
+  const [lookups, receipts] = await Promise.all([get('lookups'), get('list')]);
+  const l = lookups || { items: [], coldStores: [] };
+  return {
+    coldStores: (l.coldStores || []).length,
+    items: (l.items || []).length,
+    receipts: new Set((receipts || []).map(r => r['Receipt No'])).size
+  };
+}
+
+async function loadNotifications() {
+  const [leave, cold] = await Promise.allSettled([fetchLeavePending(), fetchColdStoreCounts()]);
+
+  const leaveList = leave.status === 'fulfilled' ? leave.value : null;
+  const coldCounts = cold.status === 'fulfilled' ? cold.value : null;
+  const leaveCount = leaveList ? leaveList.length : 0;
+  const coldCount = coldCounts ? coldCounts.receipts : 0;
+  const total = leaveCount + coldCount;
+
+  const link = (path) => `href="#" onclick="setActiveLink(this); loadPage('${path}'); return false;"`;
+  const pill = (n, cls) => `<span class="badge ${cls} rounded-pill">${n}</span>`;
+
+  let html = '';
+
+  /* --- Leave Form --- */
+  html += `<div class="px-3 py-2 fw-bold border-bottom bg-light d-flex justify-content-between align-items-center">
+             <a class="text-dark text-decoration-none" ${link('../employees-data/leaveform/leaveform')}>Leave Form</a>
+             ${pill(leaveList ? leaveCount : '-', 'bg-danger')}
+           </div>`;
+  if (!leaveList) {
+    html += '<div class="px-3 py-2 small text-muted border-bottom">Could not load leave forms</div>';
+  } else {
+    html += `<div class="px-3 py-1 small text-muted border-bottom">Form To Be Update = ${leaveCount}</div>`;
+    html += leaveCount
+      ? leaveList.slice().reverse().map(r => `
+          <div class="px-3 py-2 border-bottom small">
+            <strong>${escHtml(r.name)}</strong><br>
+            <span class="text-muted" style="font-size:12px;">${escHtml(r.date)} &middot; Period of Leave missing</span>
+          </div>`).join('')
+      : '<div class="px-3 py-2 small text-muted border-bottom">No forms to update.</div>';
+  }
+
+  /* --- Cold Store --- */
+  html += `<div class="px-3 py-2 fw-bold border-bottom bg-light d-flex justify-content-between align-items-center">
+             <span>Cold Store</span>
+             ${pill(coldCounts ? coldCount : '-', 'bg-danger')}
+           </div>`;
+  if (!coldCounts) {
+    html += `<div class="px-3 py-2 small text-muted border-bottom">${
+      cold.reason && cold.reason.message === 'Not connected'
+        ? 'Connect via the Cold Store Receipts page first'
+        : 'Could not load Cold Store counts'}</div>`;
+  } else {
+    const row = (label, n, path) => `
+      <a class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom small text-dark text-decoration-none" ${link(path)}>
+        ${label} ${pill(n, 'bg-secondary')}
+      </a>`;
+    html += row('Cold Stores', coldCounts.coldStores, '../coldstore/reports/by-store/b-loc');
+    html += row('Items', coldCounts.items, '../coldstore/reports/by-item/b-i');
+    html += row('Receipts', coldCounts.receipts, '../coldstore/reports/by-receipt/b-rcpt');
+  }
+
+  /* --- Total --- */
+  html += `<div class="px-3 py-2 fw-bold d-flex justify-content-between align-items-center">
+             <span>Total</span>${pill(total, 'bg-danger')}
+           </div>
+           <div class="px-3 pb-2 small text-muted">Updated ${new Date().toLocaleTimeString()}</div>`;
+
+  document.getElementById('notifBody').innerHTML = html;
+  const badge = document.getElementById('notifBadge');
+  badge.textContent = total;
+  badge.classList.toggle('d-none', total === 0);
+}
+
+document.getElementById('notifDropdown').addEventListener('show.bs.dropdown', loadNotifications);
+window.addEventListener('message', (e) => {
+  if (e.origin === window.location.origin && e.data && e.data.type === 'notif-refresh') loadNotifications();
+});
+loadNotifications();
+setInterval(loadNotifications, 60000);

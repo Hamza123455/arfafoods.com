@@ -141,6 +141,13 @@ body {
         background: rgba(0,0,0,.35);
         z-index: 1030;
       }
+      #notifDropdown + .dropdown-menu {
+        position: fixed !important;
+        inset: 56px 8px auto 8px !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+      }
       .content { margin-left: 0; padding: 12px; }
       .content h1.display-5 { font-size: 2rem; }
     }
