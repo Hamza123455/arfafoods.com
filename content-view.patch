@@ -1,0 +1,175 @@
+diff --git a/dashboard/dashboard.css b/dashboard/dashboard.css
+index 97634f4..ff44606 100644
+--- a/dashboard/dashboard.css
++++ b/dashboard/dashboard.css
+@@ -116,4 +116,31 @@
+     }
+     .bg-light-blue {
+       background-color: #F1F8FF;
+-    }
+\ No newline at end of file
++    }
++    .sidebar-backdrop { display: none; }
++    @media (max-width: 767.98px) {
++      .navbar-custom .container-fluid { flex-wrap: nowrap; }
++      .navbar-custom .container-fluid > div:first-child { min-width: 0; flex: 1 1 auto; }
++      .navbar-custom .container-fluid > div:last-child { flex-shrink: 0; }
++      .brand-title { font-size: 14px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
++      .unit-label { display: none; }
++      .nav-select { max-width: 105px; min-width: 0; font-size: 12px; margin-left: 8px; }
++      .sidebar {
++        top: 56px;
++        height: calc(100vh - 56px);
++        width: 260px;
++        z-index: 1035;
++        transform: translateX(-100%);
++        transition: transform .25s ease;
++      }
++      .sidebar.sidebar-open { transform: translateX(0); box-shadow: 4px 0 12px rgba(0,0,0,.2); }
++      .sidebar-backdrop.show {
++        display: block;
++        position: fixed;
++        top: 56px; left: 0; right: 0; bottom: 0;
++        background: rgba(0,0,0,.35);
++        z-index: 1030;
++      }
++      .content { margin-left: 0; padding: 12px; }
++      .content h1.display-5 { font-size: 2rem; }
++    }
+diff --git a/dashboard/dashboard.html b/dashboard/dashboard.html
+index e1cee17..1af2fa0 100644
+--- a/dashboard/dashboard.html
++++ b/dashboard/dashboard.html
+@@ -15,14 +15,14 @@
+ <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+   <div class="container-fluid d-flex align-items-center justify-content-between">
+     <div class="d-flex align-items-center">
+-      <button class="btn btn-primary me-3" type="button">☰</button>
++      <button class="btn btn-primary me-3" type="button" id="sidebarToggle">☰</button>
+       <span class="brand-title">Arfa Foods and Spices</span>
+       <span class="unit-label">Arfa - Top Unit</span>
+-      <select onchange="if (this.value) window.location.href = this.value;">
+-        <option value = "../dashboard/dashbaord">Management System (ver. 1.2)</option>
++      <select class="nav-select" onchange="if (this.value) window.location.href = this.value;">
++        <option value = "../dashboard/dashboard">Management System (ver. 1.2)</option>
+         <option value = "../coldstore/csms">Cold Store (ver. 1.2)</option>
+       </select>
+-      <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
++      <a class="text-white ms-3 d-none d-md-inline" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+     </div>
+     <div class="d-flex align-items-center">
+       <a class="text-white position-relative me-3" href="#">
+@@ -30,12 +30,13 @@
+         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+       </a>
+       <img src="../userknown.jpg" class="user-img me-2" />
+-      <span class="text-white me-2">Unknown</span>
+-      <i class="bi bi-three-dots-vertical text-white"></i>
++      <span class="text-white me-2 d-none d-md-inline">Unknown</span>
++      <i class="bi bi-three-dots-vertical text-white d-none d-md-inline"></i>
+     </div>
+   </div>
+ </nav>
+-<div class="sidebar">
++<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
++<div class="sidebar" id="sidebar">
+  <div class="input-group quick-search mb-3">
+     <input type="text" class="form-control" id="quickSearch" placeholder="Quick search">
+     <button class="btn btn-clear" type="button" id="clearSearch"><i class="bi bi-x"></i></button>
+@@ -64,7 +65,7 @@
+   <div id="vouchers" class="accordion-collapse collapse">
+     <div class="accordion-body">
+       <ul class="list-unstyled mb-0">
+-        <li><a href="../employees-data/cashpaymentvoucher" class="text-decoration-none text-dark">Advance Payment Voucher</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../employees-data/cashpaymentvoucher'); return false;" class="text-decoration-none text-dark">Advance Payment Voucher</a></li>
+       </ul>
+     </div>
+    </div>
+@@ -76,12 +77,12 @@
+   <div id="reports" class="accordion-collapse collapse">
+     <div class="accordion-body">
+       <ul class="list-unstyled mb-0">
+-        <li><a href="../productions/productionsummary" class="text-decoration-none text-dark">Production Summary</a></li>
+-        <li><a href="../sales summary/salessummary" class="text-decoration-none text-dark">Sales Summary</a></li>
+-        <li><a href="../purchasesummary" class="text-decoration-none text-dark">Purchase Summary</a></li>
+-        <li><a href="../employees-data/leaveform/leaveform" class="text-decoration-none text-dark">Leaveform</a></li>
+-        <li><a href="../barcode_printing/barcodev1.3" class="text-decoration-none text-dark">Barcode</a></li>
+-        <li><a href="../downloadable-files/vehdata" class="text-decoration-none text-dark">Download Vehicle's Cards</a></li>
++        <li><a href="../productions/productionsummary" target="_blank" rel="noopener" class="text-decoration-none text-dark">Production Summary</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../sales summary/salessummary'); return false;" class="text-decoration-none text-dark">Sales Summary</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../puchase/purchasesummary'); return false;" class="text-decoration-none text-dark">Purchase Summary</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../employees-data/leaveform/leaveform'); return false;" class="text-decoration-none text-dark">Leaveform</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../barcode_printing/barcodev1.3'); return false;" class="text-decoration-none text-dark">Barcode</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../downloadable-files/vehdata'); return false;" class="text-decoration-none text-dark">Download Vehicle's Cards</a></li>
+         <li><a href="../barcode_printing/brcddataindex" class="text-decoration-none text-dark">Barcode Data</a></li>
+       </ul>
+     </div>
+@@ -99,7 +100,7 @@
+         <li><a href="facebook-login.html12345" class="text-decoration-none text-dark">Import Data</a></li>
+       </ul>
+       <ul class="list-unstyled mb-2">
+-        <li><a href="../spicesinventory/spicestock" class="text-decoration-none text-dark">SpicesInventory</a></li>
++        <li><a href="#" onclick="setActiveLink(this); loadPage('../spicesinventory/spicestock'); return false;" class="text-decoration-none text-dark">SpicesInventory</a></li>
+       </ul>
+       <li>
+         <a href="#erp" 
+@@ -113,8 +114,8 @@
+         </a>
+         <div id="erp" class="collapse mt-2 ps-3 border-start">
+           <ul class="list-unstyled mb-0">
+-            <li class="mb-1"><a href="../erp/erpassistant" class="text-decoration-none text-muted">ERP Assistant Code</a></li>
+-            <li><a href="../erp/evidatt" class="text-decoration-none text-muted">Evid. Attachment</a></li>
++            <li class="mb-1"><a href="#" onclick="setActiveLink(this); loadPage('../erp/erpassistant'); return false;" class="text-decoration-none text-muted">ERP Assistant Code</a></li>
++            <li><a href="#" onclick="setActiveLink(this); loadPage('../erp/evidatt'); return false;" class="text-decoration-none text-muted">Evid. Attachment</a></li>
+           </ul>
+         </div>
+       </li>
+@@ -125,7 +126,7 @@
+      <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#access">Access Control</button></h2><div id="access" class="accordion-collapse collapse"><div class="accordion-body">User Roles</div></div></div>
+   </div>  
+ </div>
+-<div class="content">
++<div class="content" id="mainContent">
+   <h1 class="text-center heading-purple display-5 mt-3">Arfa Foods and Spices</h1>
+   <div class="text-center my-4">
+     <button class="btn btn-voucher btn-lg">Manage Vouchers</button>
+diff --git a/dashboard/dashboard.js b/dashboard/dashboard.js
+index 7ed459b..efe440b 100644
+--- a/dashboard/dashboard.js
++++ b/dashboard/dashboard.js
+@@ -1,3 +1,16 @@
++function loadPage(url) {
++  const main = document.getElementById('mainContent');
++  main.innerHTML = '';
++  main.classList.add('p-0');
++  const iframe = document.createElement('iframe');
++  iframe.src = url;
++  iframe.className = 'content-frame';
++  main.appendChild(iframe);
++}
++function setActiveLink(el) {
++  document.querySelectorAll('.sidebar .accordion-body a').forEach(a => a.classList.remove('active-link'));
++  el.classList.add('active-link');
++}
+     document.getElementById('quickSearch').addEventListener('input', (e) => {
+     const term = e.target.value.trim().toLowerCase();
+     document.querySelectorAll('.sidebar .accordion-item').forEach(item => {
+@@ -21,4 +34,16 @@
+       const input = document.getElementById('quickSearch');
+       input.value = '';
+       input.dispatchEvent(new Event('input'));
+-    });
+\ No newline at end of file
++    });
++function setSidebar(open) {
++  document.getElementById('sidebar').classList.toggle('sidebar-open', open);
++  document.getElementById('sidebarBackdrop').classList.toggle('show', open);
++}
++document.getElementById('sidebarToggle').addEventListener('click', () => {
++  setSidebar(!document.getElementById('sidebar').classList.contains('sidebar-open'));
++});
++document.getElementById('sidebarBackdrop').addEventListener('click', () => setSidebar(false));
++document.getElementById('sidebar').addEventListener('click', (e) => {
++  const a = e.target.closest('.accordion-body a');
++  if (a && a.getAttribute('href') !== '#erp' && window.innerWidth < 768) setSidebar(false);
++});

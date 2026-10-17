@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,14 +13,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
   <div class="container-fluid d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center">
-      <button class="btn btn-primary me-3" type="button">☰</button>
+      <button class="btn btn-primary me-3" type="button" id="sidebarToggle">☰</button>
       <span class="brand-title">Arfa Foods and Spices</span>
       <span class="unit-label">Arfa - Top Unit</span>
-      <select onchange="if (this.value) window.location.href = this.value;">
-        <option value = "../dashboard/dashbaord">Management System (ver. 1.1)</option>
-        <option value = "../coldstore/csms">Cold Store (ver. 1.1)</option>
+      <select class="nav-select" onchange="if (this.value) window.location.href = this.value;">
+        <option value = "../dashboard/dashboard" data-app="managementSystem">Management System</option>
       </select>
-      <a class="text-white ms-3" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+      <a class="text-white ms-3 d-none d-md-inline" href="dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
     </div>
     <div class="d-flex align-items-center">
       <a class="text-white position-relative me-3" href="#">
@@ -30,12 +27,13 @@
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
       </a>
       <img src="../userknown.jpg" class="user-img me-2" />
-      <span class="text-white me-2">Unknown</span>
-      <i class="bi bi-three-dots-vertical text-white"></i>
+      <span class="text-white me-2 d-none d-md-inline">Unknown</span>
+      <i class="bi bi-three-dots-vertical text-white d-none d-md-inline"></i>
     </div>
   </div>
 </nav>
-<div class="sidebar">
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="sidebar" id="sidebar">
  <div class="input-group quick-search mb-3">
     <input type="text" class="form-control" id="quickSearch" placeholder="Quick search">
     <button class="btn btn-clear" type="button" id="clearSearch"><i class="bi bi-x"></i></button>
@@ -64,7 +62,7 @@
   <div id="vouchers" class="accordion-collapse collapse">
     <div class="accordion-body">
       <ul class="list-unstyled mb-0">
-        <li><a href="../employees-data/cashpaymentvoucher" class="text-decoration-none text-dark">Advance Payment Voucher</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../employees-data/cashpaymentvoucher'); return false;" class="text-decoration-none text-dark">Advance Payment Voucher</a></li>
       </ul>
     </div>
    </div>
@@ -76,13 +74,32 @@
   <div id="reports" class="accordion-collapse collapse">
     <div class="accordion-body">
       <ul class="list-unstyled mb-0">
-        <li><a href="../productions/productionsummary" class="text-decoration-none text-dark">Production Summary</a></li>
-        <li><a href="../sales summary/salessummary" class="text-decoration-none text-dark">Sales Summary</a></li>
-        <li><a href="../purchasesummary" class="text-decoration-none text-dark">Purchase Summary</a></li>
-        <li><a href="../employees-data/leaveform/leaveform" class="text-decoration-none text-dark">Leaveform</a></li>
-        <li><a href="../barcode_printing/barcodev1.3" class="text-decoration-none text-dark">Barcode</a></li>
-        <li><a href="../downloadable-files/vehdata" class="text-decoration-none text-dark">Download Vehicle's Cards</a></li>
-        <li><a href="../barcode_printing/brcddataindex" class="text-decoration-none text-dark">Barcode Data</a></li>
+        <li><a href="../productions/productionsummary" target="_blank" rel="noopener" class="text-decoration-none text-dark">Production Summary</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../sales summary/salessummary'); return false;" class="text-decoration-none text-dark">Sales Summary</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../puchase/purchasesummary'); return false;" class="text-decoration-none text-dark">Purchase Summary</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../employees-data/leaveform/leaveform'); return false;" class="text-decoration-none text-dark">Leaveform</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../barcode_printing/barcodev1.3'); return false;" class="text-decoration-none text-dark">Barcode</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../downloadable-files/vehdata'); return false;" class="text-decoration-none text-dark">Download Vehicle's Cards</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../barcode_printing/barcodev1.3'); return false;" class="text-decoration-none text-dark">Barcode Data</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#coldstore">
+      Cold Store
+    </button>
+  </h2>
+  <div id="coldstore" class="accordion-collapse collapse">
+    <div class="accordion-body">
+      <ul class="list-unstyled mb-0">
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../coldstore/receipts/rcptc'); return false;" class="text-decoration-none text-dark">Advance Receipt Voucher</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../coldstore/reports/by-store/b-loc'); return false;" class="text-decoration-none text-dark">Report: By Cold Store</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../coldstore/reports/by-item/b-i'); return false;" class="text-decoration-none text-dark">Report: By Item</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../coldstore/reports/by-vendour/b-vndr'); return false;" class="text-decoration-none text-dark">Report: By Vendor</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../coldstore/reports/by-receipt/b-rcpt'); return false;" class="text-decoration-none text-dark">Report: By Receipt No</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../coldstore/addnew/addnew'); return false;" class="text-decoration-none text-dark">Add New</a></li>
       </ul>
     </div>
   </div>
@@ -99,7 +116,7 @@
         <li><a href="facebook-login.html12345" class="text-decoration-none text-dark">Import Data</a></li>
       </ul>
       <ul class="list-unstyled mb-2">
-        <li><a href="../spicesinventory/spicestock" class="text-decoration-none text-dark">SpicesInventory</a></li>
+        <li><a href="#" onclick="setActiveLink(this); loadPage('../spicesinventory/spicestock'); return false;" class="text-decoration-none text-dark">SpicesInventory</a></li>
       </ul>
       <li>
         <a href="#erp" 
@@ -113,8 +130,8 @@
         </a>
         <div id="erp" class="collapse mt-2 ps-3 border-start">
           <ul class="list-unstyled mb-0">
-            <li class="mb-1"><a href="../erp/erpassistant" class="text-decoration-none text-muted">ERP Assistant Code</a></li>
-            <li><a href="../erp/evidatt" class="text-decoration-none text-muted">Evid. Attachment</a></li>
+            <li class="mb-1"><a href="#" onclick="setActiveLink(this); loadPage('../erp/erpassistant'); return false;" class="text-decoration-none text-muted">ERP Assistant Code</a></li>
+            <li><a href="#" onclick="setActiveLink(this); loadPage('../erp/evidatt'); return false;" class="text-decoration-none text-muted">Evid. Attachment</a></li>
           </ul>
         </div>
       </li>
@@ -125,7 +142,7 @@
      <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#access">Access Control</button></h2><div id="access" class="accordion-collapse collapse"><div class="accordion-body">User Roles</div></div></div>
   </div>  
 </div>
-<div class="content">
+<div class="content" id="mainContent">
   <h1 class="text-center heading-purple display-5 mt-3">Arfa Foods and Spices</h1>
   <div class="text-center my-4">
     <button class="btn btn-voucher btn-lg">Manage Vouchers</button>
@@ -137,6 +154,7 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../version.js"></script>
 <script src="../log/activity-log.js"></script>
 <script src="dashboard.js"></script>
 </body>

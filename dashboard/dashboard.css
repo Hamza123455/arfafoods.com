@@ -1,4 +1,4 @@
-        body {
+body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
     }
@@ -116,4 +116,31 @@
     }
     .bg-light-blue {
       background-color: #F1F8FF;
+    }
+    .sidebar-backdrop { display: none; }
+    @media (max-width: 767.98px) {
+      .navbar-custom .container-fluid { flex-wrap: nowrap; }
+      .navbar-custom .container-fluid > div:first-child { min-width: 0; flex: 1 1 auto; }
+      .navbar-custom .container-fluid > div:last-child { flex-shrink: 0; }
+      .brand-title { font-size: 14px; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+      .unit-label { display: none; }
+      .nav-select { max-width: 105px; min-width: 0; font-size: 12px; margin-left: 8px; }
+      .sidebar {
+        top: 56px;
+        height: calc(100vh - 56px);
+        width: 260px;
+        z-index: 1035;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+      }
+      .sidebar.sidebar-open { transform: translateX(0); box-shadow: 4px 0 12px rgba(0,0,0,.2); }
+      .sidebar-backdrop.show {
+        display: block;
+        position: fixed;
+        top: 56px; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,.35);
+        z-index: 1030;
+      }
+      .content { margin-left: 0; padding: 12px; }
+      .content h1.display-5 { font-size: 2rem; }
     }

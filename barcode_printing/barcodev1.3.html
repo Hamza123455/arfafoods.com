@@ -8,10 +8,33 @@
       <link rel="stylesheet" href="barcode.css">
   </head>
   <body>
-        <input type="text" id="searchInput" placeholder="Type item name..." autocomplete="on">
+  <div class="page">
+    <h1 class="page-title">Barcode Printing</h1>
+ 
+    <div class="status-banner">
+      <span class="status-left" id="statusText"><span class="dot pending" id="statusDot"></span>Loading items...</span>
+      <button class="btn-ghost" id="refreshButton">&#8635; Refresh</button>
+    </div>
+ 
+    <div class="panel">
+      <div class="panel-header">Search &amp; Print</div>
+      <div class="panel-body">
+        <label for="searchInput">Item Name</label>
+        <input type="text" id="searchInput" placeholder="Type item name..." autocomplete="off">
         <div id="itemList"></div>
-        <button id="printButton" style="display: none;">Print</button>
-        <div id="results"></div>
+        <div class="actions-row">
+          <button id="printButton">Print</button>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="panel">
+      <div class="panel-header">Label Preview</div>
+      <div class="panel-body">
+        <div id="results"><span class="empty-note">Search for an item above to generate a label.</span></div>
+      </div>
+    </div>
+  </div>
         <script src="barcode.js"></script>
         <script src="activity-log.js"></script>
   </body>

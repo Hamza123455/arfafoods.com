@@ -1,4 +1,4 @@
-  :root{
+      :root{
     --blue-700:#0c5f92;
     --blue-600:#0f7ec2;
     --blue-500:#1c8fd6;
@@ -28,6 +28,8 @@
   .panel-left{
     flex:1;
     background:#fff;
+    position:relative;      /* added so version text can be positioned */
+    padding:16px;           /* added for spacing of version text */
   }
   .panel-right{
     width:44%;
@@ -83,6 +85,17 @@
   }
   .signin-btn:active{
     transform:scale(0.98);
+  }
+
+  /* NEW: version text style */
+  .version-text{
+    position:absolute;
+    bottom:12px;
+    right:16px;
+    font-size:11.5px;
+    color:#8a9aa8;
+    letter-spacing:0.3px;
+    user-select:none;
   }
 
   @media (max-width:560px){
