@@ -20,7 +20,7 @@ let receipts = [];
   }
   async function apiGet(action) {
     const cfg = getConfig();
-    const res = await fetch(`${cfg.url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
+    const res = await fetch(`${cfg.url}?module=coldstore&action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     return data;

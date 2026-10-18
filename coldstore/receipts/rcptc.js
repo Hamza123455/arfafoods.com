@@ -84,14 +84,14 @@ let receipts = [];
   });
   async function apiGet(action) {
     const cfg = getConfig();
-    const res = await fetch(`${cfg.url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
+    const res = await fetch(`${cfg.url}?module=coldstore&action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     return data;
   }
   async function apiPost(body) {
     const cfg = getConfig();
-    const res = await fetch(cfg.url, {
+    const res = await fetch(cfg.url + '?module=coldstore', {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' }, 
       body: JSON.stringify({ ...body, key: cfg.key })
