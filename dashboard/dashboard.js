@@ -172,14 +172,28 @@ async function coldGet(action) {
   return data;
 }
 
+let coldLastError = '';
+
+// Turns a technical failure into a sentence that says what to fix.
+function describeColdError(err) {
+  const m = String(err && err.message ? err.message : err);
+  if (m === 'Unauthorized') return 'Unauthorized - the key does not match "Cold Store Key" in the Settings tab (or that cell is empty).';
+  if (m === 'Not connected') return 'enter both the URL and the key.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'cannot reach the URL - check it is the /exec link and access is set to Anyone.';
+  if (/JSON|Unexpected token|<!DOCTYPE/i.test(m)) return 'the URL did not return data - check it ends in /exec and the deployment has the latest version.';
+  return m;
+}
+
 async function checkColdConnection() {
   const dot = document.getElementById('connStatusDot');
   try {
     await coldGet('settings');
     dot.style.background = '#28a745';
+    coldLastError = '';
     return true;
   } catch (err) {
     dot.style.background = '#dc3545';
+    coldLastError = describeColdError(err);
     return false;
   }
 }
@@ -207,7 +221,7 @@ document.getElementById('mgmtSaveConnBtn').addEventListener('click', async () =>
   statusEl.textContent = 'Testing connection...';
   statusEl.className = 'small text-muted';
   const ok = await checkColdConnection();
-  statusEl.textContent = ok ? 'Connected successfully.' : 'Could not connect - check the URL and key.';
+  statusEl.textContent = ok ? 'Connected successfully.' : 'Could not connect: ' + coldLastError;
   statusEl.className = 'small ' + (ok ? 'text-success' : 'text-danger');
   if (ok) {
     loadNotifications();
