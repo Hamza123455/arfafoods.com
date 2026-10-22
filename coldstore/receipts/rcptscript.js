@@ -1,4 +1,4 @@
- let receipts = [];
+let receipts = [];
   let currentLookups = { items: [], vendours: [], coldStores: [] };
   let autoRefreshTimer = null;
   let printModalInstance = null;
@@ -34,7 +34,7 @@
   document.getElementById('saveConfigBtn').addEventListener('click', () => {
     const url = document.getElementById('webAppUrl').value.trim();
     const key = document.getElementById('secretKey').value.trim();
-    if (!url || !key) { alert('Please enter both the Web App URL and the Secret Key.'); return; }
+    if (!url || !key) { uiToast('Please enter both the Web App URL and the Secret Key.', 'warning'); return; }
     localStorage.setItem('coldstore_webapp_url', url);
     localStorage.setItem('coldstore_secret_key', key);
     configPanel.classList.add('d-none');
@@ -100,14 +100,14 @@
   });
   async function apiGet(action) {
     const cfg = getConfig();
-    const res = await fetch(`${cfg.url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
+    const res = await fetch(`${cfg.url}?module=coldstore&action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     return data;
   }
   async function apiPost(body) {
     const cfg = getConfig();
-    const res = await fetch(cfg.url, {
+    const res = await fetch(cfg.url + '?module=coldstore', {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight on Apps Script
       body: JSON.stringify({ ...body, key: cfg.key })
@@ -139,7 +139,7 @@
       updateBalanceHint();
     } catch (err) {
       setStatus('off', 'Connection failed');
-      alert('Could not connect: ' + err.message + '\n\nCheck the Web App URL and Secret Key match your Apps Script deployment.');
+      uiToast('Could not connect: ' + err.message + ' - check the Web App URL and Secret Key match your Apps Script deployment.', 'error');
     }
   }
   document.getElementById('refreshBtn').addEventListener('click', connectAndLoad);
@@ -348,7 +348,7 @@ document.getElementById('receiptNo').addEventListener('blur', () => {
   };
   document.getElementById('saveEditBtn').addEventListener('click', async () => {
     const pwd = document.getElementById('editAdminPassword').value;
-    if (!pwd) { alert('Enter the admin password to save changes.'); return; }
+    if (!pwd) { uiToast('Enter the admin password to save changes.', 'warning'); return; }
     const txnType = document.getElementById('editTxnType').value;
     const qty = parseFloat(document.getElementById('editQty').value) || 0;
     const weight = parseFloat(document.getElementById('editWeight').value) || 0;
@@ -377,22 +377,25 @@ document.getElementById('receiptNo').addEventListener('blur', () => {
       editModalInstance.hide();
       await connectAndLoad();
     } catch (err) {
-      alert('Could not save changes: ' + err.message);
+      uiToast('Could not save changes: ' + err.message, 'error');
     } finally {
       btn.disabled = false;
     }
   });
   window.deleteRow = async function(index) {
     const r = receipts[index];
-    const pwd = prompt(`Enter admin password to delete Receipt No "${r['Receipt No']}" (${r['Item Name']} @ ${r['Cold Store']}):`);
+    const pwd = await uiAskPassword({
+      title: 'Delete Receipt',
+      message: `Delete Receipt No "${r['Receipt No']}" (${r['Item Name']} @ ${r['Cold Store']})? This permanently deletes this entry. Enter the admin password to confirm.`,
+      okLabel: 'Delete',
+      danger: true
+    });
     if (pwd === null) return;
-    if (!pwd) { alert('Password is required to delete.'); return; }
-    if (!confirm('This permanently deletes this entry. Are you sure?')) return;
     try {
       await apiPost({ action: 'delete', admin: pwd, recipt_id: r.recipt_id });
       await connectAndLoad();
     } catch (err) {
-      alert('Could not delete: ' + err.message);
+      uiToast('Could not delete: ' + err.message, 'error');
     }
   };
   let confirmSaveModalInstance = null;
@@ -429,15 +432,15 @@ document.getElementById('receiptNo').addEventListener('blur', () => {
     const weight = parseFloat(document.getElementById('weight').value) || 0;
     const info = computeBalance(receiptNo);
     if (txnType === 'in' && info) {
-      alert(`Receipt No "${receiptNo}" already has a Stock In entry (${info.item} @ ${info.coldStore}). A receipt no. can only be stocked in once.`);
+      uiToast(`Receipt No "${receiptNo}" already has a Stock In entry (${info.item} @ ${info.coldStore}). A receipt no. can only be stocked in once.`, 'warning');
       return;
     }
     if (txnType === 'out' && !info) {
-      alert(`Receipt No "${receiptNo}" has no Stock In recorded yet. Add the Stock In first.`);
+      uiToast(`Receipt No "${receiptNo}" has no Stock In recorded yet. Add the Stock In first.`, 'warning');
       return;
     }
     if (txnType === 'out' && info && qty > info.balance) {
-      const proceed = confirm(`Only ${info.balance} ${info.unit || ''} remaining for receipt #${receiptNo}. Continue anyway?`);
+      const proceed = await uiConfirm(`Only ${info.balance} ${info.unit || ''} remaining for receipt #${receiptNo}. Continue anyway?`, { title: 'Low balance', okLabel: 'Continue anyway' });
       if (!proceed) return;
     }
     const entry = {
@@ -483,7 +486,7 @@ document.getElementById('receiptNo').addEventListener('blur', () => {
       updateBalanceHint();
       document.getElementById('receiptNo').focus();
     } catch (err) {
-      alert('Could not save: ' + err.message);
+      uiToast('Could not save: ' + err.message, 'error');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-check-circle"></i> Confirm & Save';

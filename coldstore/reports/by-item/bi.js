@@ -23,7 +23,7 @@ const GROUP_FIELD = 'Item Name';
   }
   async function apiGet(action) {
     const cfg = getConfig();
-    const res = await fetch(`${cfg.url}?action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
+    const res = await fetch(`${cfg.url}?module=coldstore&action=${encodeURIComponent(action)}&key=${encodeURIComponent(cfg.key)}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     return data;
@@ -44,7 +44,7 @@ const GROUP_FIELD = 'Item Name';
       renderReport();
     } catch (err) {
       setStatus('off', 'Connection failed');
-      alert('Could not connect: ' + err.message + '\n\nCheck the Web App URL and Secret Key match your Apps Script deployment.');
+      uiToast('Could not connect: ' + err.message + ' - check the Web App URL and Secret Key match your Apps Script deployment.', 'error');
     }
   }
   document.getElementById('refreshBtn').addEventListener('click', connectAndLoad);

@@ -41,7 +41,7 @@ let receipts = [];
       renderReport();
     } catch (err) {
       setStatus('off', 'Connection failed');
-      alert('Could not connect: ' + err.message + '\n\nCheck the Web App URL and Secret Key match your Apps Script deployment.');
+      uiToast('Could not connect: ' + err.message + ' - check the Web App URL and Secret Key match your Apps Script deployment.', 'error');
     }
   }
   document.getElementById('refreshBtn').addEventListener('click', connectAndLoad);

@@ -65,7 +65,7 @@ let currentLookups = { items: [], vendours: [], coldStores: [] };
       updateNameHint();
     } catch (err) {
       setStatus('off', 'Connection failed');
-      alert('Could not connect: ' + err.message);
+      uiToast('Could not connect: ' + err.message, 'error');
     }
   }
   document.getElementById('refreshBtn').addEventListener('click', connectAndLoad);
@@ -127,10 +127,10 @@ let currentLookups = { items: [], vendours: [], coldStores: [] };
 
   document.getElementById('addNewBtn').addEventListener('click', () => {
     const name = document.getElementById('newName').value.trim();
-    if (!name) { alert('Enter a name first.'); return; }
+    if (!name) { uiToast('Enter a name first.', 'warning'); return; }
     const list = currentLookups[selectedType] || [];
     if (list.some(v => String(v).trim().toLowerCase() === name.toLowerCase())) {
-      alert(`"${name}" already exists in the ${TYPE_LABELS[selectedType]} list.`);
+      uiToast(`"${name}" already exists in the ${TYPE_LABELS[selectedType]} list.`, 'warning');
       return;
     }
     document.getElementById('confirmTypeLabel').textContent = TYPE_LABELS[selectedType];
@@ -153,7 +153,7 @@ let currentLookups = { items: [], vendours: [], coldStores: [] };
       document.querySelectorAll('#listTabs .nav-link').forEach(b => b.classList.toggle('active', b.dataset.list === selectedType));
       renderListTab();
     } catch (err) {
-      alert('Could not save: ' + err.message);
+      uiToast('Could not save: ' + err.message, 'error');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-check-circle"></i> Confirm & Save';
