@@ -151,3 +151,71 @@ body {
       .content { margin-left: 0; padding: 12px; }
       .content h1.display-5 { font-size: 2rem; }
     }
+
+    /* ---- top bar styled like the ERP header ---- */
+    .navbar-custom {
+      background: linear-gradient(180deg, #1686ca 0%, #0667a2 100%);
+      box-shadow: 0 2px 6px rgba(0,0,0,.28);
+    }
+    .navbar-custom #sidebarToggle {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      color: #fff;
+      font-size: 30px;
+      line-height: 1;
+      padding: 0 6px;
+      margin-right: 10px !important;
+    }
+    .navbar-custom #sidebarToggle .bi { -webkit-text-stroke: 1.4px #fff; }
+    .navbar-custom #sidebarToggle:hover { background: rgba(255,255,255,.14); border-radius: 6px; }
+    .navbar-custom .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      margin-right: 14px;
+    }
+    .navbar-custom .unit-label,
+    .navbar-custom .nav-select {
+      height: 30px;
+      border: 1px solid rgba(255,255,255,.38);
+      border-radius: 8px;
+      background-color: rgba(255,255,255,.18);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin: 0 8px 0 0;
+    }
+    .navbar-custom .unit-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      white-space: nowrap;
+    }
+    .navbar-custom .nav-select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding: 0 30px 0 12px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 8 11 13 6'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+    }
+    .navbar-custom .nav-select:hover { background-color: rgba(255,255,255,.26); }
+    .navbar-custom .nav-select:focus { outline: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
+    .navbar-custom .nav-select option { color: #212529; background: #fff; font-weight: 400; }
+    .navbar-custom a.text-white { text-decoration: none; }
+    .navbar-custom a.text-white:hover { text-decoration: underline; }
+    .navbar-custom .user-img { border: 0; background: #a1a1a1; }
+    .navbar-custom a[href="dashboard"] { font-size: 13px; font-weight: 600; margin-left: 6px !important; }
+    .navbar-custom .user-img + span { font-size: 13px; font-weight: 500; }
+    @media (max-width: 767.98px) {
+      .navbar-custom #sidebarToggle { margin-right: 4px !important; font-size: 28px; }
+      .navbar-custom .unit-label { display: none; }
+      .navbar-custom .container-fluid { padding-left: 8px; padding-right: 8px; }
+      .navbar-custom .brand-title { font-size: 14px; margin-right: 8px; }
+      .navbar-custom .nav-select { max-width: 112px; font-size: 11.5px; padding: 0 22px 0 8px; margin-right: 8px; background-position: right 7px center; }
+      .navbar-custom .container-fluid > div:last-child > .dropdown,
+      .navbar-custom .container-fluid > div:last-child > a { margin-right: 10px !important; }
+    }
