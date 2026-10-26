@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Arfa Foods</title>
-  <link rel="icon" href="../logo1.0.00.jpg" type="image/jpg">
   <style>
     /* --- Reset & Variables --- */
     * {
@@ -605,6 +604,7 @@
     // --- API ---
     async function proxyGet(action, params) {
       const url = new URL(state.proxyUrl);
+      url.searchParams.set("module", "evid");
       url.searchParams.set("secret", state.secret);
       url.searchParams.set("action", action);
       for (const [k, v] of Object.entries(params || {})) {
@@ -625,7 +625,7 @@
     }
 
     async function proxyUploadNoCors(fields) {
-      const body = new URLSearchParams({ secret: state.secret, action: "upload", ...fields });
+      const body = new URLSearchParams({ module: "evid", secret: state.secret, action: "upload", ...fields });
       try {
         await fetch(state.proxyUrl, {
           method: "POST",
@@ -760,6 +760,7 @@
         mimeType: "image/jpeg",
         endpoint: endpoint || 'SVoucher'
       });
+      return blob;
     }
 
     // --- Sorting ---
@@ -935,10 +936,28 @@
           pickBtn.disabled = true;
           statusSpan.textContent = "Uploading...";
           try {
-            await uploadVoucherImage(v.id, file, v.endpoint);
-            statusSpan.textContent = "✅ Sent — refreshing...";
-            await refresh(true);
-            statusSpan.textContent = "";
+            const sentBlob = await uploadVoucherImage(v.id, file, v.endpoint);
+
+            // No reload: show the picture on this card straight away.
+            const previewUrl = URL.createObjectURL(sentBlob);
+            v.images.push(previewUrl);
+            v.status = "delivered";
+            let grid = el.querySelector(".images-grid");
+            if (!grid) {
+              grid = document.createElement("div");
+              grid.className = "images-grid";
+              el.querySelector(".upload-row").before(grid);
+            }
+            const img = document.createElement("img");
+            img.src = previewUrl;
+            grid.appendChild(img);
+            const badge = el.querySelector(".badge");
+            if (badge) badge.outerHTML = statusBadge("delivered");
+
+            statusSpan.textContent = "✅ Sent";
+            setTimeout(() => { statusSpan.textContent = ""; }, 4000);
+            fileInput.value = "";
+            pickBtn.disabled = false;
           } catch (e) {
             statusSpan.textContent = "";
             errDiv.textContent = e.message;
