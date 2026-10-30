@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sale Order Draft</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#667085;--bd:#d9dde3;--ac:#0b6e4f;--er:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#14171a;--card:#1d2125;--tx:#e8eaed;--mu:#9aa3ad;--bd:#343a40;--ac:#3ab98a;--er:#f97066}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,Segoe UI,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}
+h1{font-size:19px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}
+input{width:100%;padding:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{font-size:12px;color:var(--mu);text-align:left;padding:4px}
+td{padding:3px;vertical-align:top}
+.nm{font-size:12px;color:var(--mu);min-height:16px;padding:2px 4px}
+.nm.bad{color:var(--er)}
+textarea{width:100%;padding:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
+.iw{position:relative}
+.il{position:absolute;left:0;right:0;top:100%;z-index:6;background:var(--card);border:1px solid var(--bd);border-radius:6px;max-height:240px;overflow:auto;min-width:260px}
+.il:empty{display:none}
+#pastemsg{white-space:pre-wrap;font-size:13px}
+button{padding:9px 14px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--tx);font:inherit;cursor:pointer}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button.danger{background:var(--er);border-color:var(--er);color:#fff}
+button:disabled{opacity:.5;cursor:wait}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+#msg{margin-top:10px;font-size:14px}
+.ok{color:var(--ac)}.err{color:var(--er)}
+.num{text-align:right}
+.st-PUSHED{color:var(--ac)}.st-FAILED,.st-CHECK{color:var(--er)}
+.sm{font-size:12px;color:var(--mu);max-width:260px}
+.dt td{border-top:1px solid var(--bd);padding:6px 4px}
+.cw{position:relative}
+#cl{position:absolute;left:0;right:0;top:62px;z-index:5;background:var(--card);border:1px solid var(--bd);border-radius:6px;max-height:220px;overflow:auto}
+#cl:empty{display:none}
+.opt{padding:7px 9px;cursor:pointer}.opt:hover{background:var(--bg)}.opt.mu{color:var(--mu);cursor:default}
+
+/* ---- popup windows (replace the browser's "this page says" boxes) ---- */
+dialog.pop{border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);padding:0;width:min(440px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+dialog.pop::backdrop{background:rgba(0,0,0,.45)}
+.pop-h{padding:14px 16px;font-weight:600;font-size:16px;border-bottom:1px solid var(--bd)}
+.pop-h.danger{color:var(--er)}
+.pop-b{padding:14px 16px}
+.pop-b p{margin:0 0 12px;white-space:pre-wrap}
+.pop-fb{margin-top:8px;font-size:13px;font-weight:600;color:var(--er);min-height:16px}
+.pop-f{padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--bd)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Master data <span style="font-size:12px;font-weight:400;color:var(--mu)">kept in your sheet, so drafts work without the ERP</span></h1>
+    <div class="bar" style="margin-top:0"><span id="stc">Customers: ...</span><button id="syc">Sync customers</button></div>
+    <div class="bar"><span id="sti">Items: ...</span><button id="syi">Sync items</button></div>
+    <div id="smsg"></div>
+  </div>
+
+  <div class="card">
+    <h1>Sale Order Draft <button id="cfg" title="API key">Settings</button></h1>
+    <div class="g">
+      <div><label>Invoice date</label><input id="date" type="date"></div>
+      <div class="cw"><label>Customer (type name or code)</label><input id="cust" autocomplete="off"><div id="cl"></div><div class="nm" id="cinfo"></div></div>
+      <div><label>Reference</label><input id="ref" autocomplete="off"></div>
+      <div><label>Remarks</label><input id="rem" autocomplete="off"></div>
+      <div><label>Vehicle No</label><input id="veh" autocomplete="off"></div>
+      <div><label>Driver Name</label><input id="drv" autocomplete="off"></div>
+      <div><label>Dispatcher Name</label><input id="dsp" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:34%">Item (code or description)</th><th style="width:16%">Qty</th><th style="width:20%">Price (blank = ERP price)</th><th class="num">Total</th><th></th></tr></thead>
+      <tbody id="lines"></tbody>
+    </table>
+    <div class="bar">
+      <button id="add">+ Add line</button>
+      <div><b>Qty:</b> <span id="tq">0</span> &nbsp; <b>Total:</b> <span id="tt">0</span></div>
+    </div>
+    <details style="margin-top:12px"><summary style="cursor:pointer">Paste item codes and qty from Excel</summary>
+      <textarea id="paste" rows="5" style="margin-top:8px" placeholder="Copy from Excel: item code first, qty last (columns in between, like description, are ignored)"></textarea>
+      <div class="bar"><button id="pasteAdd">Add pasted lines</button><span id="pastemsg"></span></div>
+    </details>
+  </div>
+
+  <div class="bar">
+    <button class="p" id="save">Save draft to sheet</button>
+    <span style="color:var(--mu);font-size:13px">Drafts are pushed to the ERP later from the sheet's ERP menu.</span>
+  </div>
+  <div id="msg"></div>
+
+  <div class="card" style="margin-top:16px">
+    <h1>Saved drafts <button id="rf">Refresh</button></h1>
+    <div style="overflow-x:auto">
+    <table class="dt">
+      <thead><tr><th><input type="checkbox" id="dall" title="Select all"></th><th>Draft</th><th>Date</th><th>Customer</th><th>Lines / Qty</th><th>Status</th><th>Message</th></tr></thead>
+      <tbody id="dbody"></tbody>
+    </table></div>
+    <div class="bar">
+      <span><button class="p" id="pushSel">Push selected to ERP</button> <button id="dry">Dry run</button></span>
+      <span style="color:var(--mu);font-size:13px">Only DRAFT and FAILED orders can be pushed.</span>
+    </div>
+    <div id="pmsg"></div>
+  </div>
+</div>
+
+<script src="../backend-config.js"></script>
+<script>
+// ---- Connection: the server address is saved once per device by the dashboard's connection icon;
+// ---- the API key is typed once in the popup below and kept only in this browser.
+var LS = { key: 'sod_key' };
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k) || ''; localStorage.setItem(k, v); } catch (e) { return ''; } }
+function $(id) { return document.getElementById(id); }
+function backendUrl() { return window.ARFA_BACKEND_URL ? window.ARFA_BACKEND_URL + '?module=saleorder' : ''; }
+var NOT_CONNECTED = 'Not connected - use the connection icon on the dashboard first.';
+
+// ---- Popup windows ----
+// Builds a <dialog>; resolves with the typed text (askPassword), true/false (confirm), after it has fully closed.
+function openPopup(o) {
+  return new Promise(function (resolve) {
+    var d = document.createElement('dialog');
+    d.className = 'pop';
+    d.innerHTML =
+      '<form method="dialog">' +
+        '<div class="pop-h' + (o.danger ? ' danger' : '') + '"></div>' +
+        '<div class="pop-b"><p></p>' + (o.password ? '<input type="password" autocomplete="off" placeholder="required"><div class="pop-fb"></div>' : '') + '</div>' +
+        '<div class="pop-f"><button type="button" class="pc">Cancel</button><button type="submit" class="' + (o.danger ? 'danger' : 'p') + ' pk"></button></div>' +
+      '</form>';
+    d.querySelector('.pop-h').textContent = o.title || '';
+    d.querySelector('.pop-b p').textContent = o.message || '';
+    d.querySelector('.pk').textContent = o.okLabel || 'OK';
+    var input = d.querySelector('input'), fb = d.querySelector('.pop-fb');
+    var result = o.password ? null : false;
+    d.querySelector('.pc').onclick = function () { d.close(); };
+    d.querySelector('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (o.password) {
+        if (!input.value) { fb.textContent = 'Enter the API key.'; input.focus(); return; }
+        result = input.value;
+      } else { result = true; }
+      d.close();
+    });
+    d.addEventListener('close', function () { d.remove(); resolve(result); });   // Esc / Cancel keep the default result
+    document.body.appendChild(d);
+    d.showModal();
+    if (input) input.focus();
+  });
+}
+function popConfirm(message, o) {
+  o = o || {};
+  return openPopup({ title: o.title || 'Please confirm', message: message, okLabel: o.okLabel || 'OK', danger: !!o.danger });
+}
+var keyPopupOpen = false;
+function askKey() {
+  if (keyPopupOpen) return Promise.resolve(null);
+  if (!window.ARFA_BACKEND_URL) { show(NOT_CONNECTED, 'err'); return Promise.resolve(null); }
+  keyPopupOpen = true;
+  return openPopup({
+    title: 'Sale Order API key',
+    message: store(LS.key) ? 'A key is saved on this device. Enter a new one to replace it.' : 'Enter the Sale Order API key (the "Sale Order API Key" row in the Settings tab of the sheet). It is saved only on this device.',
+    okLabel: 'Save', password: true
+  }).then(function (k) {
+    keyPopupOpen = false;
+    if (k) { store(LS.key, k.trim()); show('API key saved on this device.', 'ok'); start(); }
+    return k;
+  });
+}
+$('cfg').onclick = function () { askKey(); };
+
+// ---- Lines ----
+function addLine() {
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><div class="iw"><input class="code" autocomplete="off" placeholder="Code or description"><div class="il"></div></div><div class="nm"></div></td>' +
+    '<td><input class="qty" type="number" min="0" step="any" inputmode="decimal"></td>' +
+    '<td><input class="price" type="number" min="0" step="any" inputmode="decimal"></td>' +
+    '<td class="num tot">0</td><td><button class="del" title="Remove">&times;</button></td>';
+  $('lines').appendChild(tr);
+  var code = tr.querySelector('.code'), price = tr.querySelector('.price');
+  code.addEventListener('change', function () { lookup(tr); });
+  attachItemSearch(tr);
+  tr.addEventListener('input', totals);
+  tr.querySelector('.del').onclick = function () { tr.remove(); if (!$('lines').children.length) addLine(); totals(); };
+  return tr;
+}
+
+function totals() {
+  var q = 0, t = 0;
+  Array.prototype.forEach.call($('lines').children, function (tr) {
+    var qty = parseFloat(tr.querySelector('.qty').value) || 0;
+    var p = tr.querySelector('.price').value;
+    var price = p !== '' ? parseFloat(p) : (parseFloat(tr._price) || 0);
+    var line = qty * price;
+    tr.querySelector('.tot').textContent = line ? line.toFixed(2) : '0';
+    q += qty; t += line;
+  });
+  $('tq').textContent = q; $('tt').textContent = t.toFixed(2);
+}
+
+// ---- Server calls (no custom headers => no CORS preflight) ----
+function call(payload) {
+  var url = backendUrl(), key = store(LS.key);
+  if (!url) return Promise.reject(new Error(NOT_CONNECTED));
+  if (!key) { askKey(); return Promise.reject(new Error('Enter the API key in the popup first.')); }
+  payload.key = key;
+  return fetch(url, { method: 'POST', body: JSON.stringify(payload) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (!j.ok) throw new Error(j.error || 'Request failed'); return j; });
+}
+
+function lookup(tr) {
+  var code = tr.querySelector('.code').value.trim(), nm = tr.querySelector('.nm');
+  tr._price = 0; nm.className = 'nm'; nm.textContent = '';
+  if (!code) return;
+  nm.textContent = 'Checking...';
+  call({ action: 'lookupItem', code: code }).then(function (j) {
+    nm.textContent = j.name + ' - ' + j.price;
+    tr._price = j.price;
+    tr.querySelector('.price').placeholder = j.price;
+    totals();
+  }).catch(function (e) { nm.className = 'nm bad'; nm.textContent = e.message; });
+}
+
+function show(text, cls) { $('msg').className = cls; $('msg').textContent = text; }
+
+$('save').onclick = async function () {
+  var lines = [];
+  Array.prototype.forEach.call($('lines').children, function (tr) {
+    var code = tr.querySelector('.code').value.trim(), qty = tr.querySelector('.qty').value;
+    if (!code && !qty) return;
+    lines.push({ itemCode: code, qty: qty, price: tr.querySelector('.price').value });
+  });
+  if (!$('cust').value.trim()) return show('Enter the customer code.', 'err');
+  if (!lines.length) return show('Add at least one item line.', 'err');
+  if (document.querySelector('.nm.bad') &&
+      !(await popConfirm('Some item codes were not found in the synced items. Save anyway?', { title: 'Item codes not found', okLabel: 'Save anyway' }))) return;
+
+  var btn = $('save'); btn.disabled = true; show('Saving...', '');
+  call({ date: $('date').value, customerCode: selCode || $('cust').value.trim(), reference: $('ref').value.trim(), remarks: $('rem').value.trim(),
+    vehicleNo: $('veh').value.trim(), driverName: $('drv').value.trim(), dispatcherName: $('dsp').value.trim(), lines: lines })
+    .then(function (j) {
+      show('Saved as ' + j.draftId + ' (' + j.lines + ' line' + (j.lines > 1 ? 's' : '') + ').', 'ok');
+      reset(); loadDrafts();
+    })
+    .catch(function (e) { show(e.message, 'err'); })
+    .then(function () { btn.disabled = false; });
+};
+
+function reset() {
+  $('cust').value = ''; $('ref').value = ''; $('rem').value = ''; $('veh').value = ''; $('drv').value = ''; $('dsp').value = ''; selCode = ''; $('cinfo').textContent = ''; $('cl').innerHTML = '';
+  $('lines').innerHTML = ''; addLine(); totals();
+}
+
+// ---- Customer type-ahead ----
+var selCode = '', cTimer, cSeq = 0;
+function opt(text, cls) { var d = document.createElement('div'); d.className = 'opt ' + (cls || ''); d.textContent = text; return d; }
+$('cust').addEventListener('input', function () {
+  selCode = ''; $('cinfo').textContent = ''; clearTimeout(cTimer);
+  var q = this.value.trim(), cl = $('cl'), my = ++cSeq;
+  cl.innerHTML = '';
+  if (q.length < 2) return;
+  cTimer = setTimeout(function () {
+    cl.appendChild(opt('Searching...', 'mu'));
+    call({ action: 'searchCustomers', q: q }).then(function (j) {
+      if (my !== cSeq) return;
+      cl.innerHTML = '';
+      if (!j.customers.length) { cl.appendChild(opt('No match', 'mu')); return; }
+      j.customers.forEach(function (c) {
+        var d = opt(c.name + '  (' + c.code + ')');
+        d.onclick = function () { selCode = c.code; $('cust').value = c.name; $('cinfo').textContent = 'Code: ' + c.code; cl.innerHTML = ''; };
+        cl.appendChild(d);
+      });
+    }).catch(function (e) { if (my !== cSeq) return; cl.innerHTML = ''; var d = opt(e.message, 'mu'); d.style.color = 'var(--er)'; cl.appendChild(d); });
+  }, 300);
+});
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('.cw')) $('cl').innerHTML = '';
+  if (!e.target.closest('.iw')) Array.prototype.forEach.call(document.querySelectorAll('.il'), function (l) { l.innerHTML = ''; });
+});
+
+// ---- Drafts panel: list + push ----
+function ready() { return backendUrl() && store(LS.key); }
+function showP(t, c) { $('pmsg').className = c || ''; $('pmsg').textContent = t; }
+function cell(text, cls) { var td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; return td; }
+
+function loadDrafts() {
+  if (!ready()) return Promise.resolve();
+  return call({ action: 'listDrafts' }).then(function (j) { renderDrafts(j.drafts); })
+    .catch(function (e) { showP(e.message, 'err'); });
+}
+
+function renderDrafts(list) {
+  var tb = $('dbody'); tb.innerHTML = ''; $('dall').checked = false;
+  if (!list.length) { var r = document.createElement('tr'); var c = cell('No drafts yet.', 'sm'); c.colSpan = 7; r.appendChild(c); tb.appendChild(r); return; }
+  list.forEach(function (d) {
+    var tr = document.createElement('tr'), td0 = document.createElement('td');
+    if (d.status === 'DRAFT' || d.status === 'FAILED') {
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'dsel'; cb.value = d.id; td0.appendChild(cb);
+    }
+    tr.appendChild(td0);
+    [cell(d.id), cell(d.date), cell(d.customer), cell(d.lines + ' / ' + d.qty), cell(d.status, 'st-' + d.status), cell(d.message, 'sm')]
+      .forEach(function (c) { tr.appendChild(c); });
+    tb.appendChild(tr);
+  });
+}
+
+function selectedIds() {
+  return Array.prototype.map.call(document.querySelectorAll('.dsel:checked'), function (c) { return c.value; });
+}
+
+function pushIds(ids, dry) {
+  if (!ids.length) return showP('Select at least one draft.', 'err');
+  var go = dry ? Promise.resolve(true)
+    : popConfirm('Push ' + ids.length + ' draft' + (ids.length > 1 ? 's' : '') + ' to the ERP? This creates the sale order voucher' + (ids.length > 1 ? 's' : '') + ' in the ERP.', { title: 'Push to ERP', okLabel: 'Push' });
+  go.then(function (yes) { if (yes) runPush(ids, dry); });
+}
+
+function runPush(ids, dry) {
+  $('pushSel').disabled = $('dry').disabled = true;
+  var i = 0, done = 0, bad = 0, chk = 0, notes = [], erpDown = false;
+  (function next() {
+    if (i >= ids.length) {
+      $('pushSel').disabled = $('dry').disabled = false;
+      showP((dry ? 'Dry run OK: ' : 'Pushed: ') + done + (bad ? ' | Failed: ' + bad : '') + (chk ? ' | Check in ERP: ' + chk : '') +
+            (notes.length ? '\n' + notes.join('\n') : ''), bad || chk || erpDown ? 'err' : 'ok');
+      loadDrafts(); return;
+    }
+    showP((dry ? 'Checking ' : 'Pushing ') + (i + 1) + ' of ' + ids.length + '...', '');
+    call({ action: 'push', ids: [ids[i]], dryRun: !!dry }).then(function (j) {
+      var s = j.summary; done += s.pushed + s.dry; bad += s.failed; chk += s.check; if (s.erpDown) erpDown = true;
+      if (s.lines.length) notes.push(s.lines.join('; '));
+    }).catch(function (e) { chk++; notes.push(ids[i] + ': ' + e.message + ' (check the ERP before retrying)'); })
+      .then(function () { i = erpDown ? ids.length : i + 1; next(); });
+  })();
+}
+
+$('rf').onclick = loadDrafts;
+$('pushSel').onclick = function () { pushIds(selectedIds(), false); };
+$('dry').onclick = function () { pushIds(selectedIds(), true); };
+$('dall').onchange = function () { var on = this.checked; Array.prototype.forEach.call(document.querySelectorAll('.dsel'), function (c) { c.checked = on; }); };
+$('pmsg').style.whiteSpace = 'pre-wrap';
+
+// ---- Item search by description ----
+function attachItemSearch(tr) {
+  var inp = tr.querySelector('.code'), il = tr.querySelector('.il'), timer, seq = 0;
+  inp.addEventListener('input', function () {
+    clearTimeout(timer); il.innerHTML = '';
+    var q = inp.value.trim(), mine = ++seq;
+    if (q.length < 2) return;
+    timer = setTimeout(function () {
+      call({ action: 'searchItems', q: q }).then(function (j) {
+        if (mine !== seq) return;
+        il.innerHTML = '';
+        if (!j.items.length) { il.appendChild(opt('No match', 'mu')); return; }
+        j.items.forEach(function (it) {
+          var d = opt(it.name + '  (' + it.code + ')  ' + it.price);
+          d.onclick = function () { inp.value = it.code; il.innerHTML = ''; lookup(tr); tr.querySelector('.qty').focus(); };
+          il.appendChild(d);
+        });
+      }).catch(function (e) { if (mine !== seq) return; il.innerHTML = ''; var d = opt(e.message, 'mu'); d.style.color = 'var(--er)'; il.appendChild(d); });
+    }, 300);
+  });
+  inp.addEventListener('change', function () { setTimeout(function () { il.innerHTML = ''; }, 250); });
+}
+
+// ---- Paste from Excel ----
+function parsePaste(text) {
+  // First column = item code, LAST column = qty. Anything in between (e.g. the description) is ignored.
+  var rows = [], skipped = [];
+  text.split(/\r?\n/).forEach(function (line, n) {
+    if (!line.trim()) return;
+    var cells;
+    if (line.indexOf('\t') > -1) {
+      cells = line.split('\t');
+      var first = cells[0].trim(), rest = cells.slice(1).map(function (x) { return x.trim(); }).filter(Boolean);
+      cells = [first, rest.length ? rest[rest.length - 1] : ''];
+    } else {
+      var tok = line.trim().split(/[\s;]+/);
+      if (tok.length === 1 && tok[0].indexOf(',') > -1) tok = tok[0].split(',');     // plain "code,qty"
+      cells = [tok[0], tok.length > 1 ? tok[tok.length - 1] : ''];
+    }
+    var code = cells[0].replace(/^"(.*)"$/, '$1'), qty = parseFloat(cells[1].replace(/^"(.*)"$/, '$1').replace(/,/g, ''));
+    if (n === 0 && isNaN(qty) && /code|item|qty|quantity|sku|barcode/i.test(line)) return;   // header row
+    if (!code || !(qty > 0)) { skipped.push('line ' + (n + 1) + ' (' + line.trim().slice(0, 30) + ')'); return; }
+    if (/^\d(\.\d+)?e\+\d+$/i.test(code)) { skipped.push('line ' + (n + 1) + ' (code looks like 1E+12: format the Excel column as Text)'); return; }
+    rows.push({ code: code, qty: qty });
+  });
+  return { rows: rows, skipped: skipped };
+}
+
+function lookupBatch(codes) {
+  var map = {}, p = Promise.resolve();
+  for (var i = 0; i < codes.length; i += 300) (function (part) {
+    p = p.then(function () { return call({ action: 'lookupItems', codes: part }); })
+         .then(function (j) { j.items.forEach(function (it) { map[it.code.toLowerCase()] = it; }); });
+  })(codes.slice(i, i + 300));
+  return p.then(function () { return map; });
+}
+
+$('pasteAdd').onclick = function () {
+  var res = parsePaste($('paste').value), pm = $('pastemsg');
+  var skippedText = res.skipped.length ? ' Skipped: ' + res.skipped.join('; ') + '.' : '';
+  if (!res.rows.length) { pm.className = 'err'; pm.textContent = 'Nothing to add. Paste two columns: item code and qty.' + skippedText; return; }
+  Array.prototype.slice.call($('lines').children).forEach(function (tr) {
+    if (!tr.querySelector('.code').value.trim() && !tr.querySelector('.qty').value) tr.remove();   // drop empty starter lines
+  });
+  var trs = res.rows.map(function (r) {
+    var tr = addLine();
+    tr.querySelector('.code').value = r.code; tr.querySelector('.qty').value = r.qty;
+    tr.querySelector('.nm').textContent = 'Checking...';
+    return tr;
+  });
+  totals(); pm.className = ''; pm.textContent = 'Adding ' + trs.length + ' line(s)...';
+  var codes = []; res.rows.forEach(function (r) { if (codes.indexOf(r.code) < 0) codes.push(r.code); });
+  lookupBatch(codes).then(function (map) {
+    var bad = 0;
+    trs.forEach(function (tr) {
+      var it = map[tr.querySelector('.code').value.trim().toLowerCase()], nm = tr.querySelector('.nm');
+      if (it && !it.error) { nm.className = 'nm'; nm.textContent = it.name + ' - ' + it.price; tr._price = it.price; tr.querySelector('.price').placeholder = it.price; }
+      else { bad++; nm.className = 'nm bad'; nm.textContent = it ? it.error : 'Not found'; }
+    });
+    totals();
+    pm.className = bad ? 'err' : 'ok';
+    pm.textContent = 'Added ' + trs.length + ' line(s)' + (bad ? ', ' + bad + ' not found in the synced items (marked in red)' : '') + '.' + skippedText;
+    $('paste').value = '';
+  }).catch(function (e) {
+    trs.forEach(function (tr) { tr.querySelector('.nm').textContent = ''; });
+    pm.className = 'err'; pm.textContent = 'Lines were added, but checking them failed: ' + e.message;
+  });
+};
+
+// ---- Master data sync ----
+function fmtAt(s) { return s ? new Date(s).toLocaleString() : 'never'; }
+function sMsg(t, c) { $('smsg').className = c || ''; $('smsg').textContent = t; }
+function loadSyncStatus() {
+  if (!ready()) return Promise.resolve();
+  return call({ action: 'syncStatus' }).then(function (j) {
+    var s = j.status;
+    $('stc').textContent = 'Customers: ' + s.customers.count + ' (synced: ' + fmtAt(s.customers.at) + ')';
+    $('sti').textContent = 'Items: ' + s.items.count + ' (synced: ' + fmtAt(s.items.at) + ')';
+  }).catch(function (e) { sMsg(e.message, 'err'); });
+}
+$('syc').onclick = function () {
+  var b = this; b.disabled = true; sMsg('Syncing customers from the ERP...');
+  call({ action: 'syncCustomers' }).then(function (j) { sMsg('Customers synced: ' + j.result.count, 'ok'); return loadSyncStatus(); })
+    .catch(function (e) { sMsg(e.message, 'err'); }).then(function () { b.disabled = false; });
+};
+$('syi').onclick = function () {
+  var b = this; b.disabled = true;
+  (function step(off) {
+    sMsg(off ? 'Syncing items... ' + off : 'Syncing items from the ERP...');
+    call({ action: 'syncItems', offset: off }).then(function (j) {
+      var r = j.result;
+      if (!r.done) { sMsg('Syncing items... ' + r.offset + ' of ' + r.total); return step(r.offset); }
+      sMsg('Items synced: ' + r.offset, 'ok'); b.disabled = false; loadSyncStatus();
+    }).catch(function (e) { sMsg(e.message, 'err'); b.disabled = false; });
+  })(0);
+};
+
+$('add').onclick = function () { addLine().querySelector('.code').focus(); };
+$('date').value = new Date().toISOString().slice(0, 10);
+addLine();
+
+// ---- Start: needs the device connection (dashboard icon) and the API key ----
+function start() {
+  if (!window.ARFA_BACKEND_URL) { show(NOT_CONNECTED, 'err'); return; }
+  if (!store(LS.key)) { askKey(); return; }
+  loadDrafts();
+  loadSyncStatus();
+}
+start();
+</script>
+</body>
+</html>
