@@ -8,38 +8,100 @@
 :root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#667085;--bd:#d9dde3;--ac:#0b6e4f;--er:#b42318}
 @media(prefers-color-scheme:dark){:root{--bg:#14171a;--card:#1d2125;--tx:#e8eaed;--mu:#9aa3ad;--bd:#343a40;--ac:#3ab98a;--er:#f97066}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,Segoe UI,Arial,sans-serif}
-.wrap{max-width:860px;margin:0 auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}
-h1{font-size:19px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
-label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}
-input{width:100%;padding:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-table{width:100%;border-collapse:collapse;margin-top:8px}
-th{font-size:12px;color:var(--mu);text-align:left;padding:4px}
-td{padding:3px;vertical-align:top}
-.nm{font-size:12px;color:var(--mu);min-height:16px;padding:2px 4px}
-.nm.bad{color:var(--er)}
-textarea{width:100%;padding:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
-.iw{position:relative}
-.il{position:absolute;left:0;right:0;top:100%;z-index:6;background:var(--card);border:1px solid var(--bd);border-radius:6px;max-height:240px;overflow:auto;min-width:260px}
-.il:empty{display:none}
-#pastemsg{white-space:pre-wrap;font-size:13px}
-button{padding:9px 14px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--tx);font:inherit;cursor:pointer}
-button.p{background:var(--ac);border-color:var(--ac);color:#fff}
-button.danger{background:var(--er);border-color:var(--er);color:#fff}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,Segoe UI,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+
+/* card headings: title on the left, one small action on the right */
+.ch{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap;margin-bottom:14px}
+h1{font-size:17px;font-weight:700;margin:0}
+.hint{color:var(--mu);font-size:13px}
+
+/* buttons */
+button{height:38px;padding:0 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--mu)}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+button.danger{background:var(--er);border-color:var(--er);color:#fff;font-weight:600}
 button:disabled{opacity:.5;cursor:wait}
+.ch button,.md-row button{height:34px;padding:0 12px;font-size:13px}
+
+/* form fields */
+label{display:block;font-size:12px;font-weight:600;color:var(--mu);margin-bottom:4px}
+input,textarea{width:100%;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+input{height:40px;padding:0 10px}
+input[type=checkbox]{width:auto;height:auto}
+textarea{padding:9px 10px}
+input:focus,textarea:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px rgba(11,110,79,.18)}
+.g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.span2{grid-column:span 2}
+.rel{position:relative}
+.nm{font-size:12px;color:var(--mu);min-height:16px;padding:3px 2px 0}
+.nm.bad{color:var(--er)}
+
+/* master data */
+.md-row{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;padding:5px 0;flex-wrap:wrap}
+
+/* item lines */
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:600;color:var(--mu);text-align:left;padding:4px 6px}
+td{padding:4px 6px;vertical-align:top}
+.lines .c-qty{width:120px}.lines .c-price{width:150px}.lines .c-tot{width:120px}.lines .c-del{width:52px}
+.lines td.tot{padding-top:11px;white-space:nowrap}
+.lines button.del{width:38px;padding:0;font-size:18px;line-height:1}
+.num{text-align:right}
+.iw{position:relative}
+.il,#cl{position:absolute;left:0;right:0;top:100%;z-index:6;background:var(--card);border:1px solid var(--bd);border-radius:8px;max-height:240px;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.il{min-width:260px}
+.il:empty,#cl:empty{display:none}
+.opt{padding:8px 10px;cursor:pointer}.opt:hover{background:var(--bg)}.opt.mu{color:var(--mu);cursor:default}
+details summary{cursor:pointer}
+#pastemsg{white-space:pre-wrap;font-size:13px}
+
+/* bars, messages, drafts table */
 .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.pushbtns{display:flex;gap:8px;flex-wrap:wrap}
 #msg{margin-top:10px;font-size:14px}
 .ok{color:var(--ac)}.err{color:var(--er)}
-.num{text-align:right}
-.st-PUSHED{color:var(--ac)}.st-FAILED,.st-CHECK{color:var(--er)}
-.sm{font-size:12px;color:var(--mu);max-width:260px}
-.dt td{border-top:1px solid var(--bd);padding:6px 4px}
-.cw{position:relative}
-#cl{position:absolute;left:0;right:0;top:62px;z-index:5;background:var(--card);border:1px solid var(--bd);border-radius:6px;max-height:220px;overflow:auto}
-#cl:empty{display:none}
-.opt{padding:7px 9px;cursor:pointer}.opt:hover{background:var(--bg)}.opt.mu{color:var(--mu);cursor:default}
+.st-PUSHED{color:var(--ac);font-weight:600}.st-FAILED,.st-CHECK{color:var(--er);font-weight:600}
+.sm{font-size:12px;color:var(--mu);max-width:340px}
+.dt td{border-top:1px solid var(--bd);padding:8px 6px;vertical-align:top}
+.dt td.nw{white-space:nowrap}
+
+/* ---- phones: stacked fields, item lines and drafts become cards ---- */
+@media (max-width:640px){
+  .wrap{padding:10px}
+  .card{padding:12px;border-radius:10px}
+  input,textarea{font-size:16px}
+  .g{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .span2,.full-m{grid-column:1/-1}
+  /* phone order: date | reference, customer, vehicle | driver, dispatcher, remarks */
+  .g>div:nth-child(1){order:1}.g>div:nth-child(3){order:2}.g>div:nth-child(2){order:3}
+  .g>div:nth-child(4){order:4}.g>div:nth-child(5){order:5}.g>div:nth-child(6){order:6}.g>div:nth-child(7){order:7}
+
+  .lines thead{display:none}
+  .lines,.lines tbody{display:block}
+  .lines tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto auto;gap:6px 8px;align-items:start;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg)}
+  .lines td{display:block;padding:0;width:auto!important}
+  .lines td.c-item{grid-column:1/-1}
+  .lines tr input{background:var(--card)}
+  .lines td.tot{padding-top:11px;text-align:right;min-width:66px}
+  .il{min-width:0}
+
+  .savebar{flex-direction:column;align-items:stretch}
+  #save{width:100%;height:44px}
+  .pushbtns{width:100%}
+  .pushbtns button{flex:1}
+
+  .dt thead{display:none}
+  .dt,.dt tbody{display:block}
+  .dt tr{display:block;border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin:8px 0;background:var(--bg)}
+  .dt td{display:flex;justify-content:space-between;gap:12px;border:0;padding:3px 0;text-align:right}
+  .dt td::before{content:attr(data-l);color:var(--mu);font-size:12px;text-align:left;flex-shrink:0}
+  .dt td:first-child{justify-content:flex-start}
+  .dt td.sm{max-width:none}
+  .dt td.nw{white-space:normal}
+  .dt td:empty{display:none}
+}
 
 /* ---- popup windows (replace the browser's "this page says" boxes) ---- */
 dialog.pop{border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);padding:0;width:min(440px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.3)}
@@ -55,28 +117,28 @@ dialog.pop::backdrop{background:rgba(0,0,0,.45)}
 <body>
 <div class="wrap">
   <div class="card">
-    <h1>Master data <span style="font-size:12px;font-weight:400;color:var(--mu)">kept in your sheet, so drafts work without the ERP</span></h1>
-    <div class="bar" style="margin-top:0"><span id="stc">Customers: ...</span><button id="syc">Sync customers</button></div>
-    <div class="bar"><span id="sti">Items: ...</span><button id="syi">Sync items</button></div>
+    <div class="ch"><h1>Master data</h1><span class="hint">kept in your sheet, so drafts work without the ERP</span></div>
+    <div class="md-row"><span id="stc">Customers: ...</span><button id="syc">Sync customers</button></div>
+    <div class="md-row"><span id="sti">Items: ...</span><button id="syi">Sync items</button></div>
     <div id="smsg"></div>
   </div>
 
   <div class="card">
-    <h1>Sale Order Draft <button id="cfg" title="API key">Settings</button></h1>
+    <div class="ch"><h1>Sale Order Draft</h1><button id="cfg" title="API key">Settings</button></div>
     <div class="g">
       <div><label>Invoice date</label><input id="date" type="date"></div>
-      <div class="cw"><label>Customer (type name or code)</label><input id="cust" autocomplete="off"><div id="cl"></div><div class="nm" id="cinfo"></div></div>
+      <div class="cw span2"><label>Customer (type name or code)</label><div class="rel"><input id="cust" autocomplete="off"><div id="cl"></div></div><div class="nm" id="cinfo"></div></div>
       <div><label>Reference</label><input id="ref" autocomplete="off"></div>
-      <div><label>Remarks</label><input id="rem" autocomplete="off"></div>
       <div><label>Vehicle No</label><input id="veh" autocomplete="off"></div>
       <div><label>Driver Name</label><input id="drv" autocomplete="off"></div>
-      <div><label>Dispatcher Name</label><input id="dsp" autocomplete="off"></div>
+      <div class="full-m"><label>Dispatcher Name</label><input id="dsp" autocomplete="off"></div>
+      <div class="full-m"><label>Remarks</label><input id="rem" autocomplete="off"></div>
     </div>
   </div>
 
   <div class="card">
-    <table>
-      <thead><tr><th style="width:34%">Item (code or description)</th><th style="width:16%">Qty</th><th style="width:20%">Price (blank = ERP price)</th><th class="num">Total</th><th></th></tr></thead>
+    <table class="lines">
+      <thead><tr><th>Item (code or description)</th><th class="c-qty">Qty</th><th class="c-price">Price (blank = ERP price)</th><th class="c-tot num">Total</th><th class="c-del"></th></tr></thead>
       <tbody id="lines"></tbody>
     </table>
     <div class="bar">
@@ -89,22 +151,22 @@ dialog.pop::backdrop{background:rgba(0,0,0,.45)}
     </details>
   </div>
 
-  <div class="bar">
+  <div class="bar savebar">
     <button class="p" id="save">Save draft to sheet</button>
-    <span style="color:var(--mu);font-size:13px">Drafts are pushed to the ERP later from the sheet's ERP menu.</span>
+    <span class="hint">Drafts are pushed to the ERP later from the sheet's ERP menu.</span>
   </div>
   <div id="msg"></div>
 
   <div class="card" style="margin-top:16px">
-    <h1>Saved drafts <button id="rf">Refresh</button></h1>
+    <div class="ch"><h1>Saved drafts</h1><button id="rf">Refresh</button></div>
     <div style="overflow-x:auto">
     <table class="dt">
       <thead><tr><th><input type="checkbox" id="dall" title="Select all"></th><th>Draft</th><th>Date</th><th>Customer</th><th>Lines / Qty</th><th>Status</th><th>Message</th></tr></thead>
       <tbody id="dbody"></tbody>
     </table></div>
     <div class="bar">
-      <span><button class="p" id="pushSel">Push selected to ERP</button> <button id="dry">Dry run</button></span>
-      <span style="color:var(--mu);font-size:13px">Only DRAFT and FAILED orders can be pushed.</span>
+      <span class="pushbtns"><button class="p" id="pushSel">Push selected to ERP</button><button id="dry">Dry run</button><button id="selAll">Select all</button></span>
+      <span class="hint">Only DRAFT and FAILED orders can be pushed.</span>
     </div>
     <div id="pmsg"></div>
   </div>
@@ -177,10 +239,10 @@ $('cfg').onclick = function () { askKey(); };
 function addLine() {
   var tr = document.createElement('tr');
   tr.innerHTML =
-    '<td><div class="iw"><input class="code" autocomplete="off" placeholder="Code or description"><div class="il"></div></div><div class="nm"></div></td>' +
-    '<td><input class="qty" type="number" min="0" step="any" inputmode="decimal"></td>' +
-    '<td><input class="price" type="number" min="0" step="any" inputmode="decimal"></td>' +
-    '<td class="num tot">0</td><td><button class="del" title="Remove">&times;</button></td>';
+    '<td class="c-item"><div class="iw"><input class="code" autocomplete="off" placeholder="Code or description"><div class="il"></div></div><div class="nm"></div></td>' +
+    '<td class="c-qty"><input class="qty" type="number" min="0" step="any" inputmode="decimal" placeholder="Qty"></td>' +
+    '<td class="c-price"><input class="price" type="number" min="0" step="any" inputmode="decimal" placeholder="Price"></td>' +
+    '<td class="num tot c-tot">0</td><td class="c-del"><button class="del" title="Remove">&times;</button></td>';
   $('lines').appendChild(tr);
   var code = tr.querySelector('.code'), price = tr.querySelector('.price');
   code.addEventListener('change', function () { lookup(tr); });
@@ -216,15 +278,18 @@ function call(payload) {
 
 function lookup(tr) {
   var code = tr.querySelector('.code').value.trim(), nm = tr.querySelector('.nm');
+  var mine = tr._lk = (tr._lk || 0) + 1;                // only the newest lookup of this line may change it
   tr._price = 0; nm.className = 'nm'; nm.textContent = '';
   if (!code) return;
   nm.textContent = 'Checking...';
   call({ action: 'lookupItem', code: code }).then(function (j) {
+    if (mine !== tr._lk) return;
+    nm.className = 'nm';
     nm.textContent = j.name + ' - ' + j.price;
     tr._price = j.price;
     tr.querySelector('.price').placeholder = j.price;
     totals();
-  }).catch(function (e) { nm.className = 'nm bad'; nm.textContent = e.message; });
+  }).catch(function (e) { if (mine !== tr._lk) return; nm.className = 'nm bad'; nm.textContent = e.message; });
 }
 
 function show(text, cls) { $('msg').className = cls; $('msg').textContent = text; }
@@ -287,7 +352,7 @@ document.addEventListener('click', function (e) {
 // ---- Drafts panel: list + push ----
 function ready() { return backendUrl() && store(LS.key); }
 function showP(t, c) { $('pmsg').className = c || ''; $('pmsg').textContent = t; }
-function cell(text, cls) { var td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; return td; }
+function cell(text, cls, label) { var td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; if (label) td.setAttribute('data-l', label); return td; }
 
 function loadDrafts() {
   if (!ready()) return Promise.resolve();
@@ -304,7 +369,7 @@ function renderDrafts(list) {
       var cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'dsel'; cb.value = d.id; td0.appendChild(cb);
     }
     tr.appendChild(td0);
-    [cell(d.id), cell(d.date), cell(d.customer), cell(d.lines + ' / ' + d.qty), cell(d.status, 'st-' + d.status), cell(d.message, 'sm')]
+    [cell(d.id, 'nw', 'Draft'), cell(d.date, 'nw', 'Date'), cell(d.customer, '', 'Customer'), cell(d.lines + ' / ' + d.qty, 'nw', 'Lines / Qty'), cell(d.status, 'st-' + d.status, 'Status'), cell(d.message, 'sm', 'Message')]
       .forEach(function (c) { tr.appendChild(c); });
     tb.appendChild(tr);
   });
@@ -343,6 +408,11 @@ function runPush(ids, dry) {
 $('rf').onclick = loadDrafts;
 $('pushSel').onclick = function () { pushIds(selectedIds(), false); };
 $('dry').onclick = function () { pushIds(selectedIds(), true); };
+$('selAll').onclick = function () {
+  var boxes = document.querySelectorAll('.dsel'), on = Array.prototype.some.call(boxes, function (c) { return !c.checked; });
+  Array.prototype.forEach.call(boxes, function (c) { c.checked = on; });
+  $('selAll').textContent = on ? 'Select none' : 'Select all';
+};
 $('dall').onchange = function () { var on = this.checked; Array.prototype.forEach.call(document.querySelectorAll('.dsel'), function (c) { c.checked = on; }); };
 $('pmsg').style.whiteSpace = 'pre-wrap';
 
